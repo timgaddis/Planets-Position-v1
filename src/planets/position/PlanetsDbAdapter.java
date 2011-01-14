@@ -122,20 +122,6 @@ public class PlanetsDbAdapter {
 		mDbHelper.close();
 	}
 
-	// public long addLocation(String name, double lat, double lng, double temp,
-	// double pressure, long date, double offset, double elevation) {
-	// ContentValues args = new ContentValues();
-	// args.put(KEY_NAME, name);
-	// args.put("lat", lat);
-	// args.put("lng", lng);
-	// args.put("temp", temp);
-	// args.put("pressure", pressure);
-	// args.put("elevation", elevation);
-	// args.put("date", date);
-	// args.put("offset", offset);
-	// return mDb.insert(DATABASE_TABLE, null, args);
-	// }
-
 	public boolean updateLocation(long rowID, double lat, double lng,
 			double temp, double pressure, long date, double offset,
 			int ioffset, double elevation) {
@@ -150,20 +136,6 @@ public class PlanetsDbAdapter {
 		args.put("ioffset", ioffset);
 		return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowID, null) > 0;
 	}
-
-	// public long addPlanet(String name, double lat, double lng, double temp,
-	// double pressure, long date, double offset, double elevation) {
-	// ContentValues args = new ContentValues();
-	// args.put(KEY_NAME, name);
-	// args.put("lat", lat);
-	// args.put("lng", lng);
-	// args.put("temp", temp);
-	// args.put("pressure", pressure);
-	// args.put("elevation", elevation);
-	// args.put("date", date);
-	// args.put("offset", offset);
-	// return mDb.insert(DATABASE_TABLE, null, args);
-	// }
 
 	public boolean updatePlanet(long rowID, String name, double ra, double dec,
 			double az, double alt, double dis) {

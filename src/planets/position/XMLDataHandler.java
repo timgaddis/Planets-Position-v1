@@ -89,20 +89,6 @@ public class XMLDataHandler extends DefaultHandler {
 		if (gmtOffsetTag | elevationTag | temperatureTag | pressureTag) {
 			buff.append(ch, start, length);
 		}
-
-		// if (this.gmtOffsetTag) {
-		// String value = new String(ch, start, length);
-		//
-		// } else if (this.elevationTag) {
-		// String value = new String(ch, start, length);
-		//
-		// } else if (this.temperatureTag) {
-		// String value = new String(ch, start, length);
-		//
-		// } else if (this.pressureTag) {
-		// String value = new String(ch, start, length);
-		//
-		// }
 	}
 
 	/**

@@ -76,6 +76,8 @@ public class Planets extends Activity {
 	private static final int ABOUT_ID = 2;
 	private static final int HELP_ID = 3;
 
+	private boolean DEBUG = false;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -148,24 +150,27 @@ public class Planets extends Activity {
 		running = true;
 		new GetGPSWeatherTask().execute();
 
-		// Test data to use with the emulator
-		latitude = 32.221743;
-		longitude = -110.926479;
-		elevation = 713.0;
-		date = Calendar.getInstance().getTimeInMillis();
-		getWeatherData();
-		loadWeatherData();
-		saveLocation();
-		positionButton.setEnabled(true);
-		whatupButton.setEnabled(true);
-		running = false;
-
-		// if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-		// showGPSDisabledAlertToUser();
-		// } else {
-		// ll = new mylocationlistener();
-		// lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, ll);
-		// }
+		if (DEBUG) {
+			// Test data to use with the emulator
+			latitude = 32.221743;
+			longitude = -110.926479;
+			elevation = 713.0;
+			date = Calendar.getInstance().getTimeInMillis();
+			getWeatherData();
+			loadWeatherData();
+			saveLocation();
+			positionButton.setEnabled(true);
+			whatupButton.setEnabled(true);
+			running = false;
+		} else {
+			if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+				showGPSDisabledAlertToUser();
+			} else {
+				ll = new mylocationlistener();
+				lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,
+						ll);
+			}
+		}
 	}
 
 	private void launchPosition() {
@@ -179,7 +184,6 @@ public class Planets extends Activity {
 		Intent i = new Intent(this, Position.class);
 		i.putExtras(bundle);
 		startActivity(i);
-		// startActivityForResult(i, ACTIVITY_CREATE);
 	}
 
 	private void launchWhatsUp() {
@@ -193,7 +197,6 @@ public class Planets extends Activity {
 		Intent i = new Intent(this, ViewWhatsUp.class);
 		i.putExtras(bundle);
 		startActivity(i);
-		// startActivityForResult(i, ACTIVITY_CREATE);
 	}
 
 	private void loadLocation() {
@@ -537,9 +540,6 @@ public class Planets extends Activity {
 			i = new Intent(this, About.class);
 			i.putExtras(b);
 			startActivity(i);
-			// showAboutDialog();
-			// Toast.makeText(Planets.this, "Planet Position v1.0",
-			// Toast.LENGTH_LONG).show();
 			return true;
 		case HELP_ID:
 			// showHelpDialog();
@@ -548,8 +548,6 @@ public class Planets extends Activity {
 			i = new Intent(this, About.class);
 			i.putExtras(b);
 			startActivity(i);
-			// Toast.makeText(Planets.this, "Planet Position v1.0",
-			// Toast.LENGTH_LONG).show();
 			return true;
 		}
 

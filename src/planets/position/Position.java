@@ -82,21 +82,6 @@ public class Position extends Activity {
 		pBelowText = (TextView) findViewById(R.id.pBelowText);
 		pDistText = (TextView) findViewById(R.id.pDistText);
 
-		// default test values
-		// ***************************
-		// planetNum = 5;
-		// pPlanetName.setText(planetNames[planetNum]);
-		// pLat = 32.221743;
-		// pLong = -110.926479;
-		// pTemp = 21;
-		// pPressure = 1020;
-		// pAltitude = 821.4;
-		// offset = -7.0;
-		// g[1] = pLat;
-		// g[0] = pLong;
-		// g[2] = pAltitude;
-		// ***************************
-
 		// load bundle from previous activity
 		bundle = getIntent().getExtras();
 		if (bundle != null) {
@@ -137,27 +122,9 @@ public class Position extends Activity {
 			}
 		});
 
-		// showPosButton.setOnClickListener(new View.OnClickListener() {
-		// public void onClick(View view) {
-		// launchSkyPosition();
-		// }
-		// });
-
 		computeLocation();
 
 	}
-
-	// private void launchSkyPosition() {
-	// bundle = new Bundle();
-	// bundle.putDouble("Az", pAz);
-	// bundle.putDouble("Alt", pAlt);
-	// bundle.putString("Name", planetName);
-	// Intent i = new Intent(this, SkyPosition.class);
-	// i.putExtras(bundle);
-	// startActivity(i);
-	// // Intent i = new Intent(this, Position.class);
-	// // startActivity(i);
-	// }
 
 	private void computeLocation() {
 		if (planetNum >= 0 && planetNum < 10) {
@@ -317,8 +284,6 @@ public class Position extends Activity {
 			i = new Intent(this, About.class);
 			i.putExtras(b);
 			startActivity(i);
-			// Toast.makeText(Planets.this, "Planet Position v1.0",
-			// Toast.LENGTH_LONG).show();
 			return true;
 		}
 

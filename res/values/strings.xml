@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">Planets Position</string>
+	<string name="name">Name</string>
+	<string name="menu_about">About</string>
+	<string name="menu_help">Help</string>
+	<string name="no_loc">No Locations</string>
+	<string name="no_planets">No Planets Up</string>
+	<string name="save">Save</string>
+	<string name="cancel">Cancel</string>
+	<string name="next">Next</string>
+	<string name="change">Change</string>
+	<string name="loc_prompt">Choose a location</string>
+	<string name="planet_prompt">Choose a planet</string>
+	<string-array name="planets_array">
+		<item>Sun</item>
+		<item>Moon</item>
+		<item>Mercury</item>
+		<item>Venus</item>
+		<item>Mars</item>
+		<item>Jupiter</item>
+		<item>Saturn</item>
+		<item>Uranus</item>
+		<item>Neptune</item>
+		<item>Pluto</item>
+	</string-array>
+	<string name="main_about">
+		Planets Position is a
+		program to calculate the
+		position of the
+		planets in
+		the night sky based
+		on a given location on Earth.\n\n
+		<b>License and Copyright</b>
+		\n\n
+		Copyright
+		(C) 2011 Tim Gaddis\n\n
+		This program is free software: you
+		can
+		redistribute it
+		and/or modify it under the terms of the GNU General
+		Public
+		License as published by the Free Software Foundation, either
+		version 3 of the License, or (at your option) any later version.\n\n
+		This program is distributed in the hope that it will be useful,
+		but
+		WITHOUT ANY WARRANTY; without even the implied warranty of
+		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+		GNU
+		General Public License for more details.\n\n
+		You should have received a
+		copy of the GNU General Public License
+		along with this program. If not,
+		see \n
+		http://www.gnu.org/licenses/.\n\n
+		Feedback can be sent to\n
+		planets.position@gmail.com\n\n
+		Source code avaliable at GitHub.\n\n
+		Swiss Ephemeris code is used in this program for planetary position
+		calculations.\n
+		http://www.astro.com/swisseph/swephinfo_e.htm?lang=e\n\n
+		Weather and
+		timezone data courtsey of GeoNames web services.\n
+		http://www.geonames.org/
+	</string>
+	<string name="main_help">
+		Initially, location data needs to be saved for the
+		position
+		calculations.\n
+		The two options are to retrieve location data
+		from GPS
+		and download
+		timezone
+		and weather data or manually enter all of
+		the
+		data.
+		The data is then saved to the program.\n\n
+		The Planet\'s
+		Position
+		screen will let you select a planet and a date and
+		time,
+		then it
+		will
+		calculate the position.\n\n
+		The What\'s Up Now screen lists what
+		planets
+		are up for the current date
+		and time
+		for the given location.
+	</string>
+	<string name="pos_help">
+		The Planet, Local Date, and Local Time fields are
+		user changeable.
+		Initially the Local Date and Local Time are set to the
+		current date
+		and
+		time of the device.\n\n
+		When a planet is selected, 5
+		values are
+		calculated.\n\n
+		<b>Right Ascension:</b>
+		\n
+		The position on the
+		celestial sphere east of the Vernal Equinox.\n
+		http://en.wikipedia.org/wiki/Right_ascension\n\n
+		<b>Declination:</b>
+		\n
+		The
+		position on the celestial sphere north or south of the celestial
+		equator.\n
+		http://en.wikipedia.org/wiki/Declination\n\n
+		<b>Azimuth:</b>
+		\n
+		The
+		compass direction for the planet\'s position for the given
+		location.\n
+		http://en.wikipedia.org/wiki/Azimuth\n\n
+		<b>Altitude:</b>
+		\n
+		The angle above the
+		horizon of the given planet.\n
+		http://en.wikipedia.org/wiki/Altitude_(astronomy)#Altitude\n\n
+		<b>Distance:</b>
+		\n
+		The distance of the planet from the Earth in astronomical
+		units.\n
+		http://en.wikipedia.org/wiki/Astronomical_unit\n
+	</string>
+	<string name="up_help">
+		This is a list of the planets above the horizon at
+		the current date and
+		time.\n\n
+		5 values are calculated for each
+		planet.\n\n
+		<b>Right Ascension:</b>
+		\n
+		The position on the
+		celestial sphere east of the Vernal Equinox.\n
+		http://en.wikipedia.org/wiki/Right_ascension\n\n
+		<b>Declination:</b>
+		\n
+		The
+		position on the celestial sphere north or south of the celestial
+		equator.\n
+		http://en.wikipedia.org/wiki/Declination\n\n
+		<b>Azimuth:</b>
+		\n
+		The
+		compass direction for the planet\'s position for the given
+		location.\n
+		http://en.wikipedia.org/wiki/Azimuth\n\n
+		<b>Altitude:</b>
+		\n
+		The angle above the
+		horizon of the given planet.\n
+		http://en.wikipedia.org/wiki/Altitude_(astronomy)#Altitude\n\n
+		<b>Distance:</b>
+		\n
+		The distance of the planet from the Earth in astronomical
+		units.\n
+		http://en.wikipedia.org/wiki/Astronomical_unit\n
+	</string>
+</resources>

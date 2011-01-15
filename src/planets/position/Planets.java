@@ -110,10 +110,6 @@ public class Planets extends Activity {
 		manualButton.setEnabled(true);
 		downloadButton.setEnabled(true);
 
-		// Toast.makeText(Planets.this, "Done copying files",
-		// Toast.LENGTH_SHORT)
-		// .show();
-
 		downloadButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				getGPS();

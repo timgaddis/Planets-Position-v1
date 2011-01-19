@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="app_name">Planets Position</string>
+	<string name="up_title">What\'s Up Now</string>
+	<string name="pos_title">Planet\'s Position</string>
+	<string name="loc_title">Location</string>
+	<string name="about_name">About Planets Position</string>
 	<string name="menu_about">About</string>
 	<string name="menu_help">Help</string>
 	<string name="no_planets">No Planets Up</string>
@@ -19,6 +23,8 @@
 		<item>Pluto</item>
 	</string-array>
 	<string name="main_about">
+		<b>Planets Position v1.0</b>
+		\n\n
 		Planets Position is a
 		program to calculate the
 		position of the
@@ -56,8 +62,11 @@
 		calculations.\n
 		http://www.astro.com/swisseph/swephinfo_e.htm?lang=e\n\n
 		Weather and
-		timezone data courtsey of GeoNames web services.\n
-		http://www.geonames.org/
+		timezone data courtsey of:\n
+		GeoNames web services.\n
+		http://www.geonames.org/ and\n
+		World Weather Online\n
+		http://www.worldweatheronline.com/
 	</string>
 	<string name="main_help">
 		Initially, location data needs to be saved for the
@@ -81,8 +90,9 @@
 		The What\'s Up Now screen lists what
 		planets
 		are up for the current date
-		and time
-		for the given location.
+		and time of the device
+		for the given
+		location.\n\n
 	</string>
 	<string name="pos_help">
 		The Planet, Local Date, and Local Time fields are

@@ -24,7 +24,6 @@ import org.xml.sax.helpers.DefaultHandler;
 public class XMLDataHandler extends DefaultHandler {
 
 	private boolean gmtOffsetTag = false;
-	private boolean elevationTag = false;
 	private boolean temperatureTag = false;
 	private boolean pressureTag = false;
 	private StringBuffer buff = null;
@@ -49,29 +48,26 @@ public class XMLDataHandler extends DefaultHandler {
 	}
 
 	/**
-	 * Gets be called on opening tags like: <tag> Can provide attribute(s), when
+	 * Gets called on opening tags like: <tag> Can provide attribute(s), when
 	 * xml was like: <tag attribute="attributeValue">
 	 */
 	@Override
 	public void startElement(String namespaceURI, String localName,
 			String qName, Attributes atts) throws SAXException {
-		if (localName.equals("rawOffset")) {
+		if (localName.equals("rawOffset") || localName.equals("utcOffset")) {
 			this.gmtOffsetTag = true;
 			buff = new StringBuffer("");
-		} else if (localName.equals("elevation")) {
-			this.elevationTag = true;
-			buff = new StringBuffer("");
-		} else if (localName.equals("temperature")) {
+		} else if (localName.equals("temperature")
+				|| localName.equals("temp_C")) {
 			this.temperatureTag = true;
 			buff = new StringBuffer("");
-		} else if (localName.equals("seaLevelPressure")) {
-			this.pressureTag = true;
-			buff = new StringBuffer("");
-		} else if (localName.equals("hectoPascAltimeter")) {
+		} else if (localName.equals("seaLevelPressure")
+				|| localName.equals("hectoPascAltimeter")
+				|| localName.equals("pressure")) {
 			this.pressureTag = true;
 			buff = new StringBuffer("");
 		} else if (localName.equals("status")) {
-			// error message returned
+			// error message returned from Geonames
 			String attrValue = atts.getValue("value");
 			int i = Integer.parseInt(attrValue);
 			String attrMsg = atts.getValue("message");
@@ -81,39 +77,33 @@ public class XMLDataHandler extends DefaultHandler {
 	}
 
 	/**
-	 * Gets be called on the following structure: <tag>characters</tag>
+	 * Gets called on the following structure: <tag>characters</tag>
 	 */
 	@Override
 	public void characters(char ch[], int start, int length) {
-
-		if (gmtOffsetTag | elevationTag | temperatureTag | pressureTag) {
+		if (gmtOffsetTag | temperatureTag | pressureTag) {
 			buff.append(ch, start, length);
 		}
 	}
 
 	/**
-	 * Gets be called on closing tags like: </tag>
+	 * Gets called on closing tags like: </tag>
 	 */
 	@Override
 	public void endElement(String namespaceURI, String localName, String qName)
 			throws SAXException {
-		if (localName.equals("rawOffset")) {
+		if (localName.equals("rawOffset") || localName.equals("utcOffset")) {
 			String content = buff.toString();
 			locationDataSet.setOffset(Double.parseDouble(content));
 			this.gmtOffsetTag = false;
-		} else if (localName.equals("elevation")) {
-			String content = buff.toString();
-			locationDataSet.setElevation(Double.parseDouble(content));
-			this.elevationTag = false;
-		} else if (localName.equals("temperature")) {
+		} else if (localName.equals("temperature")
+				|| localName.equals("temp_C")) {
 			String content = buff.toString();
 			locationDataSet.setTemp(Double.parseDouble(content));
 			this.temperatureTag = false;
-		} else if (localName.equals("seaLevelPressure")) {
-			String content = buff.toString();
-			locationDataSet.setPressure(Double.parseDouble(content));
-			this.pressureTag = false;
-		} else if (localName.equals("hectoPascAltimeter")) {
+		} else if (localName.equals("seaLevelPressure")
+				|| localName.equals("hectoPascAltimeter")
+				|| localName.equals("pressure")) {
 			String content = buff.toString();
 			locationDataSet.setPressure(Double.parseDouble(content));
 			this.pressureTag = false;

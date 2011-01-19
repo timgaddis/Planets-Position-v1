@@ -317,8 +317,6 @@ public class Planets extends Activity {
 		@Override
 		public void onLocationChanged(Location location) {
 			if (location != null) {
-				// Log.d("LOCATION CHANGED", location.getLatitude() + "");
-				// Log.d("LOCATION CHANGED", location.getLongitude() + "");
 				latitude = location.getLatitude();
 				longitude = location.getLongitude();
 				elevation = location.getAltitude();
@@ -353,6 +351,13 @@ public class Planets extends Activity {
 
 		// http://ws.geonames.org/findNearByWeatherXML?lat=43&lng=-2
 		// http://ws.geonames.org/timezone?lat=47.01&lng=10.2
+
+		// http://www.worldweatheronline.com/feed/weather.ashx
+		// ?format=xml&num_of_days=1&key=77241f817e062244102410&q=32.00,-110.00
+
+		// http://www.worldweatheronline.com/feed/tz.ashx
+		// ?format=xml&key=77241f817e062244102410&q=32.00,-110.00
+
 		try {
 			ParsedLocationData locationDataSet = new ParsedLocationData();
 
@@ -375,15 +380,14 @@ public class Planets extends Activity {
 
 			// check to see if an error was returned from Geonames
 			if (locationData.getErrCode() >= 10) {
-				Toast.makeText(
-						Planets.this,
-						"The following error was returned:\n"
-								+ locationData.getErr() + "\nCode:"
-								+ locationData.getErrCode(), Toast.LENGTH_LONG)
-						.show();
-			} else {
-				// loadWeatherData();
-				// running = false;
+				// if error from Geonames, call worldweatheronline.com for data
+				xr.parse(new InputSource(
+						getData("http://www.worldweatheronline.com/feed/weather.ashx?format=xml&num_of_days=1&key=77241f817e062244102410&q="
+								+ latitude + "," + longitude)));
+				xr.parse(new InputSource(
+						getData("http://www.worldweatheronline.com/feed/tz.ashx?format=xml&key=77241f817e062244102410&q="
+								+ latitude + "," + longitude)));
+				locationData = dataHandler.getParsedData();
 			}
 		} catch (Exception e) {
 			Toast.makeText(Planets.this,
@@ -463,30 +467,6 @@ public class Planets extends Activity {
 		alert.show();
 	}
 
-	private void showAboutDialog() {
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-		alertDialogBuilder.setMessage(R.string.main_about).setCancelable(false)
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.cancel();
-					}
-				});
-		AlertDialog alert = alertDialogBuilder.create();
-		alert.show();
-	}
-
-	private void showHelpDialog() {
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-		alertDialogBuilder.setMessage(R.string.main_help).setCancelable(false)
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.cancel();
-					}
-				});
-		AlertDialog alert = alertDialogBuilder.create();
-		alert.show();
-	}
-
 	private class GetGPSWeatherTask extends AsyncTask<Void, Void, Void> {
 		ProgressDialog dialog;
 
@@ -495,11 +475,6 @@ public class Planets extends Activity {
 			while (true) {
 				if (!running)
 					break;
-				// try {
-				// Thread.sleep(500);
-				// } catch (InterruptedException e) {
-				// e.printStackTrace();
-				// }
 			}
 			return null;
 		}

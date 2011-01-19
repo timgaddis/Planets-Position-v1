@@ -20,7 +20,7 @@ package planets.position;
 public class ParsedLocationData {
 
 	private String err;
-	private double temp = 0, pressure = 0, offset = 0, elevation = 0;
+	private double temp = 0, pressure = 0, offset = 0;
 	private int errCode = -1;
 
 	public String getErr() {
@@ -37,14 +37,6 @@ public class ParsedLocationData {
 
 	public void setErrCode(int errCode) {
 		this.errCode = errCode;
-	}
-
-	public double getElevation() {
-		return elevation;
-	}
-
-	public void setElevation(double elevation) {
-		this.elevation = elevation;
 	}
 
 	public double getTemp() {

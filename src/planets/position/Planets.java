@@ -238,10 +238,34 @@ public class Planets extends Activity {
 			// copy the ephermeris files from assets folder to the sd card.
 			try {
 				// copyFile("seas_18.se1"); // 225440
-				copyFile("semo_18.se1"); // 1305686
-				copyFile("sepl_18.se1"); // 484065
+				// copyFile("semo_18.se1"); // 1305686
+				// copyFile("sepl_18.se1"); // 484065
+				String[] filenames = new String[] { "semo_18.se1",
+						"sepl_18.se1" };
+				File sdCard = Environment.getExternalStorageDirectory();
+				File dir = new File(sdCard.getAbsolutePath() + "/ephemeris");
+				if (!dir.isDirectory()) {
+					dir.mkdirs();
+				}
+				for (int i = 0; i < 2; i++) {
+					File f = new File(dir + "/" + filenames[i]);
+					if (!f.exists()) {
+						myInput = Planets.this.getAssets().open(filenames[i]);
+						Log.d("InputStream Open", "" + f.exists());
+						myOutput = new FileOutputStream(f);
+						Log.d("OutputStream Open", "" + f.exists());
+						byte[] buffer = new byte[1024];
+						int length = 0;
+						while ((length = myInput.read(buffer)) > 0) {
+							myOutput.write(buffer, 0, length);
+						}
+						// Close the streams
+						myOutput.flush();
+						myOutput.close();
+						myInput.close();
+					}
+				}
 			} catch (IOException e) {
-				// e.printStackTrace();
 				Log.d("CopyFile error", e.getMessage());
 				Toast.makeText(Planets.this, "Error copying assets files",
 						Toast.LENGTH_LONG).show();
@@ -258,8 +282,6 @@ public class Planets extends Activity {
 
 		@Override
 		protected void onPreExecute() {
-			// dialog = ProgressDialog.show(Planets.this, "",
-			// "Copying files. Please wait...", true);
 		}
 	}
 
@@ -274,43 +296,6 @@ public class Planets extends Activity {
 		File sdCard = Environment.getExternalStorageDirectory();
 		File f = new File(sdCard.getAbsolutePath() + "/ephemeris/" + name);
 		return f.exists();
-	}
-
-	/**
-	 * copies the given files from the assets folder to the ephermeris folder on
-	 * the sdcard.
-	 */
-	private void copyFile(String filename) throws IOException {
-		// check if ephemeris dir is on sdcard, if not create dir
-		Log.d("Copy Files", filename);
-		File sdCard = Environment.getExternalStorageDirectory();
-		File dir = new File(sdCard.getAbsolutePath() + "/ephemeris");
-		if (!dir.isDirectory()) {
-			dir.mkdirs();
-		}
-		Log.d("File Dir", dir.getCanonicalPath());
-		// check if ephemeris file is on sdcard, if not copy form assets folder
-		File f = new File(dir + "/" + filename);
-		Log.d("File Exists", "" + f.exists());
-		if (!f.exists()) {
-
-			myInput = this.getAssets().open(filename);
-			Log.d("InputStream Open", "" + f.exists());
-
-			myOutput = new FileOutputStream(f);
-			Log.d("OutputStream Open", "" + f.exists());
-
-			byte[] buffer = new byte[1024];
-			int length = 0;
-			while ((length = myInput.read(buffer)) > 0) {
-				myOutput.write(buffer, 0, length);
-			}
-			// Close the streams
-			myOutput.flush();
-			myOutput.close();
-			myInput.close();
-
-		}
 	}
 
 	private class mylocationlistener implements LocationListener {
@@ -390,6 +375,7 @@ public class Planets extends Activity {
 				locationData = dataHandler.getParsedData();
 			}
 		} catch (Exception e) {
+			Log.d("Parse Error", "" + e);
 			Toast.makeText(Planets.this,
 					"The following parsing error occured:\n" + e,
 					Toast.LENGTH_LONG).show();

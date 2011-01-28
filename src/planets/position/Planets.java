@@ -67,7 +67,7 @@ public class Planets extends Activity {
 	private LocationListener ll;
 	private PlanetsDbAdapter planetDbHelper;
 	private ParsedLocationData locationData;
-	private double elevation, latitude, longitude, temp, pressure, offset;
+	private double elevation, latitude, longitude, offset;
 	private boolean running = false;
 	private Bundle bundle;
 	private ProgressDialog copyDialog;
@@ -152,19 +152,22 @@ public class Planets extends Activity {
 			longitude = -110.926479;
 			elevation = 713.0;
 			date = Calendar.getInstance().getTimeInMillis();
-			getWeatherData();
-			loadWeatherData();
+			getXMLData();
+			loadXMLData();
 			saveLocation();
 			positionButton.setEnabled(true);
 			whatupButton.setEnabled(true);
 			running = false;
 		} else {
-			if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-				showGPSDisabledAlertToUser();
-			} else {
+			if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+				// showGPSDisabledAlertToUser();
 				ll = new mylocationlistener();
 				lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,
 						ll);
+			} else {
+				ll = new mylocationlistener();
+				lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0,
+						0, ll);
 			}
 		}
 	}
@@ -174,8 +177,6 @@ public class Planets extends Activity {
 		bundle.putDouble("Lat", latitude);
 		bundle.putDouble("Long", longitude);
 		bundle.putDouble("Elevation", elevation);
-		bundle.putDouble("Temp", temp);
-		bundle.putDouble("Pressure", pressure);
 		bundle.putDouble("Offset", offset);
 		Intent i = new Intent(this, Position.class);
 		i.putExtras(bundle);
@@ -187,8 +188,6 @@ public class Planets extends Activity {
 		bundle.putDouble("Lat", latitude);
 		bundle.putDouble("Long", longitude);
 		bundle.putDouble("Elevation", elevation);
-		bundle.putDouble("Temp", temp);
-		bundle.putDouble("Pressure", pressure);
 		bundle.putDouble("Offset", offset);
 		Intent i = new Intent(this, ViewWhatsUp.class);
 		i.putExtras(bundle);
@@ -203,9 +202,6 @@ public class Planets extends Activity {
 		if (locDate > 0) {
 			latitude = locCur.getDouble(locCur.getColumnIndexOrThrow("lat"));
 			longitude = locCur.getDouble(locCur.getColumnIndexOrThrow("lng"));
-			temp = locCur.getDouble(locCur.getColumnIndexOrThrow("temp"));
-			pressure = locCur.getDouble(locCur
-					.getColumnIndexOrThrow("pressure"));
 			offset = locCur.getDouble(locCur.getColumnIndexOrThrow("offset"));
 			elevation = locCur.getDouble(locCur
 					.getColumnIndexOrThrow("elevation"));
@@ -213,8 +209,6 @@ public class Planets extends Activity {
 			data += "Latitude: " + latitude;
 			data += "\nLongitude: " + longitude;
 			data += "\nElevation: " + elevation;
-			data += "\nTemperature: " + temp;
-			data += "\nPressure: " + pressure;
 			data += "\nGMT offset: " + offset;
 			locationText.setText(data);
 			positionButton.setEnabled(true);
@@ -226,8 +220,8 @@ public class Planets extends Activity {
 
 	private void saveLocation() {
 		// update location
-		planetDbHelper.updateLocation(0, latitude, longitude, temp, pressure,
-				date, offset, 13, elevation);
+		planetDbHelper.updateLocation(0, latitude, longitude, 0.0, 0.0, date,
+				offset, 13, elevation);
 	}
 
 	private class CopyFilesTask extends AsyncTask<Void, Void, Void> {
@@ -307,10 +301,11 @@ public class Planets extends Activity {
 				elevation = location.getAltitude();
 				date = Calendar.getInstance().getTimeInMillis();
 				lm.removeUpdates(ll);
+				saveLocation();
 				// download weather data if older than 3 hours
 				if (date - locDate > (3 * 60 * 60 * 1000)) {
-					getWeatherData();
-					loadWeatherData();
+					getXMLData();
+					loadXMLData();
 					saveLocation();
 				}
 				running = false;
@@ -331,14 +326,10 @@ public class Planets extends Activity {
 
 	}
 
-	private void getWeatherData() {
+	private void getXMLData() {
 		// download weather data xml files
 
-		// http://ws.geonames.org/findNearByWeatherXML?lat=43&lng=-2
-		// http://ws.geonames.org/timezone?lat=47.01&lng=10.2
-
-		// http://www.worldweatheronline.com/feed/weather.ashx
-		// ?format=xml&num_of_days=1&key=77241f817e062244102410&q=32.00,-110.00
+		// http://api.geonames.org/timezone?lat=47.01&lng=10.2&username=tgaddis
 
 		// http://www.worldweatheronline.com/feed/tz.ashx
 		// ?format=xml&key=77241f817e062244102410&q=32.00,-110.00
@@ -354,12 +345,8 @@ public class Planets extends Activity {
 			xr.setContentHandler(dataHandler);
 
 			xr.parse(new InputSource(
-					getData("http://ws.geonames.org/findNearByWeatherXML?lat="
-							+ latitude + "&lng=" + longitude)));
-
-			xr.parse(new InputSource(
-					getData("http://ws.geonames.org/timezone?lat=" + latitude
-							+ "&lng=" + longitude)));
+					getData("http://api.geonames.org/timezone?lat=" + latitude
+							+ "&lng=" + longitude + "&username=tgaddis")));
 
 			locationData = dataHandler.getParsedData();
 
@@ -367,10 +354,8 @@ public class Planets extends Activity {
 			if (locationData.getErrCode() >= 10) {
 				// if error from Geonames, call worldweatheronline.com for data
 				xr.parse(new InputSource(
-						getData("http://www.worldweatheronline.com/feed/weather.ashx?format=xml&num_of_days=1&key=77241f817e062244102410&q="
-								+ latitude + "," + longitude)));
-				xr.parse(new InputSource(
-						getData("http://www.worldweatheronline.com/feed/tz.ashx?format=xml&key=77241f817e062244102410&q="
+						getData("http://www.worldweatheronline.com/feed/tz.ashx?"
+								+ "format=xml&key=77241f817e062244102410&q="
 								+ latitude + "," + longitude)));
 				locationData = dataHandler.getParsedData();
 			}
@@ -382,16 +367,12 @@ public class Planets extends Activity {
 		}
 	}
 
-	private void loadWeatherData() {
-		temp = locationData.getTemp();
-		pressure = locationData.getPressure();
+	private void loadXMLData() {
 		offset = locationData.getOffset();
 		String data = "";
 		data += "Latitude: " + latitude;
 		data += "\nLongitude: " + longitude;
 		data += "\nElevation: " + elevation;
-		data += "\nTemperature: " + temp;
-		data += "\nPressure: " + pressure;
 		data += "\nGMT offset: " + offset;
 		locationText.setText(data);
 		positionButton.setEnabled(true);
@@ -434,10 +415,10 @@ public class Planets extends Activity {
 		alertDialogBuilder
 				.setMessage(
 						"There is no location data saved.  "
-								+ "You can either download the data using GPS or "
+								+ "You can either download the data or "
 								+ "manually enter the data.")
 				.setCancelable(false)
-				.setPositiveButton("GPS",
+				.setPositiveButton("Download",
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								getGPS();

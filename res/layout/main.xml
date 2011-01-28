@@ -25,7 +25,7 @@
 
 	<TextView android:id="@+id/locationData" android:background="@color/background_color"
 		android:textColor="@color/text_color" android:layout_width="240dip"
-		android:layout_height="wrap_content" android:lines="6"
+		android:layout_height="wrap_content" android:lines="4"
 		android:textSize="14sp" android:padding="5dip" />
 
 </LinearLayout>

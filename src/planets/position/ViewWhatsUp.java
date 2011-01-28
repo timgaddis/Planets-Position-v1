@@ -33,7 +33,7 @@ import android.widget.SimpleCursorAdapter;
 
 public class ViewWhatsUp extends ListActivity {
 
-	private double pTemp, pPressure, offset;
+	private double offset;
 	double[] g = new double[3];
 	private String[] planetNames = { "Sun", "Moon", "Mercury", "Venus", "Mars",
 			"Jupiter", "Saturn", "Uranus", "Neptune", "Pluto" };
@@ -65,8 +65,6 @@ public class ViewWhatsUp extends ListActivity {
 			g[1] = bundle.getDouble("Lat", 0);
 			g[0] = bundle.getDouble("Long", 0);
 			g[2] = bundle.getDouble("Elevation", 0);
-			pTemp = bundle.getDouble("Temp", 0);
-			pPressure = bundle.getDouble("Pressure", 0);
 		}
 
 		planetDbHelper = new PlanetsDbAdapter(this, "planets");
@@ -111,7 +109,7 @@ public class ViewWhatsUp extends ListActivity {
 		// run calculations on all 10 solar system objects
 		// save data to database
 		for (int i = 0; i < 10; i++) {
-			data = planetRADec(time[0], time[1], i, g, pPressure, pTemp);
+			data = planetRADec(time[0], time[1], i, g, 0.0, 0.0);
 			if (data == null) {
 				System.out.println("position error");
 				return;

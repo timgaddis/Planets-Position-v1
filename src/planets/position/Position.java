@@ -45,7 +45,7 @@ public class Position extends Activity {
 	// private Button showPosButton;
 	private Bundle bundle;
 	private int mYear, mMonth, mDay, mHour, mMinute, planetNum = -1;
-	private double pTemp, pPressure, offset;
+	private double offset;
 	private double mSec, pLat, pLong, pAltitude, pAz, pAlt;
 	double[] g = new double[3];
 	private Calendar gc, utc;
@@ -89,8 +89,6 @@ public class Position extends Activity {
 			g[1] = bundle.getDouble("Lat", 0);
 			g[0] = bundle.getDouble("Long", 0);
 			g[2] = bundle.getDouble("Elevation", 0);
-			pTemp = bundle.getDouble("Temp", 0);
-			pPressure = bundle.getDouble("Pressure", 0);
 		}
 
 		// get the current date, time
@@ -145,13 +143,10 @@ public class Position extends Activity {
 				System.out.println("date error");
 				return;
 			}
-			pRAText.setText(data[0] + "");
-			pDecText.setText(data[1] + "");
-
 			// jdTT = data[0];
 			// jdUT = data[1];
 
-			data = planetRADec(data[0], data[1], planetNum, g, pPressure, pTemp);
+			data = planetRADec(data[0], data[1], planetNum, g, 0.0, 0.0);
 			if (data == null) {
 				System.out.println("position error");
 				return;

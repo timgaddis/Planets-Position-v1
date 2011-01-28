@@ -35,13 +35,11 @@ public class NewLoc extends Activity {
 
 	private Button saveLocButton;
 	private EditText newLongText, newLatText, newElevationText;
-	private EditText newTempText, newPressureText;
 	private Spinner newOffsetSpin;
 	private long date = 0;
 	private PlanetsDbAdapter planetDbHelper;
 	private int ioffset = 13;
-	private double elevation = 0, latitude = 0, longitude = 0, temp = 0,
-			pressure = 0, offset = 0;
+	private double elevation = 0, latitude = 0, longitude = 0, offset = 0;
 	static final String[] timeZones = new String[] { "-12:00", "-11:00",
 			"-10:00", "-9:00", "-8:00", "-7:00", "-6:00", "-5:00", "-4:00",
 			"-3:30", "-3:00", "-2:00", "-1:00", "0:00", "+1:00", "+2:00",
@@ -57,8 +55,6 @@ public class NewLoc extends Activity {
 		newElevationText = (EditText) findViewById(R.id.newElevationText);
 		newLatText = (EditText) findViewById(R.id.newLatText);
 		newLongText = (EditText) findViewById(R.id.newLongText);
-		newTempText = (EditText) findViewById(R.id.newTempText);
-		newPressureText = (EditText) findViewById(R.id.newPressureText);
 		newOffsetSpin = (Spinner) findViewById(R.id.newOffsetSpin);
 		// newOffsetText = (EditText) findViewById(R.id.newOffsetText);
 
@@ -98,10 +94,6 @@ public class NewLoc extends Activity {
 					.getColumnIndexOrThrow("lng")));
 			newElevationText.setText(locCur.getString(locCur
 					.getColumnIndexOrThrow("elevation")));
-			newTempText.setText(locCur.getString(locCur
-					.getColumnIndexOrThrow("temp")));
-			newPressureText.setText(locCur.getString(locCur
-					.getColumnIndexOrThrow("pressure")));
 			newOffsetSpin.setSelection(locCur.getInt(locCur
 					.getColumnIndexOrThrow("ioffset")));
 		}
@@ -131,20 +123,10 @@ public class NewLoc extends Activity {
 			return 1;
 		}
 
-		if (!newTempText.getText().toString().equals(""))
-			temp = Double.parseDouble(newTempText.getText().toString());
-		else
-			temp = 15;
-
-		if (!newPressureText.getText().toString().equals(""))
-			pressure = Double.parseDouble(newPressureText.getText().toString());
-		else
-			pressure = 0;
-
 		date = Calendar.getInstance().getTimeInMillis();
 		// update location
-		planetDbHelper.updateLocation(0, latitude, longitude, temp, pressure,
-				date, offset, ioffset, elevation);
+		planetDbHelper.updateLocation(0, latitude, longitude, 0.0, 0.0, date,
+				offset, ioffset, elevation);
 		return 0;
 	}
 

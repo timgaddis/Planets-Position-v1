@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -52,7 +53,6 @@ public class Position extends Activity {
 	private String planetName;
 	static final int DATE_DIALOG_ID = 0;
 	static final int TIME_DIALOG_ID = 1;
-	private static final int HELP_ID = 3;
 
 	// load c library
 	static {
@@ -262,8 +262,8 @@ public class Position extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-		menu.add(0, HELP_ID, 0, R.string.menu_help);
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.help_menu, menu);
 		return true;
 	}
 
@@ -272,7 +272,7 @@ public class Position extends Activity {
 		Bundle b;
 		Intent i;
 		switch (item.getItemId()) {
-		case HELP_ID:
+		case R.id.id_menu_help:
 			// showHelpDialog();
 			b = new Bundle();
 			b.putInt("res", R.string.pos_help);

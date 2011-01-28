@@ -50,6 +50,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -73,8 +74,6 @@ public class Planets extends Activity {
 	private ProgressDialog copyDialog;
 
 	private static final int ACTIVITY_CREATE = 0;
-	private static final int ABOUT_ID = 2;
-	private static final int HELP_ID = 3;
 
 	private boolean DEBUG = false;
 
@@ -302,12 +301,10 @@ public class Planets extends Activity {
 				date = Calendar.getInstance().getTimeInMillis();
 				lm.removeUpdates(ll);
 				saveLocation();
-				// download weather data if older than 3 hours
-				if (date - locDate > (3 * 60 * 60 * 1000)) {
-					getXMLData();
-					loadXMLData();
-					saveLocation();
-				}
+				// download time zone data
+				getXMLData();
+				loadXMLData();
+				saveLocation();
 				running = false;
 			}
 		}
@@ -327,7 +324,7 @@ public class Planets extends Activity {
 	}
 
 	private void getXMLData() {
-		// download weather data xml files
+		// download time zone data xml files
 
 		// http://api.geonames.org/timezone?lat=47.01&lng=10.2&username=tgaddis
 
@@ -460,9 +457,8 @@ public class Planets extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-		menu.add(0, HELP_ID, 0, R.string.menu_help);
-		menu.add(0, ABOUT_ID, 0, R.string.menu_about);
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.main_menu, menu);
 		return true;
 	}
 
@@ -471,7 +467,7 @@ public class Planets extends Activity {
 		Bundle b;
 		Intent i;
 		switch (item.getItemId()) {
-		case ABOUT_ID:
+		case R.id.id_menu_about:
 			// about description
 			b = new Bundle();
 			b.putInt("res", R.string.main_about);
@@ -479,7 +475,7 @@ public class Planets extends Activity {
 			i.putExtras(b);
 			startActivity(i);
 			return true;
-		case HELP_ID:
+		case R.id.id_menu_help:
 			// showHelpDialog();
 			b = new Bundle();
 			b.putInt("res", R.string.main_help);

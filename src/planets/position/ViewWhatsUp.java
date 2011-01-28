@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
@@ -40,7 +41,6 @@ public class ViewWhatsUp extends ListActivity {
 	private Bundle bundle;
 	private Calendar gc, utc;
 	private PlanetsDbAdapter planetDbHelper;
-	private static final int HELP_ID = 3;
 
 	// load c library
 	static {
@@ -207,15 +207,12 @@ public class ViewWhatsUp extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		showPlanetData(id);
-		// Intent i = new Intent(this, NewObs.class);
-		// i.putExtra(AstroDbAdapter.KEY_ROWID, id);
-		// startActivityForResult(i, ACTIVITY_EDIT);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-		menu.add(0, HELP_ID, 0, R.string.menu_help);
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.help_menu, menu);
 		return true;
 	}
 
@@ -224,15 +221,13 @@ public class ViewWhatsUp extends ListActivity {
 		Bundle b;
 		Intent i;
 		switch (item.getItemId()) {
-		case HELP_ID:
+		case R.id.id_menu_help:
 			// showHelpDialog();
 			b = new Bundle();
 			b.putInt("res", R.string.up_help);
 			i = new Intent(this, About.class);
 			i.putExtras(b);
 			startActivity(i);
-			// Toast.makeText(Planets.this, "Planet Position v1.0",
-			// Toast.LENGTH_LONG).show();
 			return true;
 		}
 

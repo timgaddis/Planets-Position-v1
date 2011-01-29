@@ -23,7 +23,7 @@
 		<item>Pluto</item>
 	</string-array>
 	<string name="main_about">
-		<b>Planets Position v1.0</b>
+		<b>Planets Position v1.0.2</b>
 		\n\n
 		Planets Position is a
 		program to calculate the
@@ -61,8 +61,7 @@
 		is used in this program for planetary position
 		calculations.\n
 		http://www.astro.com/swisseph/swephinfo_e.htm?lang=e\n\n
-		Weather and
-		timezone data courtsey of:\n
+		Timezone data courtsey of:\n
 		GeoNames web services.\n
 		http://www.geonames.org/ and\n
 		World Weather Online\n

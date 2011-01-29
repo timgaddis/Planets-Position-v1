@@ -58,7 +58,7 @@ public class PlanetsDbAdapter {
 
 	private static final String DATABASE_NAME = "PlanetsDB";
 	private static String DATABASE_TABLE;
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 
 	private final Context mCtx;
 
@@ -85,7 +85,7 @@ public class PlanetsDbAdapter {
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 			Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
 					+ newVersion + ", which will destroy all old data");
-			db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE);
+			db.execSQL("DROP TABLE IF EXISTS location, planets");
 			onCreate(db);
 		}
 	}

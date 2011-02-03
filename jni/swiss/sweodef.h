@@ -129,7 +129,7 @@
 # endif
 #endif
 
-#if MSDOS
+#ifdef MSDOS
 #  define HPUNIX MY_FALSE
 #  define INTEL_BYTE_ORDER 1
 #  ifndef TURBO_C
@@ -198,7 +198,7 @@
 # define ABS4	labs		/* abs function for long */ 
 #else
   typedef int	int32;
-  typedef long int64;
+  typedef long long	int64;
   typedef unsigned int	uint32;
   typedef short	int16;
   typedef double  REAL8;  /* real with at least 64 bit precision */
@@ -240,17 +240,7 @@ typedef unsigned char UCHAR;
 #define UCP	(UCHAR*)
 #define SCP	(char*)
 
-# define CHARSET_ISO_LATIN_1 TRUE	/* used by ctype256 */
-
-#ifdef DOS_DEGREE		/* use compiler switch to get DOS character! */
-# define ODEGREE_CHAR	248	/* DOS degree character */
-#else
-# ifdef MACOS
-#  define ODEGREE_CHAR	161	/* Macintosh degree character */
-# else
-#  define ODEGREE_CHAR	176	/* Latin1 degree character */
-# endif
-#endif
+# define ODEGREE_STRING "°"	/* degree as string, utf8 encoding */
  
 
 

@@ -19,24 +19,35 @@ package planets.position;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.view.View;
+import android.widget.Button;
 
-public class About extends Activity {
+public class WiFiAlert extends Activity {
 
-	private TextView aboutText;
+	private Button button1, button2;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.about);
+		setContentView(R.layout.alert);
 
-		aboutText = (TextView) findViewById(R.id.aboutText);
+		button1 = (Button) findViewById(R.id.buttonWifi);
+		button2 = (Button) findViewById(R.id.buttonContinue);
 
-		Bundle bundle = getIntent().getExtras();
-		if (bundle != null) {
-			aboutText.setText(bundle.getInt("res"));
-		}
+		button1.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View view) {
+				// Wifi
+				setResult(1);
+				finish();
+			}
+		});
 
+		button2.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View view) {
+				// Continue
+				setResult(2);
+				finish();
+			}
+		});
 	}
-
 }

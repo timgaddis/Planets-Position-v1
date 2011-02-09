@@ -1,7 +1,7 @@
 package planets.position;
 
 /*
- * Copyright (C) 2010 Tim Gaddis
+ * Copyright (C) 2011 Tim Gaddis
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,14 @@ package planets.position;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Calendar;
 
 import javax.xml.parsers.SAXParser;
@@ -45,6 +47,8 @@ import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -61,8 +65,6 @@ public class Planets extends Activity {
 
 	private Button positionButton, whatupButton, downloadButton, manualButton;
 	private TextView locationText;
-	private InputStream myInput;
-	private OutputStream myOutput;
 	private long date = 0, locDate = 0;
 	private LocationManager lm;
 	private LocationListener ll;
@@ -71,9 +73,10 @@ public class Planets extends Activity {
 	private double elevation, latitude, longitude, offset;
 	private boolean running = false;
 	private Bundle bundle;
-	private ProgressDialog copyDialog;
 
-	private static final int ACTIVITY_CREATE = 0;
+	private static final int LOCATION_MANUAL = 0;
+	private static final int WIFI_STATUS = 1;
+	private static final int WIFI_ALERT = 2;
 
 	private boolean DEBUG = false;
 
@@ -98,13 +101,7 @@ public class Planets extends Activity {
 		planetDbHelper = new PlanetsDbAdapter(this, "location");
 		planetDbHelper.open();
 
-		if (!(checkFiles("semo_18.se1") && checkFiles("sepl_18.se1"))) {
-			copyDialog = ProgressDialog.show(Planets.this, "",
-					"Copying files. Please wait...", true);
-			// copy files thread
-			new CopyFilesTask().execute();
-		} else
-			loadLocation();
+		checkWiFi();
 
 		manualButton.setEnabled(true);
 		downloadButton.setEnabled(true);
@@ -140,6 +137,37 @@ public class Planets extends Activity {
 
 	}
 
+	private void checkWiFi() {
+		if (!(checkFiles("semo_18.se1") && checkFiles("sepl_18.se1"))) {
+			// check wifi for connection
+			ConnectivityManager connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+			NetworkInfo mWifi = connManager
+					.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+			if (!mWifi.isConnected()) {
+				startActivityForResult(new Intent(this, WiFiAlert.class),
+						WIFI_ALERT);
+			} else {
+				DownloadFile DownloadFile = new DownloadFile();
+				DownloadFile
+						.execute("http://www.astro.com/ftp/swisseph/ephe/archive/sweph_18.zip");
+			}
+		} else
+			loadLocation();
+	}
+
+	/**
+	 * Checks to see if the given file exists on the sdcard.
+	 * 
+	 * @param name
+	 *            file name to check
+	 * @return true if exists, false otherwise
+	 */
+	private boolean checkFiles(String name) {
+		File sdCard = Environment.getExternalStorageDirectory();
+		File f = new File(sdCard.getAbsolutePath() + "/ephemeris/" + name);
+		return f.exists();
+	}
+
 	private void getGPS() {
 		// get lat/long from GPS
 		running = true;
@@ -159,7 +187,6 @@ public class Planets extends Activity {
 			running = false;
 		} else {
 			if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-				// showGPSDisabledAlertToUser();
 				ll = new mylocationlistener();
 				lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,
 						ll);
@@ -223,72 +250,107 @@ public class Planets extends Activity {
 				offset, 13, elevation);
 	}
 
-	private class CopyFilesTask extends AsyncTask<Void, Void, Void> {
-		// ProgressDialog dialog;
+	private class DownloadFile extends AsyncTask<String, Integer, String> {
+
+		private ProgressDialog progressDialog;
+		private File sdCard, dir;
+		private BufferedInputStream input;
+		private BufferedOutputStream output;
 
 		@Override
-		protected Void doInBackground(Void... params) {
-			// copy the ephermeris files from assets folder to the sd card.
+		protected void onPreExecute() {
+			sdCard = Environment.getExternalStorageDirectory();
+			dir = new File(sdCard.getAbsolutePath() + "/ephemeris");
+			if (!dir.isDirectory()) {
+				dir.mkdirs();
+			}
+			progressDialog = new ProgressDialog(Planets.this);
+			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			progressDialog.setMessage("Downloading File...");
+			progressDialog.setCancelable(false);
+			progressDialog.show();
+		}
+
+		@Override
+		protected String doInBackground(String... url) {
+			int count;
+
 			try {
-				// copyFile("seas_18.se1"); // 225440
-				// copyFile("semo_18.se1"); // 1305686
-				// copyFile("sepl_18.se1"); // 484065
-				String[] filenames = new String[] { "semo_18.se1",
-						"sepl_18.se1" };
-				File sdCard = Environment.getExternalStorageDirectory();
-				File dir = new File(sdCard.getAbsolutePath() + "/ephemeris");
-				if (!dir.isDirectory()) {
-					dir.mkdirs();
+				URL url1 = new URL(url[0]);
+				URLConnection conexion = url1.openConnection();
+				conexion.connect();
+
+				File f = new File(dir + "/" + url[0].split("/")[7]);
+
+				int lenghtOfFile = conexion.getContentLength();
+				progressDialog.setMax(lenghtOfFile);
+
+				// downlod the file
+				input = new BufferedInputStream(conexion.getInputStream());
+				output = new BufferedOutputStream(new FileOutputStream(f));
+
+				byte data[] = new byte[1024];
+				int total = 0;
+				while ((count = input.read(data)) != -1) {
+					total += count;
+					publishProgress(total);
+					output.write(data, 0, count);
 				}
-				for (int i = 0; i < 2; i++) {
-					File f = new File(dir + "/" + filenames[i]);
-					if (!f.exists()) {
-						myInput = Planets.this.getAssets().open(filenames[i]);
-						Log.d("InputStream Open", "" + f.exists());
-						myOutput = new FileOutputStream(f);
-						Log.d("OutputStream Open", "" + f.exists());
-						byte[] buffer = new byte[1024];
-						int length = 0;
-						while ((length = myInput.read(buffer)) > 0) {
-							myOutput.write(buffer, 0, length);
-						}
-						// Close the streams
-						myOutput.flush();
-						myOutput.close();
-						myInput.close();
-					}
-				}
-			} catch (IOException e) {
-				Log.d("CopyFile error", e.getMessage());
-				Toast.makeText(Planets.this, "Error copying assets files",
-						Toast.LENGTH_LONG).show();
-				running = false;
+				output.flush();
+				output.close();
+				input.close();
+			} catch (Exception e) {
+				Log.d("DownloadTest error", "" + e);
 			}
 			return null;
 		}
 
 		@Override
-		protected void onPostExecute(Void result) {
-			copyDialog.dismiss();
-			loadLocation();
+		public void onProgressUpdate(Integer... args) {
+			progressDialog.setProgress(args[0]);
 		}
 
 		@Override
-		protected void onPreExecute() {
+		protected void onPostExecute(String result) {
+			progressDialog.dismiss();
+			UnZipFile unzip = new UnZipFile();
+			unzip.execute();
 		}
+
 	}
 
-	/**
-	 * Checks to see if the given file exists on the sdcard.
-	 * 
-	 * @param name
-	 *            file name to check
-	 * @return true if exists, false otherwise
-	 */
-	private boolean checkFiles(String name) {
-		File sdCard = Environment.getExternalStorageDirectory();
-		File f = new File(sdCard.getAbsolutePath() + "/ephemeris/" + name);
-		return f.exists();
+	private class UnZipFile extends AsyncTask<Void, Void, Void> {
+
+		private ProgressDialog progressDialog;
+		private File sdCard, dir, file;
+
+		@Override
+		protected void onPreExecute() {
+			sdCard = Environment.getExternalStorageDirectory();
+			dir = new File(sdCard.getAbsolutePath() + "/ephemeris");
+			file = new File(dir + "/sweph_18.zip");
+
+			progressDialog = new ProgressDialog(Planets.this);
+			progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			progressDialog.setMessage("Extracting Files...");
+			progressDialog.setCancelable(false);
+			progressDialog.show();
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			Unzip uzip = new Unzip(file.getAbsolutePath(),
+					dir.getAbsolutePath() + "/");
+			uzip.unzip();
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			progressDialog.dismiss();
+			file.delete();
+			loadLocation();
+		}
 	}
 
 	private class mylocationlistener implements LocationListener {
@@ -383,30 +445,6 @@ public class Planets extends Activity {
 		return response.getEntity().getContent();
 	}
 
-	private void showGPSDisabledAlertToUser() {
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-		alertDialogBuilder
-				.setMessage(
-						"GPS is disabled in your device. Would you like to enable it?")
-				.setCancelable(false)
-				.setPositiveButton("Goto Settings Page To Enable GPS",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								Intent callGPSSettingIntent = new Intent(
-										android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-								startActivity(callGPSSettingIntent);
-							}
-						});
-		alertDialogBuilder.setNegativeButton("Cancel",
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.cancel();
-					}
-				});
-		AlertDialog alert = alertDialogBuilder.create();
-		alert.show();
-	}
-
 	private void showLocationDataAlert() {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 		alertDialogBuilder
@@ -490,13 +528,36 @@ public class Planets extends Activity {
 
 	private void enterLocManual() {
 		Intent i = new Intent(this, NewLoc.class);
-		startActivityForResult(i, ACTIVITY_CREATE);
+		startActivityForResult(i, LOCATION_MANUAL);
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode,
 			Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
-		loadLocation();
+		switch (requestCode) {
+		case LOCATION_MANUAL:
+			loadLocation();
+			return;
+		case WIFI_ALERT:
+			if (resultCode == 1) {
+				// go to wifi settings
+				Intent callWiFiSettingIntent = new Intent(
+						android.provider.Settings.ACTION_WIFI_SETTINGS);
+				startActivityForResult(callWiFiSettingIntent, WIFI_STATUS);
+			} else if (resultCode == 2) {
+				// continue downloading
+				DownloadFile DownloadFile = new DownloadFile();
+				DownloadFile
+						.execute("http://www.astro.com/ftp/swisseph/ephe/archive/sweph_18.zip");
+			} else if (resultCode == Activity.RESULT_CANCELED) {
+				Planets.this.finish();
+			}
+			return;
+		case WIFI_STATUS:
+			checkWiFi();
+			return;
+		}
 	}
+
 }

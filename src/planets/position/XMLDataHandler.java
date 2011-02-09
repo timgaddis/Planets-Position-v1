@@ -1,7 +1,7 @@
 package planets.position;
 
 /*
- * Copyright (C) 2010 Tim Gaddis
+ * Copyright (C) 2011 Tim Gaddis
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

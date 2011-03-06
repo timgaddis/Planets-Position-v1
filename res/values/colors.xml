@@ -5,4 +5,5 @@
 	<color name="alert_color">#FFFF0000</color>
 	<color name="text_color">#FFFFFFFF</color>
 	<color name="background_color2">#FF555555</color>
+	<color name="planet_back_color">#AA333333</color>
 </resources>

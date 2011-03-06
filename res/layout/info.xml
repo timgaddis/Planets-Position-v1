@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<ImageView android:id="@+id/backImage" android:layout_width="fill_parent"
+		android:layout_height="fill_parent" android:scaleType="center" />
+
+	<TextView android:layout_width="97dip" android:layout_height="wrap_content"
+		android:layout_marginTop="15dip" android:layout_gravity="left"
+		android:padding="4dip" android:background="@color/planet_back_color"
+		android:textColor="@color/text_color" android:text="Right Ascension"
+		android:textSize="12sp" />
+	<TextView android:id="@+id/ra_text" android:layout_width="97dip"
+		android:layout_height="wrap_content" android:layout_marginTop="15dip"
+		android:layout_gravity="right" android:padding="4dip" android:background="@color/planet_back_color"
+		android:textColor="@color/text_color" android:text="12h 24m 45.7s"
+		android:textSize="12sp" />
+
+	<TextView android:layout_width="97dip" android:layout_height="wrap_content"
+		android:layout_marginTop="50dip" android:layout_gravity="left"
+		android:padding="4dip" android:background="@color/planet_back_color"
+		android:textColor="@color/text_color" android:text="Declination"
+		android:textSize="12sp" />
+	<TextView android:id="@+id/dec_text" android:layout_width="97dip"
+		android:layout_height="wrap_content" android:layout_marginTop="50dip"
+		android:layout_gravity="right" android:padding="4dip" android:background="@color/planet_back_color"
+		android:textColor="@color/text_color" android:text="38\u00b0 24' 45.7 "
+		android:textSize="12sp" />
+
+	<TextView android:layout_width="97dip" android:layout_height="wrap_content"
+		android:layout_marginTop="85dip" android:layout_gravity="left"
+		android:padding="4dip" android:background="@color/planet_back_color"
+		android:textColor="@color/text_color" android:text="Azimuth" android:textSize="12sp" />
+	<TextView android:id="@+id/az_text" android:layout_width="97dip"
+		android:layout_height="wrap_content" android:layout_marginTop="85dip"
+		android:layout_gravity="right" android:padding="4dip" android:background="@color/planet_back_color"
+		android:textColor="@color/text_color" android:text="285\u00b0"
+		android:textSize="12sp" />
+
+	<TextView android:layout_width="97dip" android:layout_height="wrap_content"
+		android:layout_marginTop="120dip" android:layout_gravity="left"
+		android:padding="4dip" android:background="@color/planet_back_color"
+		android:textColor="@color/text_color" android:text="Altitude"
+		android:textSize="12sp" />
+	<TextView android:id="@+id/alt_text" android:layout_width="97dip"
+		android:layout_height="wrap_content" android:layout_marginTop="120dip"
+		android:layout_gravity="right" android:padding="4dip" android:background="@color/planet_back_color"
+		android:textColor="@color/text_color" android:text="52\u00b0"
+		android:textSize="12sp" />
+
+	<TextView android:layout_width="97dip" android:layout_height="wrap_content"
+		android:layout_marginTop="155dip" android:layout_gravity="left"
+		android:padding="4dip" android:background="@color/planet_back_color"
+		android:textColor="@color/text_color" android:text="Distance"
+		android:textSize="12sp" />
+	<TextView android:id="@+id/dis_text" android:layout_width="97dip"
+		android:layout_height="wrap_content" android:layout_marginTop="155dip"
+		android:layout_gravity="right" android:padding="4dip" android:background="@color/planet_back_color"
+		android:textColor="@color/text_color" android:text="39.034 AU"
+		android:textSize="12sp" />
+
+	<TextView android:layout_width="97dip" android:layout_height="wrap_content"
+		android:layout_marginTop="190dip" android:layout_gravity="left"
+		android:padding="4dip" android:background="@color/planet_back_color"
+		android:textColor="@color/text_color" android:text="Magnitude"
+		android:textSize="12sp" />
+	<TextView android:id="@+id/mag_text" android:layout_width="97dip"
+		android:layout_height="wrap_content" android:layout_marginTop="190dip"
+		android:layout_gravity="right" android:padding="4dip" android:background="@color/planet_back_color"
+		android:textColor="@color/text_color" android:text="-12" android:textSize="12sp" />
+
+	<TextView android:layout_width="97dip" android:layout_height="wrap_content"
+		android:layout_marginTop="225dip" android:layout_gravity="left"
+		android:padding="4dip" android:background="@color/planet_back_color"
+		android:textColor="@color/text_color" android:text="Set Time"
+		android:textSize="12sp" />
+	<TextView android:id="@+id/set_text" android:layout_width="97dip"
+		android:layout_height="wrap_content" android:layout_marginTop="225dip"
+		android:layout_gravity="right" android:padding="4dip" android:background="@color/planet_back_color"
+		android:textColor="@color/text_color" android:text="02:38 UT"
+		android:textSize="12sp" />
+
+</merge>

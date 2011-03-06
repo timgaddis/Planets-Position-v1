@@ -10,7 +10,8 @@
 		A 1.8MB data file needs to be downloaded to the SD
 		card.\nThis is a one
 		time download.\nWiFi can be turned on to
-		minimize your data
+		minimize
+		your data
 		usage or you
 		can continue and download over your cell
 		network.
@@ -18,8 +19,14 @@
 	<string name="about_name">About Planets Position</string>
 	<string name="menu_about">About</string>
 	<string name="menu_help">Help</string>
+	<string name="menu_filter">Filter</string>
 	<string name="no_planets">No Planets Up</string>
 	<string name="save">Save</string>
+	<string name="filter_prompt">Filter planets</string>
+	<string-array name="filter_array">
+		<item>Naked eye visible</item>
+		<item>View all planets</item>
+	</string-array>
 	<string name="planet_prompt">Choose a planet</string>
 	<string-array name="planets_array">
 		<item>Sun</item>
@@ -34,7 +41,7 @@
 		<item>Pluto</item>
 	</string-array>
 	<string name="main_about">
-		<b>Planets Position v1.0.3</b>
+		<b>Planets Position v1.1</b>
 		\n\n
 		Planets Position is a
 		program to calculate the
@@ -63,15 +70,17 @@
 		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
 		the
 		GNU
-		General Public License for more details.\n\n
+		General
+		Public License for more details.\n\n
 		You should have received a
-		copy of the GNU General Public License
+		copy of
+		the GNU General Public License
 		along with this program. If not,
 		see \n
 		http://www.gnu.org/licenses/.\n\n
 		Feedback can be sent to\n
 		planets.position@gmail.com\n\n
-		Source code avaliable at GitHub.\n
+		Source code available at GitHub.\n
 		https://github.com/timgaddis/Planets-Position\n\n
 		Swiss Ephemeris code
 		is used
@@ -79,13 +88,16 @@
 		calculations.\n
 		http://www.astro.com/swisseph/swephinfo_e.htm?lang=e\n\n
 		Timezone data
-		courtsey
+		courtesy
 		of:\n
 		GeoNames web services.\n
 		http://www.geonames.org/ and\n
 		World Weather
 		Online\n
-		http://www.worldweatheronline.com/
+		http://www.worldweatheronline.com/\n\n
+		Solar
+		System images courtesy of NASA\n
+		http://photojournal.jpl.nasa.gov/
 	</string>
 	<string name="main_help">
 		Initially, location data needs to be saved for the

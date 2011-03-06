@@ -211,7 +211,7 @@ public class Position extends Activity {
 
 	private void planetDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Choose a planet");
+		builder.setTitle(R.string.planet_prompt);
 		final ArrayAdapter<CharSequence> adapter = ArrayAdapter
 				.createFromResource(this, R.array.planets_array,
 						android.R.layout.select_dialog_item);

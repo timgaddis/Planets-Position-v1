@@ -2,5 +2,6 @@
 <resources>
 	<style name="WiFiDialog" parent="android:Theme.Dialog">
 		<item name="android:windowAnimationStyle">@null</item>
+		<item name="android:background">#FF000000</item>
 	</style>
 </resources>

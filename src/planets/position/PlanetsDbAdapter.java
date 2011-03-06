@@ -54,11 +54,11 @@ public class PlanetsDbAdapter {
 
 	private static final String PL_DB_CREATE = "create table planets "
 			+ "(_id integer primary key autoincrement, name text not null, "
-			+ "ra real, dec real, az real, alt real, dis real);";
+			+ "ra real, dec real, az real, alt real, dis real, mag integer, setT integer);";
 
 	private static final String DATABASE_NAME = "PlanetsDB";
 	private static String DATABASE_TABLE;
-	private static final int DATABASE_VERSION = 3;
+	private static final int DATABASE_VERSION = 4;
 
 	private final Context mCtx;
 
@@ -74,8 +74,8 @@ public class PlanetsDbAdapter {
 			db.execSQL(insertRow);
 			db.execSQL(PL_DB_CREATE);
 			String ip1 = "insert into planets "
-					+ "(_id, name, ra, dec, az, alt, dis) VALUES (";
-			String ip2 = ", 'P', 0.0, 0.0, 0.0, 0.0, 0.0);";
+					+ "(_id, name, ra, dec, az, alt, dis, mag, setT) VALUES (";
+			String ip2 = ", 'P', 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0);";
 			for (int i = 0; i < 10; i++) {
 				db.execSQL(ip1 + i + ip2);
 			}
@@ -139,7 +139,7 @@ public class PlanetsDbAdapter {
 	}
 
 	public boolean updatePlanet(long rowID, String name, double ra, double dec,
-			double az, double alt, double dis) {
+			double az, double alt, double dis, long mag, long setT) {
 		ContentValues args = new ContentValues();
 		args.put(KEY_NAME, name);
 		args.put("ra", ra);
@@ -147,6 +147,8 @@ public class PlanetsDbAdapter {
 		args.put("az", az);
 		args.put("alt", alt);
 		args.put("dis", dis);
+		args.put("mag", mag);
+		args.put("setT", setT);
 		return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowID, null) > 0;
 	}
 
@@ -162,10 +164,27 @@ public class PlanetsDbAdapter {
 		return mDb.delete(DATABASE_TABLE, KEY_ROWID + "=" + rowId, null) > 0;
 	}
 
+	/**
+	 * Returns all of the planets above the horizon
+	 * 
+	 * @return A cursor with the data
+	 */
 	public Cursor fetchAllList() {
 		// "alt > 0"
 		return mDb.query(DATABASE_TABLE, new String[] { KEY_ROWID, KEY_NAME,
-				"az", "alt" }, "alt > 0", null, null, null, null);
+				"az", "alt", "mag" }, "alt > 0", null, null, null, null);
+	}
+
+	/**
+	 * Return all of the planets above the horizon and visible to the naked eye
+	 * 
+	 * @return A cursor with the data
+	 */
+	public Cursor fetchEyeList() {
+		// "alt > 0 AND mag <= 6"
+		return mDb.query(DATABASE_TABLE, new String[] { KEY_ROWID, KEY_NAME,
+				"az", "alt", "mag" }, "alt > 0 AND mag <= 6", null, null, null,
+				null);
 	}
 
 	/**

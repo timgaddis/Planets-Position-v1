@@ -3,12 +3,15 @@
 	android:orientation="horizontal" android:layout_height="fill_parent"
 	android:layout_width="fill_parent">
 	<TextView android:id="@+id/list2" android:layout_weight="1"
-		android:layout_width="fill_parent" android:padding="10dp"
-		android:textSize="18sp" android:layout_height="fill_parent" />
+		android:layout_width="fill_parent" android:padding="7dp" android:textSize="16sp"
+		android:layout_height="fill_parent" />
 	<TextView android:id="@+id/list3" android:layout_weight="1"
 		android:layout_width="fill_parent" android:gravity="center_horizontal"
-		android:padding="10dp" android:textSize="18sp" android:layout_height="fill_parent" />
+		android:padding="7dp" android:textSize="16sp" android:layout_height="fill_parent" />
 	<TextView android:id="@+id/list4" android:layout_weight="1"
 		android:layout_width="fill_parent" android:gravity="center_horizontal"
-		android:padding="10dp" android:textSize="18sp" android:layout_height="fill_parent" />
+		android:padding="7dp" android:textSize="16sp" android:layout_height="fill_parent" />
+	<TextView android:id="@+id/list5" android:layout_weight="1"
+		android:layout_width="fill_parent" android:gravity="center_horizontal"
+		android:padding="7dp" android:textSize="16sp" android:layout_height="fill_parent" />
 </LinearLayout>

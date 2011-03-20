@@ -47,6 +47,7 @@ public class NewLoc extends Activity {
 			"+6:00", "+7:00", "+8:00", "+9:00", "+9:30", "+10:00", "+11:00",
 			"+12:00" };
 
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.new_loc);
@@ -56,12 +57,12 @@ public class NewLoc extends Activity {
 		newLatText = (EditText) findViewById(R.id.newLatText);
 		newLongText = (EditText) findViewById(R.id.newLongText);
 		newOffsetSpin = (Spinner) findViewById(R.id.newOffsetSpin);
-		// newOffsetText = (EditText) findViewById(R.id.newOffsetText);
 
 		planetDbHelper = new PlanetsDbAdapter(this, "location");
 		planetDbHelper.open();
 
 		saveLocButton.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				// save location data
 				if (saveLocation() == 0) {
@@ -132,6 +133,7 @@ public class NewLoc extends Activity {
 
 	// offset spinner selection
 	public class OffsetSelectedListener implements OnItemSelectedListener {
+		@Override
 		public void onItemSelected(AdapterView<?> parent, View view, int pos,
 				long id) {
 			NewLoc.this.ioffset = pos;
@@ -143,11 +145,10 @@ public class NewLoc extends Activity {
 				h += m;
 			else
 				h -= m;
-			// Toast.makeText(NewLoc.this, "tz= " + h,
-			// Toast.LENGTH_LONG).show();
 			NewLoc.this.offset = h;
 		}
 
+		@Override
 		public void onNothingSelected(AdapterView<?> parent) {
 			// Do nothing.
 		}

@@ -35,6 +35,7 @@ public class WiFiAlert extends Activity {
 		button2 = (Button) findViewById(R.id.buttonContinue);
 
 		button1.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				// Wifi
 				setResult(1);
@@ -43,6 +44,7 @@ public class WiFiAlert extends Activity {
 		});
 
 		button2.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				// Continue
 				setResult(2);

@@ -25,6 +25,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,13 +38,10 @@ import android.widget.SimpleCursorAdapter;
 public class ViewWhatsUp extends ListActivity {
 
 	private double offset;
-	double[] g = new double[3];
+	private double[] g = new double[3];
+	private int filter = 1;
 	private String[] planetNames = { "Sun", "Moon", "Mercury", "Venus", "Mars",
 			"Jupiter", "Saturn", "Uranus", "Neptune", "Pluto" };
-	private int[] planetImages = { R.drawable.sun, R.drawable.moon,
-			R.drawable.mercury, R.drawable.venus, R.drawable.mars,
-			R.drawable.jupiter, R.drawable.saturn, R.drawable.uranus,
-			R.drawable.neptune, R.drawable.pluto };
 	private Bundle bundle;
 	private PlanetsDbAdapter planetDbHelper;
 
@@ -53,7 +51,7 @@ public class ViewWhatsUp extends ListActivity {
 	}
 
 	// c function prototypes
-	public native double[] planetRADec(double d1, double d2, int p,
+	public native double[] planetUpData(double d1, double d2, int p,
 			double[] loc, double press, double temp);
 
 	public native double[] utc2jd(int m, int d, int y, int hr, int min,
@@ -61,6 +59,7 @@ public class ViewWhatsUp extends ListActivity {
 
 	public native String jd2utc(double jdate);
 
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.planet_list);
@@ -104,8 +103,11 @@ public class ViewWhatsUp extends ListActivity {
 		double[] data = null, time;
 		int m;
 
-		// convert local time to utc
 		Calendar c = Calendar.getInstance();
+		// set the title of the activity with the current date and time
+		this.setTitle("What's up on "
+				+ DateFormat.format("MMM d @ hh:mm aa", c));
+		// convert local time to utc
 		m = (int) (offset * 60);
 		c.add(Calendar.MINUTE, m * -1);
 
@@ -114,7 +116,6 @@ public class ViewWhatsUp extends ListActivity {
 				c.get(Calendar.MINUTE), c.get(Calendar.SECOND));
 		if (time == null) {
 			Log.e("Position error", "utc2jd error");
-			System.out.println("date error");
 			return;
 		}
 		// jdTT = time[0];
@@ -123,10 +124,9 @@ public class ViewWhatsUp extends ListActivity {
 		// run calculations on all 10 solar system objects
 		// save data to database
 		for (int i = 0; i < 10; i++) {
-			data = planetRADec(time[0], time[1], i, g, 0.0, 0.0);
+			data = planetUpData(time[0], time[1], i, g, 0.0, 0.0);
 			if (data == null) {
-				Log.e("Position error", "planetRADec error");
-				System.out.println("position error");
+				Log.e("Position error", "planetUpData error");
 				return;
 			}
 			String[] dateArr = jd2utc(data[6]).split("_");
@@ -146,28 +146,21 @@ public class ViewWhatsUp extends ListActivity {
 	}
 
 	private void showPlanetData(int num) {
+		double[] data = new double[6];
+
 		Cursor planetCur = planetDbHelper.fetchEntry(num);
 		startManagingCursor(planetCur);
-		Bundle bundle = new Bundle();
-		bundle.putString("name", planetNames[num]);
-		bundle.putInt("image", planetImages[num]);
-		bundle.putDouble("ra",
-				planetCur.getDouble(planetCur.getColumnIndexOrThrow("ra")));
-		bundle.putDouble("dec",
-				planetCur.getDouble(planetCur.getColumnIndexOrThrow("dec")));
-		bundle.putDouble("az",
-				planetCur.getDouble(planetCur.getColumnIndexOrThrow("az")));
-		bundle.putDouble("alt",
-				planetCur.getDouble(planetCur.getColumnIndexOrThrow("alt")));
-		bundle.putDouble("dis",
-				planetCur.getDouble(planetCur.getColumnIndexOrThrow("dis")));
-		bundle.putDouble("mag",
-				planetCur.getDouble(planetCur.getColumnIndexOrThrow("mag")));
-		bundle.putLong("setT",
+		data[0] = planetCur.getDouble(planetCur.getColumnIndexOrThrow("ra"));
+		data[1] = planetCur.getDouble(planetCur.getColumnIndexOrThrow("dec"));
+		data[2] = planetCur.getDouble(planetCur.getColumnIndexOrThrow("az"));
+		data[3] = planetCur.getDouble(planetCur.getColumnIndexOrThrow("alt"));
+		data[4] = planetCur.getDouble(planetCur.getColumnIndexOrThrow("dis"));
+		data[5] = planetCur.getDouble(planetCur.getColumnIndexOrThrow("mag"));
+
+		PlanetDialog planetDialog = new PlanetDialog(this, planetNames[num],
+				data,
 				planetCur.getLong(planetCur.getColumnIndexOrThrow("setT")));
-		Intent i = new Intent(this, PlanetInfo.class);
-		i.putExtras(bundle);
-		startActivity(i);
+		planetDialog.show();
 	}
 
 	@Override
@@ -202,12 +195,15 @@ public class ViewWhatsUp extends ListActivity {
 			builder.setTitle(R.string.filter_prompt);
 			final ArrayAdapter<CharSequence> adapter = ArrayAdapter
 					.createFromResource(this, R.array.filter_array,
-							android.R.layout.select_dialog_item);
-			builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int item) {
-					fillData(item);
-				}
-			});
+							android.R.layout.select_dialog_singlechoice);
+			builder.setSingleChoiceItems(adapter, filter,
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int item) {
+							fillData(item);
+							filter = item;
+							dialog.dismiss();
+						}
+					});
 			AlertDialog alert = builder.create();
 			alert.show();
 			return true;

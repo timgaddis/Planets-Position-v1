@@ -1,147 +1,289 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView android:id="@+id/ScrollView01"
+<ScrollView
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="wrap_content" android:layout_height="wrap_content">
-	<TableLayout android:layout_width="fill_parent"
-		android:layout_height="fill_parent" android:stretchColumns="1">
+	android:layout_alignParentLeft="true"
+	android:id="@+id/scrollView1"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content">
+	<RelativeLayout
+		android:id="@+id/relativeLayout1"
+		android:padding="10dp"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent">
 
-		<TableRow android:layout_width="wrap_content"
-			android:layout_height="wrap_content">
-			<TextView android:id="@+id/dataText" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:text="Planet:" />
-		</TableRow>
+		<Spinner
+			android:id="@+id/pos_name_spin"
+			android:layout_centerHorizontal="true"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:textSize="@dimen/pos_planet_name"
+			android:prompt="@string/planet_prompt" />
 
-		<TableRow android:layout_width="wrap_content"
-			android:paddingTop="5dip" android:paddingBottom="5dip"
-			android:layout_height="wrap_content">
-			<TextView android:id="@+id/pPlanetName" android:textSize="24sp"
-				android:layout_weight="1" android:layout_width="fill_parent"
-				android:layout_height="35dip" android:gravity="center"
-				android:background="@color/background_color2" android:textColor="@color/text_color" />
-		</TableRow>
+		<Button
+			android:id="@+id/pos_date_button"
+			android:layout_width="@dimen/pos_text_width"
+			android:layout_height="45dp"
+			android:layout_below="@+id/pos_name_spin"
+			android:layout_alignLeft="@+id/pos_name_spin"
+			android:textSize="@dimen/pos_planet_name"
+			android:text="03/16/2011" />
+		<Button
+			android:id="@+id/pos_time_button"
+			android:layout_width="@dimen/pos_text_width"
+			android:layout_height="45dp"
+			android:layout_below="@+id/pos_name_spin"
+			android:layout_alignRight="@+id/pos_name_spin"
+			android:textSize="@dimen/pos_planet_name"
+			android:text="9:38 am" />
 
-		<TableRow android:layout_width="wrap_content"
-			android:layout_height="wrap_content">
-			<LinearLayout android:layout_width="fill_parent"
-				android:layout_height="fill_parent" android:layout_weight="1">
-				<TextView android:layout_width="fill_parent"
-					android:layout_weight="1" android:layout_height="wrap_content"
-					android:text="Local Date:" />
-				<View android:layout_height="fill_parent" android:background="#FF000000"
-					android:layout_width="5dip" />
-				<TextView android:layout_width="fill_parent"
-					android:layout_weight="1" android:layout_height="wrap_content"
-					android:text="Local Time:" />
-			</LinearLayout>
+		<View
+			android:id="@+id/view1"
+			android:layout_below="@+id/pos_date_button"
+			android:layout_width="fill_parent"
+			android:layout_height="20dp" />
 
-		</TableRow>
+		<TextView
+			android:id="@+id/pos_ra"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/view1"
+			android:layout_alignLeft="@+id/view1"
+			android:padding="@dimen/pos_data_pad"
+			android:background="@color/planet_back_color"
+			android:textColor="@color/text_color"
+			android:text="Right Ascension"
+			android:textSize="@dimen/pos_data_text" />
+		<TextView
+			android:id="@+id/pos_ra_text"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/view1"
+			android:layout_alignRight="@+id/view1"
+			android:gravity="right"
+			android:padding="@dimen/pos_data_pad"
+			android:background="@color/planet_back_color"
+			android:textColor="@color/text_color"
+			android:textSize="@dimen/pos_data_text" />
 
-		<TableRow android:paddingTop="5dip" android:paddingBottom="5dip">
-			<LinearLayout android:layout_width="fill_parent"
-				android:gravity="fill_vertical" android:layout_height="fill_parent"
-				android:layout_weight="1">
-				<TextView android:id="@+id/pDateText" android:background="@color/background_color2"
-					android:layout_weight="1" android:layout_width="fill_parent"
-					android:layout_height="40dip" android:text="12/19/2010"
-					android:textColor="@color/text_color" android:gravity="center"
-					android:textSize="22sp" />
-				<View android:layout_height="fill_parent" android:background="#FF000000"
-					android:layout_width="5dip" />
-				<TextView android:id="@+id/pTimeText" android:background="@color/background_color2"
-					android:layout_weight="1" android:layout_width="fill_parent"
-					android:layout_height="40dip" android:text="11:07"
-					android:textColor="@color/text_color" android:gravity="center"
-					android:textSize="22sp" />
-			</LinearLayout>
-		</TableRow>
+		<View
+			android:id="@+id/view2"
+			android:layout_below="@+id/pos_ra"
+			android:layout_width="fill_parent"
+			android:layout_height="5dp" />
 
-		<TableRow android:layout_width="wrap_content"
-			android:layout_height="wrap_content">
-			<TextView android:id="@+id/dataText" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:text="Right Ascension:" />
-		</TableRow>
+		<TextView
+			android:id="@+id/pos_dec"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/view2"
+			android:layout_alignLeft="@+id/view2"
+			android:padding="@dimen/pos_data_pad"
+			android:background="@color/planet_back_color"
+			android:textColor="@color/text_color"
+			android:text="Declination"
+			android:textSize="@dimen/pos_data_text" />
+		<TextView
+			android:id="@+id/pos_dec_text"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/view2"
+			android:layout_alignRight="@+id/view2"
+			android:gravity="right"
+			android:padding="@dimen/pos_data_pad"
+			android:background="@color/planet_back_color"
+			android:textColor="@color/text_color"
+			android:textSize="@dimen/pos_data_text" />
 
-		<TableRow android:paddingTop="5dip" android:paddingBottom="5dip">
-			<TextView android:id="@+id/pRAText" android:textSize="26sp"
-				android:layout_weight="1" android:layout_width="wrap_content"
-				android:layout_height="40dip" android:gravity="center"
-				android:background="@color/background_color" android:textColor="@color/text_color" />
-		</TableRow>
+		<View
+			android:id="@+id/view3"
+			android:layout_below="@+id/pos_dec"
+			android:layout_width="fill_parent"
+			android:layout_height="5dp" />
 
-		<TableRow android:layout_width="wrap_content"
-			android:layout_height="wrap_content">
-			<TextView android:id="@+id/dataText" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:text="Declination:" />
-		</TableRow>
+		<TextView
+			android:id="@+id/pos_az"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/view3"
+			android:layout_alignLeft="@+id/view3"
+			android:padding="@dimen/pos_data_pad"
+			android:background="@color/planet_back_color"
+			android:textColor="@color/text_color"
+			android:text="Azimuth"
+			android:textSize="@dimen/pos_data_text" />
+		<TextView
+			android:id="@+id/pos_az_text"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/view3"
+			android:layout_alignRight="@+id/view3"
+			android:gravity="right"
+			android:padding="@dimen/pos_data_pad"
+			android:background="@color/planet_back_color"
+			android:textColor="@color/text_color"
+			android:textSize="@dimen/pos_data_text" />
 
-		<TableRow android:paddingTop="5dip" android:paddingBottom="5dip">
-			<TextView android:id="@+id/pDecText" android:textSize="26sp"
-				android:layout_weight="1" android:layout_width="wrap_content"
-				android:layout_height="40dip" android:gravity="center"
-				android:background="@color/background_color" android:textColor="@color/text_color" />
-		</TableRow>
+		<View
+			android:id="@+id/view4"
+			android:layout_below="@+id/pos_az"
+			android:layout_width="fill_parent"
+			android:layout_height="5dp" />
 
-		<TableRow android:layout_width="wrap_content"
-			android:layout_height="wrap_content">
-			<LinearLayout android:layout_width="fill_parent"
-				android:layout_height="fill_parent" android:layout_weight="1">
-				<TextView android:layout_width="fill_parent"
-					android:layout_weight="1" android:layout_height="wrap_content"
-					android:text="Azimuth:" />
-				<View android:layout_height="fill_parent" android:background="#FF000000"
-					android:layout_width="5dip" />
-				<TextView android:layout_width="fill_parent"
-					android:layout_weight="1" android:layout_height="wrap_content"
-					android:text="Altitude:" />
-			</LinearLayout>
-		</TableRow>
+		<TextView
+			android:id="@+id/pos_alt"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/view4"
+			android:layout_alignLeft="@+id/view4"
+			android:padding="@dimen/pos_data_pad"
+			android:background="@color/planet_back_color"
+			android:textColor="@color/text_color"
+			android:text="Altitude"
+			android:textSize="@dimen/pos_data_text" />
+		<TextView
+			android:id="@+id/pos_alt_text"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/view4"
+			android:layout_alignRight="@+id/view4"
+			android:gravity="right"
+			android:padding="@dimen/pos_data_pad"
+			android:background="@color/planet_back_color"
+			android:textColor="@color/text_color"
+			android:textSize="@dimen/pos_data_text" />
 
-		<TableRow android:paddingTop="5dip" android:paddingBottom="5dip">
-			<LinearLayout android:layout_width="fill_parent"
-				android:gravity="fill_vertical" android:layout_height="fill_parent"
-				android:layout_weight="1">
-				<TextView android:id="@+id/pAzText" android:background="@color/background_color"
-					android:layout_weight="1" android:layout_width="fill_parent"
-					android:layout_height="40dip" android:textColor="@color/text_color"
-					android:gravity="center" android:textSize="30sp" />
-				<View android:layout_height="fill_parent" android:background="#FF000000"
-					android:layout_width="5dip" />
-				<TextView android:id="@+id/pAltText" android:background="@color/background_color"
-					android:layout_weight="1" android:layout_width="fill_parent"
-					android:layout_height="40dip" android:textColor="@color/text_color"
-					android:gravity="center" android:textSize="30sp" />
-			</LinearLayout>
-		</TableRow>
+		<View
+			android:id="@+id/view5"
+			android:layout_below="@+id/pos_alt"
+			android:layout_width="fill_parent"
+			android:layout_height="5dp" />
 
-		<TableRow android:layout_width="wrap_content"
-			android:layout_height="wrap_content">
-			<TextView android:id="@+id/dataText" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:text="Distance:" />
-		</TableRow>
+		<TextView
+			android:id="@+id/pos_dis"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/view5"
+			android:layout_alignLeft="@+id/view5"
+			android:padding="@dimen/pos_data_pad"
+			android:background="@color/planet_back_color"
+			android:textColor="@color/text_color"
+			android:text="Distance"
+			android:textSize="@dimen/pos_data_text" />
+		<TextView
+			android:id="@+id/pos_dis_text"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/view5"
+			android:layout_alignRight="@+id/view5"
+			android:gravity="right"
+			android:padding="@dimen/pos_data_pad"
+			android:background="@color/planet_back_color"
+			android:textColor="@color/text_color"
+			android:textSize="@dimen/pos_data_text" />
 
-		<TableRow android:paddingTop="5dip" android:paddingBottom="5dip">
-			<TextView android:id="@+id/pDistText" android:textSize="26sp"
-				android:layout_weight="1" android:layout_width="wrap_content"
-				android:layout_height="40dip" android:gravity="center"
-				android:background="@color/background_color" android:textColor="@color/text_color" />
-		</TableRow>
+		<View
+			android:id="@+id/view6"
+			android:layout_below="@+id/pos_dis"
+			android:layout_width="fill_parent"
+			android:layout_height="5dp" />
 
-		<View android:layout_height="5dip" android:layout_width="fill_parent" />
+		<TextView
+			android:id="@+id/pos_mag"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/view6"
+			android:layout_alignLeft="@+id/view6"
+			android:padding="@dimen/pos_data_pad"
+			android:background="@color/planet_back_color"
+			android:textColor="@color/text_color"
+			android:text="Magnitude"
+			android:textSize="@dimen/pos_data_text" />
+		<TextView
+			android:id="@+id/pos_mag_text"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/view6"
+			android:layout_alignRight="@+id/view6"
+			android:gravity="right"
+			android:padding="@dimen/pos_data_pad"
+			android:background="@color/planet_back_color"
+			android:textColor="@color/text_color"
+			android:textSize="@dimen/pos_data_text" />
 
-		<TableRow android:paddingTop="5dip" android:paddingBottom="5dip">
-			<TextView android:id="@+id/pBelowText" android:textSize="16sp"
-				android:layout_weight="1" android:layout_width="wrap_content"
-				android:layout_height="40dip" android:gravity="center"
-				android:textColor="@color/alert_color" android:text="Object is below the horizon"
-				android:visibility="invisible" />
-		</TableRow>
+		<View
+			android:id="@+id/view7"
+			android:layout_below="@+id/pos_mag"
+			android:layout_width="fill_parent"
+			android:layout_height="5dp" />
 
-		<TableRow>
-			<TextView android:id="@+id/pTap" android:textSize="12sp"
-				android:layout_weight="1" android:layout_width="fill_parent"
-				android:layout_height="wrap_content" android:gravity="center"
-				android:text="Tap on planet, date, or time fields to change the value" />
-		</TableRow>
+		<TextView
+			android:id="@+id/pos_riseTime"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/view7"
+			android:layout_alignLeft="@+id/view7"
+			android:padding="@dimen/pos_data_pad"
+			android:background="@color/planet_back_color"
+			android:textColor="@color/text_color"
+			android:text="Rise Time"
+			android:textSize="@dimen/pos_data_text" />
+		<TextView
+			android:id="@+id/pos_riseTime_text"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/view7"
+			android:layout_alignRight="@+id/view7"
+			android:gravity="right"
+			android:padding="@dimen/pos_data_pad"
+			android:background="@color/planet_back_color"
+			android:textColor="@color/text_color"
+			android:textSize="@dimen/pos_data_text" />
 
-	</TableLayout>
+		<View
+			android:id="@+id/view8"
+			android:layout_below="@+id/pos_riseTime"
+			android:layout_width="fill_parent"
+			android:layout_height="5dp" />
+
+		<TextView
+			android:id="@+id/pos_setTime"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/view8"
+			android:layout_alignLeft="@+id/view8"
+			android:padding="@dimen/pos_data_pad"
+			android:background="@color/planet_back_color"
+			android:textColor="@color/text_color"
+			android:text="Set Time"
+			android:textSize="@dimen/pos_data_text" />
+		<TextView
+			android:id="@+id/pos_setTime_text"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/view8"
+			android:layout_alignRight="@+id/view8"
+			android:gravity="right"
+			android:padding="@dimen/pos_data_pad"
+			android:background="@color/planet_back_color"
+			android:textColor="@color/text_color"
+			android:textSize="@dimen/pos_data_text" />
+
+		<View
+			android:id="@+id/view9"
+			android:layout_below="@+id/pos_setTime"
+			android:layout_width="fill_parent"
+			android:layout_height="15dp" />
+
+		<TextView
+			android:id="@+id/pos_below_text"
+			android:textSize="@dimen/pos_data_text"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/view9"
+			android:layout_centerHorizontal="true"
+			android:textColor="@color/alert_color"
+			android:text="Object is below the horizon"
+			android:visibility="invisible" />
+
+	</RelativeLayout>
 </ScrollView>

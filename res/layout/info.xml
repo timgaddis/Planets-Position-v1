@@ -1,82 +1,237 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/relativeLayout1"
+	android:background="#FF000000"
+	android:layout_width="210dp"
+	android:layout_height="wrap_content">
 
-	<ImageView android:id="@+id/backImage" android:layout_width="fill_parent"
-		android:layout_height="fill_parent" android:scaleType="center" />
+	<TextView
+		android:id="@+id/info_name"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_centerHorizontal="true"
+		android:padding="@dimen/pos_data_pad"
+		android:background="@color/planet_back_color"
+		android:gravity="center_horizontal"
+		android:textColor="@color/text_color"
+		android:textSize="@dimen/info_planet_name" />
 
-	<TextView android:layout_width="97dip" android:layout_height="wrap_content"
-		android:layout_marginTop="15dip" android:layout_gravity="left"
-		android:padding="4dip" android:background="@color/planet_back_color"
-		android:textColor="@color/text_color" android:text="Right Ascension"
-		android:textSize="12sp" />
-	<TextView android:id="@+id/ra_text" android:layout_width="97dip"
-		android:layout_height="wrap_content" android:layout_marginTop="15dip"
-		android:layout_gravity="right" android:padding="4dip" android:background="@color/planet_back_color"
-		android:textColor="@color/text_color" android:text="12h 24m 45.7s"
-		android:textSize="12sp" />
+	<View
+		android:id="@+id/view1"
+		android:layout_below="@+id/info_name"
+		android:layout_width="fill_parent"
+		android:layout_height="10dp" />
 
-	<TextView android:layout_width="97dip" android:layout_height="wrap_content"
-		android:layout_marginTop="50dip" android:layout_gravity="left"
-		android:padding="4dip" android:background="@color/planet_back_color"
-		android:textColor="@color/text_color" android:text="Declination"
-		android:textSize="12sp" />
-	<TextView android:id="@+id/dec_text" android:layout_width="97dip"
-		android:layout_height="wrap_content" android:layout_marginTop="50dip"
-		android:layout_gravity="right" android:padding="4dip" android:background="@color/planet_back_color"
-		android:textColor="@color/text_color" android:text="38\u00b0 24' 45.7 "
-		android:textSize="12sp" />
+	<TextView
+		android:id="@+id/info_ra"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/view1"
+		android:layout_alignLeft="@+id/view1"
+		android:padding="@dimen/pos_data_pad"
+		android:background="@color/planet_back_color"
+		android:textColor="@color/text_color"
+		android:text="Right Ascension"
+		android:textSize="@dimen/info_data_text" />
+	<TextView
+		android:id="@+id/info_ra_text"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/view1"
+		android:layout_alignRight="@+id/view1"
+		android:gravity="right"
+		android:padding="@dimen/pos_data_pad"
+		android:background="@color/planet_back_color"
+		android:textColor="@color/text_color"
+		android:textSize="@dimen/info_data_text" />
 
-	<TextView android:layout_width="97dip" android:layout_height="wrap_content"
-		android:layout_marginTop="85dip" android:layout_gravity="left"
-		android:padding="4dip" android:background="@color/planet_back_color"
-		android:textColor="@color/text_color" android:text="Azimuth" android:textSize="12sp" />
-	<TextView android:id="@+id/az_text" android:layout_width="97dip"
-		android:layout_height="wrap_content" android:layout_marginTop="85dip"
-		android:layout_gravity="right" android:padding="4dip" android:background="@color/planet_back_color"
-		android:textColor="@color/text_color" android:text="285\u00b0"
-		android:textSize="12sp" />
+	<View
+		android:id="@+id/view2"
+		android:layout_below="@+id/info_ra"
+		android:layout_width="fill_parent"
+		android:layout_height="5dp" />
 
-	<TextView android:layout_width="97dip" android:layout_height="wrap_content"
-		android:layout_marginTop="120dip" android:layout_gravity="left"
-		android:padding="4dip" android:background="@color/planet_back_color"
-		android:textColor="@color/text_color" android:text="Altitude"
-		android:textSize="12sp" />
-	<TextView android:id="@+id/alt_text" android:layout_width="97dip"
-		android:layout_height="wrap_content" android:layout_marginTop="120dip"
-		android:layout_gravity="right" android:padding="4dip" android:background="@color/planet_back_color"
-		android:textColor="@color/text_color" android:text="52\u00b0"
-		android:textSize="12sp" />
+	<TextView
+		android:id="@+id/info_dec"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/view2"
+		android:layout_alignLeft="@+id/view2"
+		android:padding="@dimen/pos_data_pad"
+		android:background="@color/planet_back_color"
+		android:textColor="@color/text_color"
+		android:text="Declination"
+		android:textSize="@dimen/info_data_text" />
+	<TextView
+		android:id="@+id/info_dec_text"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/view2"
+		android:layout_alignRight="@+id/view2"
+		android:gravity="right"
+		android:padding="@dimen/pos_data_pad"
+		android:background="@color/planet_back_color"
+		android:textColor="@color/text_color"
+		android:textSize="@dimen/info_data_text" />
 
-	<TextView android:layout_width="97dip" android:layout_height="wrap_content"
-		android:layout_marginTop="155dip" android:layout_gravity="left"
-		android:padding="4dip" android:background="@color/planet_back_color"
-		android:textColor="@color/text_color" android:text="Distance"
-		android:textSize="12sp" />
-	<TextView android:id="@+id/dis_text" android:layout_width="97dip"
-		android:layout_height="wrap_content" android:layout_marginTop="155dip"
-		android:layout_gravity="right" android:padding="4dip" android:background="@color/planet_back_color"
-		android:textColor="@color/text_color" android:text="39.034 AU"
-		android:textSize="12sp" />
+	<View
+		android:id="@+id/view3"
+		android:layout_below="@+id/info_dec"
+		android:layout_width="fill_parent"
+		android:layout_height="5dp" />
 
-	<TextView android:layout_width="97dip" android:layout_height="wrap_content"
-		android:layout_marginTop="190dip" android:layout_gravity="left"
-		android:padding="4dip" android:background="@color/planet_back_color"
-		android:textColor="@color/text_color" android:text="Magnitude"
-		android:textSize="12sp" />
-	<TextView android:id="@+id/mag_text" android:layout_width="97dip"
-		android:layout_height="wrap_content" android:layout_marginTop="190dip"
-		android:layout_gravity="right" android:padding="4dip" android:background="@color/planet_back_color"
-		android:textColor="@color/text_color" android:text="-12" android:textSize="12sp" />
+	<TextView
+		android:id="@+id/info_az"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/view3"
+		android:layout_alignLeft="@+id/view3"
+		android:padding="@dimen/pos_data_pad"
+		android:background="@color/planet_back_color"
+		android:textColor="@color/text_color"
+		android:text="Azimuth"
+		android:textSize="@dimen/info_data_text" />
+	<TextView
+		android:id="@+id/info_az_text"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/view3"
+		android:layout_alignRight="@+id/view3"
+		android:gravity="right"
+		android:padding="@dimen/pos_data_pad"
+		android:background="@color/planet_back_color"
+		android:textColor="@color/text_color"
+		android:textSize="@dimen/info_data_text" />
 
-	<TextView android:layout_width="97dip" android:layout_height="wrap_content"
-		android:layout_marginTop="225dip" android:layout_gravity="left"
-		android:padding="4dip" android:background="@color/planet_back_color"
-		android:textColor="@color/text_color" android:text="Set Time"
-		android:textSize="12sp" />
-	<TextView android:id="@+id/set_text" android:layout_width="97dip"
-		android:layout_height="wrap_content" android:layout_marginTop="225dip"
-		android:layout_gravity="right" android:padding="4dip" android:background="@color/planet_back_color"
-		android:textColor="@color/text_color" android:text="02:38 UT"
-		android:textSize="12sp" />
+	<View
+		android:id="@+id/view4"
+		android:layout_below="@+id/info_az"
+		android:layout_width="fill_parent"
+		android:layout_height="5dp" />
 
-</merge>
+	<TextView
+		android:id="@+id/info_alt"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/view4"
+		android:layout_alignLeft="@+id/view4"
+		android:padding="@dimen/pos_data_pad"
+		android:background="@color/planet_back_color"
+		android:textColor="@color/text_color"
+		android:text="Altitude"
+		android:textSize="@dimen/info_data_text" />
+	<TextView
+		android:id="@+id/info_alt_text"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/view4"
+		android:layout_alignRight="@+id/view4"
+		android:gravity="right"
+		android:padding="@dimen/pos_data_pad"
+		android:background="@color/planet_back_color"
+		android:textColor="@color/text_color"
+		android:textSize="@dimen/info_data_text" />
+
+	<View
+		android:id="@+id/view5"
+		android:layout_below="@+id/info_alt"
+		android:layout_width="fill_parent"
+		android:layout_height="5dp" />
+
+	<TextView
+		android:id="@+id/info_dis"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/view5"
+		android:layout_alignLeft="@+id/view5"
+		android:padding="@dimen/pos_data_pad"
+		android:background="@color/planet_back_color"
+		android:textColor="@color/text_color"
+		android:text="Distance"
+		android:textSize="@dimen/info_data_text" />
+	<TextView
+		android:id="@+id/info_dis_text"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/view5"
+		android:layout_alignRight="@+id/view5"
+		android:gravity="right"
+		android:padding="@dimen/pos_data_pad"
+		android:background="@color/planet_back_color"
+		android:textColor="@color/text_color"
+		android:textSize="@dimen/info_data_text" />
+
+	<View
+		android:id="@+id/view6"
+		android:layout_below="@+id/info_dis"
+		android:layout_width="fill_parent"
+		android:layout_height="5dp" />
+
+	<TextView
+		android:id="@+id/info_mag"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/view6"
+		android:layout_alignLeft="@+id/view6"
+		android:padding="@dimen/pos_data_pad"
+		android:background="@color/planet_back_color"
+		android:textColor="@color/text_color"
+		android:text="Magnitude"
+		android:textSize="@dimen/info_data_text" />
+	<TextView
+		android:id="@+id/info_mag_text"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/view6"
+		android:layout_alignRight="@+id/view6"
+		android:gravity="right"
+		android:padding="@dimen/pos_data_pad"
+		android:background="@color/planet_back_color"
+		android:textColor="@color/text_color"
+		android:textSize="@dimen/info_data_text" />
+
+	<View
+		android:id="@+id/view7"
+		android:layout_below="@+id/info_mag"
+		android:layout_width="fill_parent"
+		android:layout_height="5dp" />
+
+	<TextView
+		android:id="@+id/info_setTime"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/view7"
+		android:layout_alignLeft="@+id/view7"
+		android:padding="@dimen/pos_data_pad"
+		android:background="@color/planet_back_color"
+		android:textColor="@color/text_color"
+		android:text="Set Time"
+		android:textSize="@dimen/info_data_text" />
+	<TextView
+		android:id="@+id/info_setTime_text"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/view7"
+		android:layout_alignRight="@+id/view7"
+		android:gravity="right"
+		android:padding="@dimen/pos_data_pad"
+		android:background="@color/planet_back_color"
+		android:textColor="@color/text_color"
+		android:textSize="@dimen/info_data_text" />
+
+	<View
+		android:id="@+id/view8"
+		android:layout_below="@+id/info_setTime"
+		android:layout_width="fill_parent"
+		android:layout_height="5dp" />
+
+	<Button
+		android:text="OK"
+		android:id="@+id/closeButton"
+		android:layout_centerHorizontal="true"
+		android:layout_below="@+id/view8"
+		android:layout_width="100dp"
+		android:layout_height="wrap_content" />
+
+</RelativeLayout>

@@ -29,25 +29,30 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
 public class Position extends Activity {
 
-	private TextView pDateText, pTimeText, pPlanetName;
-	private TextView pRAText, pDecText;
+	private Button dateButton, timeButton;
+	private Spinner planetNameSpinner;
+	private TextView pRAText, pDecText, pMagText, pRiseText, pSetText;
 	private TextView pAzText, pAltText, pBelowText, pDistText;
-	// private Button showPosButton;
 	private Bundle bundle;
 	private int mYear, mMonth, mDay, mHour, mMinute, planetNum = -1;
 	private double offset;
-	private double mSec, pLat, pLong, pAltitude, pAz, pAlt;
+	private double mSec;
 	double[] g = new double[3];
 	private Calendar gc, utc;
 	private String planetName;
@@ -60,27 +65,31 @@ public class Position extends Activity {
 	}
 
 	// c function prototypes
-	public native double[] planetRADec(double d1, double d2, int p,
+	public native double[] planetPosData(double d1, double d2, int p,
 			double[] loc, double press, double temp);
 
 	public native double[] utc2jd(int m, int d, int y, int hr, int min,
 			double sec);
+
+	public native String jd2utc(double jdate);
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.position);
 
-		// showPosButton = (Button) findViewById(R.id.pShowPos);
-		pDateText = (TextView) findViewById(R.id.pDateText);
-		pTimeText = (TextView) findViewById(R.id.pTimeText);
-		pPlanetName = (TextView) findViewById(R.id.pPlanetName);
-		pAzText = (TextView) findViewById(R.id.pAzText);
-		pAltText = (TextView) findViewById(R.id.pAltText);
-		pRAText = (TextView) findViewById(R.id.pRAText);
-		pDecText = (TextView) findViewById(R.id.pDecText);
-		pBelowText = (TextView) findViewById(R.id.pBelowText);
-		pDistText = (TextView) findViewById(R.id.pDistText);
+		dateButton = (Button) findViewById(R.id.pos_date_button);
+		timeButton = (Button) findViewById(R.id.pos_time_button);
+		planetNameSpinner = (Spinner) findViewById(R.id.pos_name_spin);
+		pAzText = (TextView) findViewById(R.id.pos_az_text);
+		pAltText = (TextView) findViewById(R.id.pos_alt_text);
+		pRAText = (TextView) findViewById(R.id.pos_ra_text);
+		pDecText = (TextView) findViewById(R.id.pos_dec_text);
+		pBelowText = (TextView) findViewById(R.id.pos_below_text);
+		pDistText = (TextView) findViewById(R.id.pos_dis_text);
+		pMagText = (TextView) findViewById(R.id.pos_mag_text);
+		pRiseText = (TextView) findViewById(R.id.pos_riseTime_text);
+		pSetText = (TextView) findViewById(R.id.pos_setTime_text);
 
 		// load bundle from previous activity
 		bundle = getIntent().getExtras();
@@ -99,22 +108,27 @@ public class Position extends Activity {
 		mMonth = c.get(Calendar.MONTH);
 		mDay = c.get(Calendar.DAY_OF_MONTH);
 
+		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+				this, R.array.planets_array,
+				android.R.layout.simple_spinner_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		planetNameSpinner.setAdapter(adapter);
+
 		// display the current date (this method is below)
 		updateDisplay();
 
-		pPlanetName.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				planetDialog();
-			}
-		});
+		planetNameSpinner
+				.setOnItemSelectedListener(new PlanetNameSelectedListener());
 
-		pDateText.setOnClickListener(new View.OnClickListener() {
+		dateButton.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				showDialog(DATE_DIALOG_ID);
 			}
 		});
 
-		pTimeText.setOnClickListener(new View.OnClickListener() {
+		timeButton.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				showDialog(TIME_DIALOG_ID);
 			}
@@ -130,6 +144,7 @@ public class Position extends Activity {
 			double ra, dec, ras;
 			int rah, ram, decd, decm, decs, m;
 			char decSign;
+			String[] dateArr;
 
 			utc = new GregorianCalendar(mYear, mMonth, mDay, mHour, mMinute, 0);
 			m = (int) (offset * 60);
@@ -140,21 +155,19 @@ public class Position extends Activity {
 					utc.get(Calendar.HOUR_OF_DAY), utc.get(Calendar.MINUTE),
 					utc.get(Calendar.SECOND));
 			if (data == null) {
-				System.out.println("date error");
+				Log.e("Date error", "pos date error");
 				return;
 			}
 			// jdTT = data[0];
 			// jdUT = data[1];
 
-			data = planetRADec(data[0], data[1], planetNum, g, 0.0, 0.0);
+			data = planetPosData(data[0], data[1], planetNum, g, 0.0, 0.0);
 			if (data == null) {
-				System.out.println("position error");
+				Log.e("Position error", "planetUpData error");
 				return;
 			}
 			ra = data[0];
 			dec = data[1];
-			pAz = data[3];
-			pAlt = data[4];
 
 			// convert ra to hours
 			ra = ra / 15;
@@ -187,14 +200,35 @@ public class Position extends Activity {
 			pDistText.setText(String.format("%.4f AU", data[2]));
 			pAzText.setText(String.format("%.1f\u00b0", data[3]));
 			pAltText.setText(String.format("%.1f\u00b0", data[4]));
+			pMagText.setText(Math.round(data[5]) + "");
+
+			dateArr = jd2utc(data[6]).split("_");
+			utc.set(Integer.parseInt(dateArr[1]),
+					Integer.parseInt(dateArr[2]) - 1,
+					Integer.parseInt(dateArr[3]), Integer.parseInt(dateArr[4]),
+					Integer.parseInt(dateArr[5]));
+			utc.set(Calendar.MILLISECOND,
+					(int) (Double.parseDouble(dateArr[6]) * 1000));
+			// convert utc to local time
+			utc.add(Calendar.MINUTE, m);
+			pSetText.setText(DateFormat.format("MM/dd h:mm aa", utc));
+
+			dateArr = jd2utc(data[7]).split("_");
+			utc.set(Integer.parseInt(dateArr[1]),
+					Integer.parseInt(dateArr[2]) - 1,
+					Integer.parseInt(dateArr[3]), Integer.parseInt(dateArr[4]),
+					Integer.parseInt(dateArr[5]));
+			utc.set(Calendar.MILLISECOND,
+					(int) (Double.parseDouble(dateArr[6]) * 1000));
+			// convert utc to local time
+			utc.add(Calendar.MINUTE, m);
+			pRiseText.setText(DateFormat.format("MM/dd h:mm aa", utc));
 
 			if (data[4] <= 0.0) {
 				// below horizon
-				// showPosButton.setVisibility(View.GONE);
 				pBelowText.setVisibility(View.VISIBLE);
 			} else {
 				// above horizon
-				// showPosButton.setVisibility(View.VISIBLE);
 				pBelowText.setVisibility(View.INVISIBLE);
 			}
 		}
@@ -204,8 +238,8 @@ public class Position extends Activity {
 	// updates the date and time in the TextView
 	private void updateDisplay() {
 		gc = new GregorianCalendar(mYear, mMonth, mDay, mHour, mMinute, 0);
-		pDateText.setText(DateFormat.format("M/dd/yyyy", gc));
-		pTimeText.setText(DateFormat.format("h:mmaa", gc));
+		dateButton.setText(DateFormat.format("M/dd/yyyy", gc));
+		timeButton.setText(DateFormat.format("h:mmaa", gc));
 		computeLocation();
 	}
 
@@ -216,10 +250,10 @@ public class Position extends Activity {
 				.createFromResource(this, R.array.planets_array,
 						android.R.layout.select_dialog_item);
 		builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+			@Override
 			public void onClick(DialogInterface dialog, int item) {
 				planetNum = item;
 				planetName = (String) adapter.getItem(item);
-				pPlanetName.setText(adapter.getItem(item));
 				computeLocation();
 			}
 		});
@@ -227,8 +261,22 @@ public class Position extends Activity {
 		alert.show();
 	}
 
+	public class PlanetNameSelectedListener implements OnItemSelectedListener {
+		public void onItemSelected(AdapterView<?> parent, View view, int pos,
+				long id) {
+			planetNum = pos;
+			planetName = (String) planetNameSpinner.getItemAtPosition(pos);
+			computeLocation();
+		}
+
+		public void onNothingSelected(AdapterView<?> parent) {
+			// Do nothing.
+		}
+	}
+
 	// the callback received when the user "sets" the date in the dialog
 	private DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener() {
+		@Override
 		public void onDateSet(DatePicker view, int year, int monthOfYear,
 				int dayOfMonth) {
 			mYear = year;
@@ -240,6 +288,7 @@ public class Position extends Activity {
 
 	// the callback received when the user "sets" the time in the dialog
 	private TimePickerDialog.OnTimeSetListener mTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
+		@Override
 		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 			mHour = hourOfDay;
 			mMinute = minute;

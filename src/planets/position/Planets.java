@@ -107,6 +107,7 @@ public class Planets extends Activity {
 		downloadButton.setEnabled(true);
 
 		downloadButton.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				getGPS();
 			}
@@ -114,6 +115,7 @@ public class Planets extends Activity {
 		});
 
 		positionButton.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				// save data
 				launchPosition();
@@ -122,6 +124,7 @@ public class Planets extends Activity {
 		});
 
 		manualButton.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				enterLocManual();
 			}
@@ -129,6 +132,7 @@ public class Planets extends Activity {
 		});
 
 		whatupButton.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick(View view) {
 				launchWhatsUp();
 			}
@@ -455,12 +459,14 @@ public class Planets extends Activity {
 				.setCancelable(false)
 				.setPositiveButton("Download",
 						new DialogInterface.OnClickListener() {
+							@Override
 							public void onClick(DialogInterface dialog, int id) {
 								getGPS();
 							}
 						});
 		alertDialogBuilder.setNeutralButton("Manual",
 				new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						enterLocManual();
 					}

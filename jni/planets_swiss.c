@@ -27,23 +27,25 @@
  * 		swe_set_topo
  * 		swe_calc
  * 		swe_azalt
+ * 		swe_pheno_ut
+ * 		swe_rise_trans
  * 		swe_close
  * Input: Julian date in ephemeris time, Julian date in ut1, planet number,
  * 		location array, atmospheric pressure and temperature.
- * Output: Double array containing RA, Dec, distance, azimuth, altitude of
- * 		planet.
+ * Output: Double array containing RA, Dec, distance, azimuth, altitude,
+ * 		magnitude, set time, and rise time of planet.
  */
-jdoubleArray Java_planets_position_Position_planetRADec(JNIEnv* env,
+jdoubleArray Java_planets_position_Position_planetPosData(JNIEnv* env,
 		jobject this, jdouble d_et, jdouble d_ut, jint p, jdoubleArray loc,
 		jdouble atpress, jdouble attemp) {
 
 	char serr[256];
-	double x2[3], az[3], g[3];
+	double x2[3], az[3], g[3], attr[20], setT, riseT;
 	int iflag = SEFLG_SWIEPH | SEFLG_EQUATORIAL | SEFLG_TOPOCTR;
 	int iflgret, i;
 
 	jdoubleArray result;
-	result = (*env)->NewDoubleArray(env, 5);
+	result = (*env)->NewDoubleArray(env, 8);
 	if (result == NULL) {
 		return NULL; /* out of memory error thrown */
 	}
@@ -58,6 +60,11 @@ jdoubleArray Java_planets_position_Position_planetRADec(JNIEnv* env,
 		return NULL;
 	} else {
 		swe_azalt(d_ut, SE_EQU2HOR, g, atpress, attemp, x2, az);
+		swe_pheno_ut(d_ut, p, SEFLG_SWIEPH, attr, serr);
+		swe_rise_trans(d_ut, p, "", SEFLG_SWIEPH, SE_CALC_SET, g, atpress,
+				attemp, &setT, serr);
+		swe_rise_trans(d_ut, p, "", SEFLG_SWIEPH, SE_CALC_RISE, g, atpress,
+				attemp, &riseT, serr);
 		swe_close();
 
 		/*rotates azimuth origin to north*/
@@ -68,6 +75,9 @@ jdoubleArray Java_planets_position_Position_planetRADec(JNIEnv* env,
 		// move from the temp structure to the java structure
 		(*env)->SetDoubleArrayRegion(env, result, 0, 3, x2);
 		(*env)->SetDoubleArrayRegion(env, result, 3, 2, az);
+		(*env)->SetDoubleArrayRegion(env, result, 5, 1, &attr[4]);
+		(*env)->SetDoubleArrayRegion(env, result, 6, 1, &setT);
+		(*env)->SetDoubleArrayRegion(env, result, 7, 1, &riseT);
 		return result;
 	}
 }
@@ -103,6 +113,27 @@ jdoubleArray Java_planets_position_Position_utc2jd(JNIEnv* env, jobject this,
 }
 
 /*
+ * Covert a given Julian date to a calendar date in utc.
+ * Swiss Ephemeris function called:
+ * 		swe_jdut1_to_utc
+ * Input: Julian date
+ * Output: String containing a calendar date
+ */
+jstring Java_planets_position_Position_jd2utc(JNIEnv* env, jobject this,
+		jdouble juldate) {
+
+	char *outFormat = "_%i_%i_%i_%i_%i_%2.1f_";
+	char output[30];
+	int i, y, mo, d, h, mi;
+	double s;
+
+	swe_jdut1_to_utc(juldate, SE_GREG_CAL, &y, &mo, &d, &h, &mi, &s);
+
+	i = sprintf(output, outFormat, y, mo, d, h, mi, s);
+	return (*env)->NewStringUTF(env, output);
+}
+
+/*
  * Calculate the position of a given planet in the sky.
  * Swiss Ephemeris functions called:
  * 		swe_set_ephe_path
@@ -117,7 +148,7 @@ jdoubleArray Java_planets_position_Position_utc2jd(JNIEnv* env, jobject this,
  * Output: Double array containing RA, Dec, distance, azimuth, altitude,
  * 		magnitude, and set time of planet.
  */
-jdoubleArray Java_planets_position_ViewWhatsUp_planetRADec(JNIEnv* env,
+jdoubleArray Java_planets_position_ViewWhatsUp_planetUpData(JNIEnv* env,
 		jobject this, jdouble d_et, jdouble d_ut, jint p, jdoubleArray loc,
 		jdouble atpress, jdouble attemp) {
 

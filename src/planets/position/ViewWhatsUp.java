@@ -131,7 +131,8 @@ public class ViewWhatsUp extends ListActivity {
 			}
 			String[] dateArr = jd2utc(data[6]).split("_");
 
-			c.set(Integer.parseInt(dateArr[1]), Integer.parseInt(dateArr[2]),
+			c.set(Integer.parseInt(dateArr[1]),
+					Integer.parseInt(dateArr[2]) - 1,
 					Integer.parseInt(dateArr[3]), Integer.parseInt(dateArr[4]),
 					Integer.parseInt(dateArr[5]));
 			c.set(Calendar.MILLISECOND,

@@ -397,11 +397,15 @@ public class Planets extends Activity {
 		// http://www.worldweatheronline.com/feed/tz.ashx
 		// ?format=xml&key=77241f817e062244102410&q=32.00,-110.00
 
+		// http://www.askgeo.com/api/29002/nt4km37jp9qpti3pl6a5uohabq/
+		// timezone.xml?points=37.78%2C-122.42
 		try {
 			ParsedLocationData locationDataSet = new ParsedLocationData();
 
 			SAXParserFactory spf = SAXParserFactory.newInstance();
-			SAXParser sp = spf.newSAXParser();
+			SAXParser sp;
+
+			sp = spf.newSAXParser();
 
 			XMLReader xr = sp.getXMLReader();
 			XMLDataHandler dataHandler = new XMLDataHandler(locationDataSet);

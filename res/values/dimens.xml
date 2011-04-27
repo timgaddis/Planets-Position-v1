@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<dimen name="pos_planet_name">20sp</dimen>
+	<dimen name="pos_planet_name2">26sp</dimen>
 	<dimen name="pos_text_width">135dp</dimen>
 	<dimen name="pos_data_text">18sp</dimen>
 	<dimen name="pos_data_pad">5dp</dimen>

@@ -34,7 +34,7 @@
 		<item>Pluto</item>
 	</string-array>
 	<string name="main_about">
-		<b>Planets Position v1.1.1</b>\n\n
+		<b>Planets Position v1.2</b>\n\n
 		Planets Position is a program to calculate the position of the planets
 		in the night sky based on a given location on Earth.\n\n
 		<b>License and Copyright</b>\n\n
@@ -66,13 +66,16 @@
 	<string name="main_help">
 		Initially, location data needs to be saved for the position 
 		calculations.\n
-		The two options are to retrieve location data from GPS and download 
-		timezone data or manually enter all of the data.  The data is then saved
-		to the program.\n\n
+		The three options are to retrieve location data from GPS, download 
+		timezone data or manually enter all of the data, and view real time 
+		positions of the planets.  The location data is then saved to the 
+		program.\n\n
 		The Planet\'s Position screen will let you select a planet and a date 
 		and time, then it will calculate the position.\n\n
 		The What\'s Up Now screen lists what planets are up for the current 
 		date and time of the device for the given location.\n\n
+		The Real Time Position screen is the current real time position of the 
+		selected planet.\n\n
 	</string>
 	<string name="pos_help">
 		The Planet, Local Date, and Local Time fields are user changeable.

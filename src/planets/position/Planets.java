@@ -57,13 +57,19 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class Planets extends Activity {
 
-	private Button positionButton, whatupButton, downloadButton, manualButton;
+	private Button positionButton, whatupButton, downloadButton, manualButton,
+			liveButton;
+	private Spinner planetNameSpinner;
 	private TextView locationText;
 	private long date = 0, locDate = 0;
 	private LocationManager lm;
@@ -73,6 +79,8 @@ public class Planets extends Activity {
 	private double elevation, latitude, longitude, offset;
 	private boolean running = false;
 	private Bundle bundle;
+	private int planetNum = 0;
+	private String planetName;
 
 	private static final int LOCATION_MANUAL = 0;
 	private static final int WIFI_STATUS = 1;
@@ -85,16 +93,13 @@ public class Planets extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+		planetNameSpinner = (Spinner) findViewById(R.id.planetSpin);
+		liveButton = (Button) findViewById(R.id.goButton);
 		positionButton = (Button) findViewById(R.id.positionButton);
 		manualButton = (Button) findViewById(R.id.manualEnterButton);
 		whatupButton = (Button) findViewById(R.id.whatupButton);
 		downloadButton = (Button) findViewById(R.id.downloadButton);
 		locationText = (TextView) findViewById(R.id.locationData);
-
-		positionButton.setEnabled(false);
-		whatupButton.setEnabled(false);
-		manualButton.setEnabled(false);
-		downloadButton.setEnabled(false);
 
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -138,6 +143,24 @@ public class Planets extends Activity {
 			}
 
 		});
+
+		liveButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				launchLivePos();
+			}
+
+		});
+
+		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+				this, R.array.planets_array,
+				android.R.layout.simple_spinner_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		planetNameSpinner.setAdapter(adapter);
+		// planetNameSpinner.setSelection(planetNum);
+
+		planetNameSpinner
+				.setOnItemSelectedListener(new PlanetNameSelectedListener());
 
 	}
 
@@ -186,8 +209,6 @@ public class Planets extends Activity {
 			getXMLData();
 			loadXMLData();
 			saveLocation();
-			positionButton.setEnabled(true);
-			whatupButton.setEnabled(true);
 			running = false;
 		} else {
 			if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -224,6 +245,19 @@ public class Planets extends Activity {
 		startActivity(i);
 	}
 
+	private void launchLivePos() {
+		bundle = new Bundle();
+		bundle.putDouble("Lat", latitude);
+		bundle.putDouble("Long", longitude);
+		bundle.putDouble("Elevation", elevation);
+		bundle.putDouble("Offset", offset);
+		bundle.putInt("planet", planetNum);
+		bundle.putString("name", planetName);
+		Intent i = new Intent(this, LivePosition.class);
+		i.putExtras(bundle);
+		startActivity(i);
+	}
+
 	private void loadLocation() {
 		Cursor locCur = planetDbHelper.fetchEntry(0);
 		startManagingCursor(locCur);
@@ -241,8 +275,6 @@ public class Planets extends Activity {
 			data += "\nElevation: " + elevation;
 			data += "\nGMT offset: " + offset;
 			locationText.setText(data);
-			positionButton.setEnabled(true);
-			whatupButton.setEnabled(true);
 		} else {
 			showLocationDataAlert();
 		}
@@ -394,7 +426,7 @@ public class Planets extends Activity {
 
 		// http://api.geonames.org/timezone?lat=47.01&lng=10.2&username=tgaddis
 
-		// http://www.worldweatheronline.com/feed/tz.ashx
+		// http://free.worldweatheronline.com/feed/tz.ashx
 		// ?format=xml&key=77241f817e062244102410&q=32.00,-110.00
 
 		// http://www.askgeo.com/api/29002/nt4km37jp9qpti3pl6a5uohabq/
@@ -421,7 +453,7 @@ public class Planets extends Activity {
 			if (locationData.getErrCode() >= 10) {
 				// if error from Geonames, call worldweatheronline.com for data
 				xr.parse(new InputSource(
-						getData("http://www.worldweatheronline.com/feed/tz.ashx?"
+						getData("http://free.worldweatheronline.com/feed/tz.ashx?"
 								+ "format=xml&key=77241f817e062244102410&q="
 								+ latitude + "," + longitude)));
 				locationData = dataHandler.getParsedData();
@@ -442,8 +474,6 @@ public class Planets extends Activity {
 		data += "\nElevation: " + elevation;
 		data += "\nGMT offset: " + offset;
 		locationText.setText(data);
-		positionButton.setEnabled(true);
-		whatupButton.setEnabled(true);
 	}
 
 	private InputStream getData(String url) throws Exception {
@@ -500,6 +530,19 @@ public class Planets extends Activity {
 		protected void onPreExecute() {
 			dialog = ProgressDialog.show(Planets.this, "",
 					"Downloading data. Please wait...", true);
+		}
+	}
+
+	// Planet name selection for the live position activity
+	public class PlanetNameSelectedListener implements OnItemSelectedListener {
+		public void onItemSelected(AdapterView<?> parent, View view, int pos,
+				long id) {
+			planetNum = pos;
+			planetName = (String) planetNameSpinner.getItemAtPosition(pos);
+		}
+
+		public void onNothingSelected(AdapterView<?> parent) {
+			// Do nothing.
 		}
 	}
 

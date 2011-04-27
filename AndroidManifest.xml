@@ -3,8 +3,8 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	package="planets.position"
 	android:installLocation="auto"
-	android:versionName="1.1.1"
-	android:versionCode="7">
+	android:versionName="1.2"
+	android:versionCode="8">
 	<application
 		android:label="@string/app_name"
 		android:icon="@drawable/ic_mars">
@@ -19,7 +19,6 @@
 					android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-
 		<activity
 			android:name="About"
 			android:screenOrientation="portrait" />
@@ -39,7 +38,10 @@
 			android:theme="@style/WiFiDialog"
 			android:label="@string/alert_title"
 			android:screenOrientation="portrait" />
-
+		<activity
+			android:name="LivePosition"
+			android:label="Real Time Position"
+			android:screenOrientation="portrait" />
 	</application>
 	<uses-permission
 		android:name="android.permission.INTERNET" />
@@ -53,9 +55,7 @@
 		android:name="android.permission.ACCESS_WIFI_STATE" />
 	<uses-permission
 		android:name="android.permission.ACCESS_NETWORK_STATE" />
-
 	<uses-sdk
 		android:minSdkVersion="4"
 		android:targetSdkVersion="8" />
-
-</manifest> 
+</manifest>

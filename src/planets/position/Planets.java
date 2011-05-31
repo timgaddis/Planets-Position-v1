@@ -68,7 +68,7 @@ import android.widget.Toast;
 public class Planets extends Activity {
 
 	private Button positionButton, whatupButton, downloadButton, manualButton,
-			liveButton;
+			liveButton, solarButton, lunarButton;
 	private Spinner planetNameSpinner;
 	private TextView locationText;
 	private long date = 0, locDate = 0;
@@ -86,7 +86,7 @@ public class Planets extends Activity {
 	private static final int WIFI_STATUS = 1;
 	private static final int WIFI_ALERT = 2;
 
-	private boolean DEBUG = false;
+	private boolean DEBUG = true;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -99,6 +99,8 @@ public class Planets extends Activity {
 		manualButton = (Button) findViewById(R.id.manualEnterButton);
 		whatupButton = (Button) findViewById(R.id.whatupButton);
 		downloadButton = (Button) findViewById(R.id.downloadButton);
+		solarButton = (Button) findViewById(R.id.solarEclButton);
+		lunarButton = (Button) findViewById(R.id.lunarEclButton);
 		locationText = (TextView) findViewById(R.id.locationData);
 
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -148,6 +150,22 @@ public class Planets extends Activity {
 			@Override
 			public void onClick(View view) {
 				launchLivePos();
+			}
+
+		});
+
+		solarButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				launchSolar();
+			}
+
+		});
+
+		lunarButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				launchLunar();
 			}
 
 		});
@@ -221,6 +239,28 @@ public class Planets extends Activity {
 						0, ll);
 			}
 		}
+	}
+
+	private void launchSolar() {
+		bundle = new Bundle();
+		bundle.putDouble("Lat", latitude);
+		bundle.putDouble("Long", longitude);
+		bundle.putDouble("Elevation", elevation);
+		bundle.putDouble("Offset", offset);
+		Intent i = new Intent(this, SolarEclipse.class);
+		i.putExtras(bundle);
+		startActivity(i);
+	}
+
+	private void launchLunar() {
+		bundle = new Bundle();
+		bundle.putDouble("Lat", latitude);
+		bundle.putDouble("Long", longitude);
+		bundle.putDouble("Elevation", elevation);
+		bundle.putDouble("Offset", offset);
+		Intent i = new Intent(this, LunarEclipse.class);
+		i.putExtras(bundle);
+		startActivity(i);
 	}
 
 	private void launchPosition() {

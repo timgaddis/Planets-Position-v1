@@ -9,7 +9,7 @@
 		android:id="@+id/relativeLayout1"
 		android:padding="10dp"
 		android:layout_width="fill_parent"
-		android:layout_height="fill_parent">
+		android:layout_height="wrap_content">
 
 		<Spinner
 			android:id="@+id/pos_name_spin"

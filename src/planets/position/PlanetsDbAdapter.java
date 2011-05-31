@@ -56,9 +56,22 @@ public class PlanetsDbAdapter {
 			+ "(_id integer primary key autoincrement, name text not null, "
 			+ "ra real, dec real, az real, alt real, dis real, mag integer, setT integer);";
 
+	private static final String SE_DB_CREATE = "create table solarEcl "
+			+ "(_id integer primary key autoincrement, localType integer,globalType integer,"
+			+ "local integer,localMaxTime real,localFirstTime real,localSecondTime real,"
+			+ "localThirdTime real,localFourthTime real,diaRatio real,fracCover real,sunAz real,"
+			+ "sunAlt real,localMag real,sarosNum integer,sarosMemNum integer,moonAz real,"
+			+ "moonAlt real,globalMaxTime real,globalBeginTime real,globalEndTime real,"
+			+ "globalTotBegin real,globalTotEnd real,globalCenterBegin real,globalCenterEnd real);";
+
+	private static final String LE_DB_CREATE = "create table lunarEcl "
+			+ "(_id integer primary key autoincrement, type integer,local integer,maxEclTime real,"
+			+ "partBegin real,partEnd real,totBegin real,totEnd real,penBegin real,penEnd real,"
+			+ "eclipseMag real,penMag real,sarosNum integer,sarosMemNum integer);";
+
 	private static final String DATABASE_NAME = "PlanetsDB";
 	private static String DATABASE_TABLE;
-	private static final int DATABASE_VERSION = 4;
+	private static final int DATABASE_VERSION = 5;
 
 	private final Context mCtx;
 
@@ -79,6 +92,8 @@ public class PlanetsDbAdapter {
 			for (int i = 0; i < 10; i++) {
 				db.execSQL(ip1 + i + ip2);
 			}
+			db.execSQL(SE_DB_CREATE);
+			db.execSQL(LE_DB_CREATE);
 		}
 
 		@Override
@@ -87,6 +102,8 @@ public class PlanetsDbAdapter {
 					+ newVersion + ", which will destroy all old data");
 			db.execSQL("DROP TABLE IF EXISTS location");
 			db.execSQL("DROP TABLE IF EXISTS planets");
+			db.execSQL("DROP TABLE IF EXISTS solarEcl");
+			db.execSQL("DROP TABLE IF EXISTS lunarEcl");
 			onCreate(db);
 		}
 	}

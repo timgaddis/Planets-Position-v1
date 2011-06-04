@@ -42,7 +42,7 @@ jdoubleArray Java_planets_position_LivePosition_planetLiveData(JNIEnv* env,
 	char serr[256];
 	double x2[3], az[3], g[3], attr[20], setT, riseT;
 	int iflag = SEFLG_SWIEPH | SEFLG_EQUATORIAL | SEFLG_TOPOCTR;
-	int iflgret, i;
+	int iflgret;
 
 	jdoubleArray result;
 	result = (*env)->NewDoubleArray(env, 8);
@@ -94,7 +94,7 @@ jdoubleArray Java_planets_position_LivePosition_utc2jd(JNIEnv* env,
 
 	char serr[256];
 	double dret[2];
-	int retval, i;
+	int retval;
 	jdoubleArray result;
 	result = (*env)->NewDoubleArray(env, 5);
 	if (result == NULL) {
@@ -155,7 +155,7 @@ jdoubleArray Java_planets_position_Position_planetPosData(JNIEnv* env,
 	char serr[256];
 	double x2[3], az[3], g[3], attr[20], setT, riseT;
 	int iflag = SEFLG_SWIEPH | SEFLG_EQUATORIAL | SEFLG_TOPOCTR;
-	int iflgret, i;
+	int iflgret;
 
 	jdoubleArray result;
 	result = (*env)->NewDoubleArray(env, 8);
@@ -207,7 +207,7 @@ jdoubleArray Java_planets_position_Position_utc2jd(JNIEnv* env, jobject this,
 
 	char serr[256];
 	double dret[2];
-	int retval, i;
+	int retval;
 	jdoubleArray result;
 	result = (*env)->NewDoubleArray(env, 5);
 	if (result == NULL) {
@@ -268,7 +268,7 @@ jdoubleArray Java_planets_position_ViewWhatsUp_planetUpData(JNIEnv* env,
 	char serr[256];
 	double x2[3], az[3], g[3], attr[20], setT;
 	int iflag = SEFLG_SWIEPH | SEFLG_EQUATORIAL | SEFLG_TOPOCTR;
-	int iflgret, i;
+	int iflgret;
 
 	jdoubleArray result;
 	result = (*env)->NewDoubleArray(env, 7);
@@ -317,7 +317,7 @@ jdoubleArray Java_planets_position_ViewWhatsUp_utc2jd(JNIEnv* env,
 
 	char serr[256];
 	double dret[2];
-	int retval, i;
+	int retval;
 	jdoubleArray result;
 	result = (*env)->NewDoubleArray(env, 5);
 	if (result == NULL) {

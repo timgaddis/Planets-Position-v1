@@ -66,47 +66,38 @@
 	<TableRow
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content">
-		<LinearLayout
+		<TextView
 			android:layout_width="fill_parent"
-			android:layout_height="fill_parent"
-			android:layout_weight="1">
-			<TextView
-				android:layout_width="fill_parent"
-				android:layout_weight="0.5"
-				android:layout_height="wrap_content"
-				android:gravity="center_horizontal"
-				android:text="Elevation (m)"
-				android:layout_gravity="center" />
-			<TextView
-				android:layout_width="fill_parent"
-				android:gravity="center_horizontal"
-				android:layout_weight="0.5"
-				android:layout_height="wrap_content"
-				android:text="GMT offset +/- (hr)"
-				android:layout_gravity="center" />
-		</LinearLayout>
+			android:layout_weight="0.5"
+			android:layout_height="wrap_content"
+			android:gravity="center_horizontal"
+			android:text="Elevation (m)"
+			android:layout_gravity="center" />
+		<TextView
+			android:layout_width="fill_parent"
+			android:gravity="center_horizontal"
+			android:layout_weight="0.5"
+			android:layout_height="wrap_content"
+			android:text="GMT offset +/- (hr)"
+			android:layout_gravity="center" />
 	</TableRow>
 
-	<TableRow>
-		<LinearLayout
+	<TableRow
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content">
+		<EditText
+			android:id="@+id/newElevationText"
+			android:layout_weight="0.5"
+			android:layout_height="40dip"
+			android:inputType="numberSigned|numberDecimal"
 			android:layout_width="fill_parent"
-			android:gravity="fill_vertical"
-			android:layout_height="fill_parent"
-			android:layout_weight="1">
-			<EditText
-				android:id="@+id/newElevationText"
-				android:layout_weight="0.5"
-				android:layout_height="40dip"
-				android:inputType="numberSigned|numberDecimal"
-				android:layout_width="fill_parent"
-				android:gravity="center_horizontal" />
-			<Spinner
-				android:id="@+id/newOffsetSpin"
-				android:layout_width="fill_parent"
-				android:gravity="center_horizontal"
-				android:layout_height="42dip"
-				android:layout_weight="0.5" />
-		</LinearLayout>
+			android:gravity="center_horizontal" />
+		<Spinner
+			android:id="@+id/newOffsetSpin"
+			android:layout_width="fill_parent"
+			android:gravity="center_horizontal"
+			android:layout_height="42dip"
+			android:layout_weight="0.5" />
 	</TableRow>
 
 	<View

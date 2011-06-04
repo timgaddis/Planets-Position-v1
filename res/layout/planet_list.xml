@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical"
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content">
-	<LinearLayout
+	android:layout_width="match_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
+	<TextView
+		android:id="@+id/pTap"
+		android:textSize="12sp"
 		android:layout_width="fill_parent"
-		android:layout_height="fill_parent"
-		android:layout_weight="1">
+		android:layout_height="wrap_content"
+		android:gravity="center_horizontal"
+		android:text="Select a planet to view its position data" />
+	<LinearLayout
+		android:id="@+id/linearLayout1"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content">
 		<TextView
 			android:layout_width="fill_parent"
 			android:textSize="16sp"
@@ -46,26 +53,16 @@
 			android:gravity="center_horizontal" />
 	</LinearLayout>
 
-	<ListView
-		android:id="@+id/android:list"
-		android:layout_width="fill_parent"
-		android:layout_height="fill_parent"
-		android:textColor="@color/text_color" />
-	<TextView
-		android:id="@+id/android:empty"
-		android:padding="5dip"
+	<View
+		android:id="@+id/view1"
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:textSize="18sp"
-		android:text="@string/no_planets"
-		android:textColor="@color/text_color" />
+		android:background="@color/text_color"
+		android:layout_height="1dp" />
 
-	<TextView
-		android:id="@+id/pTap"
-		android:textSize="12sp"
-		android:layout_weight="1"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:gravity="center_horizontal"
-		android:text="Select a planet to view its position data" />
+	<ListView
+		android:id="@+id/listView1"
+		android:layout_height="fill_parent"
+		android:layout_width="fill_parent" />
+
+
 </LinearLayout>

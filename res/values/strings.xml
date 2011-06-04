@@ -34,7 +34,7 @@
 		<item>Pluto</item>
 	</string-array>
 	<string name="main_about">
-		<b>Planets Position v1.2</b>\n\n
+		<b>Planets Position v1.2.1</b>\n\n
 		Planets Position is a program to calculate the position of the planets
 		in the night sky based on a given location on Earth.\n\n
 		<b>License and Copyright</b>\n\n

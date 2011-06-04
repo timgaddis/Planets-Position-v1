@@ -19,8 +19,8 @@ package planets.position;
 
 import java.util.Calendar;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -31,12 +31,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
 
-public class ViewWhatsUp extends ListActivity {
+public class ViewWhatsUp extends Activity {
 
+	private ListView planetsList;
 	private double offset;
 	private double[] g = new double[3];
 	private int filter = 1;
@@ -64,6 +68,8 @@ public class ViewWhatsUp extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.planet_list);
 
+		planetsList = (ListView) findViewById(R.id.listView1);
+
 		// load bundle from previous activity
 		bundle = getIntent().getExtras();
 		if (bundle != null) {
@@ -78,7 +84,7 @@ public class ViewWhatsUp extends ListActivity {
 
 		computePlanets();
 		fillData(1);
-		registerForContextMenu(getListView());
+		planetsList.setOnItemClickListener(new PlanetSelectedListener());
 	}
 
 	private void fillData(int list) {
@@ -96,7 +102,7 @@ public class ViewWhatsUp extends ListActivity {
 		// Now create a simple cursor adapter and set it to display
 		SimpleCursorAdapter loc = new SimpleCursorAdapter(this,
 				R.layout.planet_row, plCursor, from, to);
-		setListAdapter(loc);
+		planetsList.setAdapter(loc);
 	}
 
 	private void computePlanets() {
@@ -116,7 +122,10 @@ public class ViewWhatsUp extends ListActivity {
 				c.get(Calendar.MINUTE), c.get(Calendar.SECOND));
 		if (time == null) {
 			Log.e("Position error", "utc2jd error");
-			return;
+			Toast.makeText(getApplicationContext(),
+					"Date conversion error,\nplease restart the activity",
+					Toast.LENGTH_SHORT).show();
+			this.finish();
 		}
 		// jdTT = time[0];
 		// jdUT = time[1];
@@ -127,7 +136,11 @@ public class ViewWhatsUp extends ListActivity {
 			data = planetUpData(time[0], time[1], i, g, 0.0, 0.0);
 			if (data == null) {
 				Log.e("Position error", "planetUpData error");
-				return;
+				Toast.makeText(
+						getApplicationContext(),
+						"Planet calculation error,\nplease restart the activity",
+						Toast.LENGTH_SHORT).show();
+				this.finish();
 			}
 			String[] dateArr = jd2utc(data[6]).split("_");
 
@@ -164,10 +177,12 @@ public class ViewWhatsUp extends ListActivity {
 		planetDialog.show();
 	}
 
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		super.onListItemClick(l, v, position, id);
-		showPlanetData((int) id);
+	public class PlanetSelectedListener implements OnItemClickListener {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int pos,
+				long id) {
+			showPlanetData((int) id);
+		}
 	}
 
 	@Override

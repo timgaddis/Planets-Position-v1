@@ -9,6 +9,7 @@ import android.os.CountDownTimer;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class LivePosition extends Activity {
 
@@ -73,6 +74,7 @@ public class LivePosition extends Activity {
 
 		updatePos = new UpdatePosition();
 		updatePos.execute();
+		counter.cancel();
 	}
 
 	// stops the UpdatePosition thread and countdown before you leave this
@@ -101,13 +103,23 @@ public class LivePosition extends Activity {
 				utc.get(Calendar.SECOND));
 		if (data == null) {
 			Log.e("Date error", "pos date error");
+			Toast.makeText(getApplicationContext(),
+					"Date conversion error,\nplease restart the activity",
+					Toast.LENGTH_SHORT).show();
+			this.finish();
 		}
 		// jdTT = data[0];
 		// jdUT = data[1];
 
 		data = planetLiveData(data[0], data[1], planetNum, g, 0.0, 0.0);
 		if (data == null) {
+			// if error is returned by planetLiveData then return to the main
+			// screen
 			Log.e("Position error", "planetUpData error");
+			Toast.makeText(getApplicationContext(),
+					"Planet calculation error,\nplease restart the activity",
+					Toast.LENGTH_SHORT).show();
+			this.finish();
 		}
 		// set - data[6]
 		// rise - data[7]
@@ -172,6 +184,11 @@ public class LivePosition extends Activity {
 							utc.get(Calendar.MINUTE), utc.get(Calendar.SECOND));
 					if (data == null) {
 						Log.e("Date error", "pos date error");
+						Toast.makeText(
+								getApplicationContext(),
+								"Date conversion error,\nplease restart the activity",
+								Toast.LENGTH_SHORT).show();
+						this.cancel(true);
 					}
 					// jdTT = data[0];
 					// jdUT = data[1];
@@ -180,6 +197,11 @@ public class LivePosition extends Activity {
 							0.0);
 					if (data == null) {
 						Log.e("Position error", "planetUpData error");
+						Toast.makeText(
+								getApplicationContext(),
+								"Planet calculation error,\nplease restart the activity",
+								Toast.LENGTH_SHORT).show();
+						this.cancel(true);
 					}
 					ra = data[0];
 					dec = data[1];

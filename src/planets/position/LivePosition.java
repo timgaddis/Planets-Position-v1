@@ -74,7 +74,6 @@ public class LivePosition extends Activity {
 
 		updatePos = new UpdatePosition();
 		updatePos.execute();
-		counter.cancel();
 	}
 
 	// stops the UpdatePosition thread and countdown before you leave this
@@ -162,7 +161,6 @@ public class LivePosition extends Activity {
 		@Override
 		protected void onPreExecute() {
 			utc = Calendar.getInstance();
-
 			// initial calculation to get rise/set time
 			resetTimer();
 		}

@@ -34,7 +34,7 @@
 		<item>Pluto</item>
 	</string-array>
 	<string name="main_about">
-		<b>Planets Position v1.2.1</b>\n\n
+		<b>Planets Position v1.2.2</b>\n\n
 		Planets Position is a program to calculate the position of the planets
 		in the night sky based on a given location on Earth.\n\n
 		<b>License and Copyright</b>\n\n
@@ -57,11 +57,6 @@
 		Swiss Ephemeris code is used in this program for planetary position
 		calculations.\n
 		http://www.astro.com/swisseph/swephinfo_e.htm?lang=e\n\n
-		Timezone data courtesy of:\n
-		GeoNames web services.\n
-		http://www.geonames.org/ and\n
-		World Weather Online\n
-		http://www.worldweatheronline.com/\n\n
 	</string>
 	<string name="main_help">
 		Initially, location data needs to be saved for the position 

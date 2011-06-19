@@ -258,17 +258,13 @@
 			android:layout_width="fill_parent"
 			android:layout_height="5dp" />
 
-		<!-- <TextView android:id="@+id/count_setTime" android:layout_width="wrap_content" 
-			android:layout_height="wrap_content" android:layout_below="@+id/view8" android:layout_alignLeft="@+id/view8" 
-			android:padding="@dimen/pos_data_pad" android:background="@color/planet_back_color" 
-			android:textColor="@color/text_color" android:text="R/S Countdown" android:textSize="@dimen/pos_data_text" 
-			/> -->
 		<TextView
 			android:id="@+id/count_setTime_text"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:layout_below="@+id/view8"
 			android:layout_alignLeft="@+id/view8"
+			android:text="16:24:35"
 			android:gravity="center_horizontal"
 			android:padding="@dimen/pos_data_pad"
 			android:background="@color/planet_back_color"

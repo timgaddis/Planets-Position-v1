@@ -21,38 +21,24 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Calendar;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-
+import planets.position.UserLocation.LocationResult;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -72,15 +58,13 @@ public class Planets extends Activity {
 	private Spinner planetNameSpinner;
 	private TextView locationText;
 	private long date = 0, locDate = 0;
-	private LocationManager lm;
-	private LocationListener ll;
 	private PlanetsDbAdapter planetDbHelper;
-	private ParsedLocationData locationData;
 	private double elevation, latitude, longitude, offset;
-	private boolean running = false;
 	private Bundle bundle;
 	private int planetNum = 0;
 	private String planetName;
+	private Location loc;
+	private UserLocation userLocation = new UserLocation();
 
 	private static final int LOCATION_MANUAL = 0;
 	private static final int WIFI_STATUS = 1;
@@ -101,8 +85,6 @@ public class Planets extends Activity {
 		downloadButton = (Button) findViewById(R.id.downloadButton);
 		locationText = (TextView) findViewById(R.id.locationData);
 
-		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
 		planetDbHelper = new PlanetsDbAdapter(this, "location");
 		planetDbHelper.open();
 
@@ -114,7 +96,7 @@ public class Planets extends Activity {
 		downloadButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				getGPS();
+				getLocation();
 			}
 
 		});
@@ -195,30 +177,23 @@ public class Planets extends Activity {
 		return f.exists();
 	}
 
-	private void getGPS() {
+	private void getLocation() {
 		// get lat/long from GPS
-		running = true;
-		new GetGPSWeatherTask().execute();
-
 		if (DEBUG) {
 			// Test data to use with the emulator
 			latitude = 32.221743;
 			longitude = -110.926479;
 			elevation = 713.0;
 			date = Calendar.getInstance().getTimeInMillis();
-			getXMLData();
-			loadXMLData();
+			offset = -7.0;
 			saveLocation();
-			running = false;
 		} else {
-			if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-				ll = new mylocationlistener();
-				lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,
-						ll);
-			} else {
-				ll = new mylocationlistener();
-				lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0,
-						0, ll);
+			boolean result;
+			loc = null;
+			new GetGPSTask().execute();
+			result = userLocation.getLocation(this, locationResult);
+			if (!result) {
+				loc = new Location(LocationManager.PASSIVE_PROVIDER);
 			}
 		}
 	}
@@ -284,6 +259,7 @@ public class Planets extends Activity {
 		// update location
 		planetDbHelper.updateLocation(0, latitude, longitude, 0.0, 0.0, date,
 				offset, 13, elevation);
+		loadLocation();
 	}
 
 	private class DownloadFile extends AsyncTask<String, Integer, String> {
@@ -336,7 +312,7 @@ public class Planets extends Activity {
 				output.close();
 				input.close();
 			} catch (Exception e) {
-				Log.d("DownloadTest error", "" + e);
+				// Log.e("DownloadTest error", "" + e);
 			}
 			return null;
 		}
@@ -389,100 +365,6 @@ public class Planets extends Activity {
 		}
 	}
 
-	private class mylocationlistener implements LocationListener {
-		@Override
-		public void onLocationChanged(Location location) {
-			if (location != null) {
-				latitude = location.getLatitude();
-				longitude = location.getLongitude();
-				elevation = location.getAltitude();
-				date = Calendar.getInstance().getTimeInMillis();
-				lm.removeUpdates(ll);
-				saveLocation();
-				// download time zone data
-				getXMLData();
-				loadXMLData();
-				saveLocation();
-				running = false;
-			}
-		}
-
-		@Override
-		public void onProviderDisabled(String provider) {
-		}
-
-		@Override
-		public void onProviderEnabled(String provider) {
-		}
-
-		@Override
-		public void onStatusChanged(String provider, int status, Bundle extras) {
-		}
-
-	}
-
-	private void getXMLData() {
-		// download time zone data xml files
-
-		// http://api.geonames.org/timezone?lat=47.01&lng=10.2&username=tgaddis
-
-		// http://free.worldweatheronline.com/feed/tz.ashx
-		// ?format=xml&key=77241f817e062244102410&q=32.00,-110.00
-
-		// http://www.askgeo.com/api/29002/nt4km37jp9qpti3pl6a5uohabq/
-		// timezone.xml?points=37.78%2C-122.42
-		try {
-			ParsedLocationData locationDataSet = new ParsedLocationData();
-
-			SAXParserFactory spf = SAXParserFactory.newInstance();
-			SAXParser sp;
-
-			sp = spf.newSAXParser();
-
-			XMLReader xr = sp.getXMLReader();
-			XMLDataHandler dataHandler = new XMLDataHandler(locationDataSet);
-			xr.setContentHandler(dataHandler);
-
-			xr.parse(new InputSource(
-					getData("http://api.geonames.org/timezone?lat=" + latitude
-							+ "&lng=" + longitude + "&username=tgaddis")));
-
-			locationData = dataHandler.getParsedData();
-
-			// check to see if an error was returned from Geonames
-			if (locationData.getErrCode() >= 10) {
-				// if error from Geonames, call worldweatheronline.com for data
-				xr.parse(new InputSource(
-						getData("http://free.worldweatheronline.com/feed/tz.ashx?"
-								+ "format=xml&key=77241f817e062244102410&q="
-								+ latitude + "," + longitude)));
-				locationData = dataHandler.getParsedData();
-			}
-		} catch (Exception e) {
-			Log.d("Parse Error", "" + e);
-			Toast.makeText(Planets.this,
-					"The following parsing error occured:\n" + e,
-					Toast.LENGTH_LONG).show();
-		}
-	}
-
-	private void loadXMLData() {
-		offset = locationData.getOffset();
-		String data = "";
-		data += "Latitude: " + latitude;
-		data += "\nLongitude: " + longitude;
-		data += "\nElevation: " + elevation;
-		data += "\nGMT offset: " + offset;
-		locationText.setText(data);
-	}
-
-	private InputStream getData(String url) throws Exception {
-		HttpClient client = new DefaultHttpClient();
-		HttpGet request = new HttpGet(new URI(url));
-		HttpResponse response = client.execute(request);
-		return response.getEntity().getContent();
-	}
-
 	private void showLocationDataAlert() {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 		alertDialogBuilder
@@ -495,7 +377,7 @@ public class Planets extends Activity {
 						new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int id) {
-								getGPS();
+								getLocation();
 							}
 						});
 		alertDialogBuilder.setNeutralButton("Manual",
@@ -509,13 +391,13 @@ public class Planets extends Activity {
 		alert.show();
 	}
 
-	private class GetGPSWeatherTask extends AsyncTask<Void, Void, Void> {
+	private class GetGPSTask extends AsyncTask<Void, Void, Void> {
 		ProgressDialog dialog;
 
 		@Override
 		protected Void doInBackground(Void... params) {
 			while (true) {
-				if (!running)
+				if (loc != null)
 					break;
 			}
 			return null;
@@ -523,13 +405,25 @@ public class Planets extends Activity {
 
 		@Override
 		protected void onPostExecute(Void result) {
+			if (loc.getTime() > 0) {
+				latitude = loc.getLatitude();
+				longitude = loc.getLongitude();
+				elevation = loc.getAltitude();
+				offset = Calendar.getInstance().getTimeZone().getRawOffset() / 3600000.0;
+				date = Calendar.getInstance().getTimeInMillis();
+				saveLocation();
+			} else {
+				Toast.makeText(Planets.this,
+						"Unable to download location data.\nPlease try again",
+						Toast.LENGTH_LONG).show();
+			}
 			dialog.dismiss();
 		}
 
 		@Override
 		protected void onPreExecute() {
 			dialog = ProgressDialog.show(Planets.this, "",
-					"Downloading data. Please wait...", true);
+					"Downloading Location.\nPlease wait...", true);
 		}
 	}
 
@@ -613,4 +507,11 @@ public class Planets extends Activity {
 		}
 	}
 
+	public LocationResult locationResult = new LocationResult() {
+		@Override
+		public void gotLocation(final Location location) {
+			// Log.i("Location", "Got Location");
+			loc = location;
+		};
+	};
 }

@@ -54,7 +54,7 @@ import android.widget.Toast;
 public class Planets extends Activity {
 
 	private Button positionButton, whatupButton, downloadButton, manualButton,
-			liveButton;
+			liveButton, solarButton, lunarButton;
 	private Spinner planetNameSpinner;
 	private TextView locationText;
 	private long date = 0, locDate = 0;
@@ -83,6 +83,8 @@ public class Planets extends Activity {
 		manualButton = (Button) findViewById(R.id.manualEnterButton);
 		whatupButton = (Button) findViewById(R.id.whatupButton);
 		downloadButton = (Button) findViewById(R.id.downloadButton);
+		solarButton = (Button) findViewById(R.id.solarEclButton);
+		lunarButton = (Button) findViewById(R.id.lunarEclButton);
 		locationText = (TextView) findViewById(R.id.locationData);
 
 		planetDbHelper = new PlanetsDbAdapter(this, "location");
@@ -130,6 +132,22 @@ public class Planets extends Activity {
 			@Override
 			public void onClick(View view) {
 				launchLivePos();
+			}
+
+		});
+
+		solarButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				launchSolar();
+			}
+
+		});
+
+		lunarButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				launchLunar();
 			}
 
 		});
@@ -196,6 +214,28 @@ public class Planets extends Activity {
 				loc = new Location(LocationManager.PASSIVE_PROVIDER);
 			}
 		}
+	}
+
+	private void launchSolar() {
+		bundle = new Bundle();
+		bundle.putDouble("Lat", latitude);
+		bundle.putDouble("Long", longitude);
+		bundle.putDouble("Elevation", elevation);
+		bundle.putDouble("Offset", offset);
+		Intent i = new Intent(this, SolarEclipse.class);
+		i.putExtras(bundle);
+		startActivity(i);
+	}
+
+	private void launchLunar() {
+		bundle = new Bundle();
+		bundle.putDouble("Lat", latitude);
+		bundle.putDouble("Long", longitude);
+		bundle.putDouble("Elevation", elevation);
+		bundle.putDouble("Offset", offset);
+		Intent i = new Intent(this, LunarEclipse.class);
+		i.putExtras(bundle);
+		startActivity(i);
 	}
 
 	private void launchPosition() {

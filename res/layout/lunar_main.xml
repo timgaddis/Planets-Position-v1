@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
+
+	<LinearLayout
+		android:id="@+id/linearLayout1"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content">
+		<Button
+			android:text="Previous 10 Eclipses"
+			android:id="@+id/prevLEclButton"
+			android:layout_width="fill_parent"
+			android:layout_height="50dp"
+			android:layout_weight="1" />
+		<Button
+			android:text="Next 10 Eclipses"
+			android:id="@+id/nextLEclButton"
+			android:layout_width="fill_parent"
+			android:layout_height="50dp"
+			android:layout_weight="1" />
+	</LinearLayout>
+
+	<CheckBox
+		android:text="Local Eclipses Only"
+		android:id="@+id/localLEclCheck"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" />
+	<LinearLayout
+		android:id="@+id/linearLayout1"
+		android:layout_gravity="center"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+		<TextView
+			android:text="Date"
+			android:id="@+id/textView1"
+			android:textSize="18sp"
+			android:layout_weight="1"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:paddingLeft="10dp"
+			android:textColor="@color/text_color" />
+		<TextView
+			android:text="Type"
+			android:id="@+id/textView2"
+			android:textSize="18sp"
+			android:layout_weight="1"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:gravity="center_horizontal"
+			android:textColor="@color/text_color" />
+	</LinearLayout>
+
+	<View
+		android:id="@+id/view1"
+		android:layout_width="wrap_content"
+		android:background="@color/text_color"
+		android:layout_height="1dp" />
+
+	<ListView
+		android:layout_width="fill_parent"
+		android:id="@+id/lunarEclList"
+		android:layout_height="fill_parent" />
+
+</LinearLayout>

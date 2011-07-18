@@ -56,9 +56,22 @@ public class PlanetsDbAdapter {
 			+ "(_id integer primary key autoincrement, name text not null, "
 			+ "ra real, dec real, az real, alt real, dis real, mag integer, setT integer);";
 
+	private static final String SE_DB_CREATE = "create table solarEcl "
+			+ "(_id integer primary key autoincrement, localType integer,globalType integer,"
+			+ "local integer,localMaxTime real,localFirstTime real,localSecondTime real,"
+			+ "localThirdTime real,localFourthTime real,diaRatio real,fracCover real,sunAz real,"
+			+ "sunAlt real,localMag real,sarosNum integer,sarosMemNum integer,moonAz real,"
+			+ "moonAlt real,globalMaxTime real,globalBeginTime real,globalEndTime real,"
+			+ "globalTotBegin real,globalTotEnd real,globalCenterBegin real,globalCenterEnd real);";
+
+	private static final String LE_DB_CREATE = "create table lunarEcl "
+			+ "(_id integer primary key autoincrement, type integer,local integer,maxEclTime real,"
+			+ "partBegin real,partEnd real,totBegin real,totEnd real,penBegin real,penEnd real,"
+			+ "eclipseMag real,penMag real,sarosNum integer,sarosMemNum integer);";
+
 	private static final String DATABASE_NAME = "PlanetsDB";
 	private static String DATABASE_TABLE;
-	private static final int DATABASE_VERSION = 4;
+	private static final int DATABASE_VERSION = 5;
 
 	private final Context mCtx;
 
@@ -70,12 +83,34 @@ public class PlanetsDbAdapter {
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
+			String ip1, ip2;
 			db.execSQL(LOC_DB_CREATE);
 			db.execSQL(insertRow);
 			db.execSQL(PL_DB_CREATE);
-			String ip1 = "insert into planets "
+			ip1 = "insert into planets "
 					+ "(_id, name, ra, dec, az, alt, dis, mag, setT) VALUES (";
-			String ip2 = ", 'P', 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0);";
+			ip2 = ", 'P', 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0);";
+			for (int i = 0; i < 10; i++) {
+				db.execSQL(ip1 + i + ip2);
+			}
+			db.execSQL(SE_DB_CREATE);
+			ip1 = "insert into solarEcl "
+					+ "(_id,localType,globalType,local,localMaxTime,localFirstTime,"
+					+ "localSecondTime,localThirdTime,localFourthTime,diaRatio,"
+					+ "fracCover,sunAz,sunAlt,localMag,sarosNum,sarosMemNum,moonAz,"
+					+ "moonAlt,globalMaxTime,globalBeginTime,globalEndTime,globalTotBegin,"
+					+ "globalTotEnd,globalCenterBegin,globalCenterEnd) VALUES (";
+			ip2 = ",0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0,0.0,"
+					+ "0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0);";
+			for (int i = 0; i < 10; i++) {
+				db.execSQL(ip1 + i + ip2);
+			}
+			db.execSQL(LE_DB_CREATE);
+			ip1 = "insert into lunarEcl "
+					+ "(_id,type,local,maxEclTime,partBegin,partEnd,totBegin,"
+					+ "totEnd,penBegin,penEnd,eclipseMag,penMag,sarosNum,"
+					+ "sarosMemNum) VALUES (";
+			ip2 = ",0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0);";
 			for (int i = 0; i < 10; i++) {
 				db.execSQL(ip1 + i + ip2);
 			}
@@ -87,6 +122,8 @@ public class PlanetsDbAdapter {
 					+ newVersion + ", which will destroy all old data");
 			db.execSQL("DROP TABLE IF EXISTS location");
 			db.execSQL("DROP TABLE IF EXISTS planets");
+			db.execSQL("DROP TABLE IF EXISTS solarEcl");
+			db.execSQL("DROP TABLE IF EXISTS lunarEcl");
 			onCreate(db);
 		}
 	}
@@ -152,6 +189,64 @@ public class PlanetsDbAdapter {
 		return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowID, null) > 0;
 	}
 
+	public boolean updateSolar(long rowID, int localType, int globalType,
+			int local, double localMaxTime, double localFirstTime,
+			double localSecondTime, double localThirdTime,
+			double localFourthTime, double diaRatio, double fracCover,
+			double sunAz, double sunAlt, double localMag, int sarosNum,
+			int sarosMemNum, double moonAz, double moonAlt,
+			double globalMaxTime, double globalBeginTime, double globalEndTime,
+			double globalTotBegin, double globalTotEnd,
+			double globalCenterBegin, double globalCenterEnd) {
+		ContentValues args = new ContentValues();
+		args.put("localType", localType);
+		args.put("globalType", globalType);
+		args.put("local", local);
+		args.put("localMaxTime", localMaxTime);
+		args.put("localFirstTime", localFirstTime);
+		args.put("localSecondTime", localSecondTime);
+		args.put("localThirdTime", localThirdTime);
+		args.put("localFourthTime", localFourthTime);
+		args.put("diaRatio", diaRatio);
+		args.put("fracCover", fracCover);
+		args.put("sunAz", sunAz);
+		args.put("sunAlt", sunAlt);
+		args.put("localMag", localMag);
+		args.put("sarosNum", sarosNum);
+		args.put("sarosMemNum", sarosMemNum);
+		args.put("moonAz", moonAz);
+		args.put("moonAlt", moonAlt);
+		args.put("globalMaxTime", globalMaxTime);
+		args.put("globalBeginTime", globalBeginTime);
+		args.put("globalEndTime", globalEndTime);
+		args.put("globalTotBegin", globalTotBegin);
+		args.put("globalTotEnd", globalTotEnd);
+		args.put("globalCenterBegin", globalCenterBegin);
+		args.put("globalCenterEnd", globalCenterEnd);
+		return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowID, null) > 0;
+	}
+
+	public boolean updateLunar(long rowID, int type, int local,
+			double maxEclTime, double partBegin, double partEnd,
+			double totBegin, double totEnd, double penBegin, double penEnd,
+			double eclipseMag, double penMag, int sarosNum, int sarosMemNum) {
+		ContentValues args = new ContentValues();
+		args.put("type", type);
+		args.put("local", local);
+		args.put("maxEclTime", maxEclTime);
+		args.put("partBegin", partBegin);
+		args.put("partEnd", partEnd);
+		args.put("totBegin", totBegin);
+		args.put("totEnd", totEnd);
+		args.put("penBegin", penBegin);
+		args.put("penEnd", penEnd);
+		args.put("eclipseMag", eclipseMag);
+		args.put("penMag", penMag);
+		args.put("sarosNum", sarosNum);
+		args.put("sarosMemNum", sarosMemNum);
+		return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowID, null) > 0;
+	}
+
 	/**
 	 * Delete the note with the given rowId
 	 * 
@@ -185,6 +280,28 @@ public class PlanetsDbAdapter {
 		return mDb.query(DATABASE_TABLE, new String[] { KEY_ROWID, KEY_NAME,
 				"az", "alt", "mag" }, "alt > 0 AND mag <= 6", null, null, null,
 				null);
+	}
+
+	/**
+	 * Returns all of the solar eclipses
+	 * 
+	 * @return A cursor with the data
+	 */
+	public Cursor fetchAllSolar() {
+		// "alt > 0"
+		return mDb.query(DATABASE_TABLE, new String[] { KEY_ROWID, "az", "alt",
+				"mag" }, null, null, null, null, null);
+	}
+
+	/**
+	 * Returns all of the lunar eclipses
+	 * 
+	 * @return A cursor with the data
+	 */
+	public Cursor fetchAllLunar() {
+		// "alt > 0"
+		return mDb.query(DATABASE_TABLE, new String[] { KEY_ROWID, "az", "alt",
+				"mag" }, null, null, null, null, null);
 	}
 
 	/**

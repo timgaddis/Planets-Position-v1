@@ -189,7 +189,7 @@ public class PlanetsDbAdapter {
 		return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowID, null) > 0;
 	}
 
-	public boolean updateSolar(long rowID, int localType, int globalType,
+	public boolean updateSolar(int rowID, int localType, int globalType,
 			int local, double localMaxTime, double localFirstTime,
 			double localSecondTime, double localThirdTime,
 			double localFourthTime, double diaRatio, double fracCover,

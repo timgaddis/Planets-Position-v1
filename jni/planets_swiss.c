@@ -18,68 +18,163 @@
 #include <jni.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <android/log.h>
 #include "swiss/swephexp.h"
 
 /*
- * Calculate the next solar eclipse after a given date.
+ * Calculate the geographic position of where a solar eclipse occurs for a
+ * 		given date.
  * Swiss Ephemeris functions called:
  * 		swe_set_ephe_path
- * 		swe_set_topo
- * 		swe_calc
- * 		swe_azalt
- * 		swe_pheno_ut
- * 		swe_rise_trans
+ * 		swe_sol_eclipse_where
  * 		swe_close
- * Input: Julian date in ephemeris time, Julian date in ut1, planet number,
- * 		location array, atmospheric pressure and temperature.
- * Output: Double array containing RA, Dec, distance, azimuth, altitude,
- * 		magnitude, set time, and rise time of planet.
+ * Input: Julian date in ut1.
+ * Output: Double array containing longitude and latitude.
  */
-jdoubleArray Java_planets_position_SolarEclipse_solarData(JNIEnv* env,
-		jobject this, jdouble d_ut, jdoubleArray loc, jdouble atpress,
-		jdouble attemp) {
+jdoubleArray Java_planets_position_SolarEclipse_solarDataPos(JNIEnv* env,
+		jobject this, jdouble d_ut) {
 
 	char serr[256];
-	double g[3], attr[20], tret[10], az[6];
-	int retval, i;
+	double attr[20], g[2];
+	int retval;
 
 	jdoubleArray result;
-	result = (*env)->NewDoubleArray(env, 8);
+	result = (*env)->NewDoubleArray(env, 2);
 	if (result == NULL) {
 		return NULL; /* out of memory error thrown */
 	}
 
-	(*env)->GetDoubleArrayRegion(env, loc, 0, 3, g);
+	swe_set_ephe_path("/mnt/sdcard/ephemeris/");
 
+	swe_sol_eclipse_where(d_ut, SEFLG_SWIEPH, g, attr, serr);
+	swe_close();
+
+	// move from the temp structure to the java structure
+	(*env)->SetDoubleArrayRegion(env, result, 0, 2, g);
+	return result;
+}
+
+/*
+ * Calculate the next solar eclipse globally after a given date.
+ * Swiss Ephemeris functions called:
+ * 		swe_set_ephe_path
+ * 		swe_sol_eclipse_when_glob
+ * 		swe_close
+ * Input: Julian date in ut1, search direction(0=forward|1=back).
+ * Output: Double array containing eclipse type and eclipse event times.
+ */
+jdoubleArray Java_planets_position_SolarEclipse_solarDataGlobal(JNIEnv* env,
+		jobject this, jdouble d_ut, jint back) {
+
+	char serr[256];
+	double tret[10], rval;
+	int retval;
+
+//	__android_log_print(ANDROID_LOG_INFO, "solarDataGlobal", "start date: %f",
+//			d_ut);
+
+	jdoubleArray result;
+	result = (*env)->NewDoubleArray(env, 9);
+	if (result == NULL) {
+		return NULL; /* out of memory error thrown */
+	}
+
+	swe_set_ephe_path("/mnt/sdcard/ephemeris/");
+
+	retval = swe_sol_eclipse_when_glob(d_ut, SEFLG_SWIEPH, 0, tret, back, serr);
+	if (retval == ERR) {
+		swe_close();
+		return NULL;
+	}
+	__android_log_print(ANDROID_LOG_INFO, "solarDataGlobal", "eclipse date: %f",
+			tret[0]);
+	rval = retval * 1.0;
+	swe_close();
+
+	// move from the temp structure to the java structure
+	(*env)->SetDoubleArrayRegion(env, result, 0, 1, &rval);
+	(*env)->SetDoubleArrayRegion(env, result, 1, 8, tret);
+	return result;
+}
+
+/*
+ * Calculate the next solar eclipse locally after a given date.
+ * Swiss Ephemeris functions called:
+ * 		swe_set_ephe_path
+ * 		swe_set_topo
+ * 		swe_sol_eclipse_when_loc
+ * 		swe_sol_eclipse_how
+ * 		swe_calc_ut
+ * 		swe_azalt
+ * 		swe_close
+ * Input: Julian date in ut1, location array, search direction(0=forward|1=back).
+ * Output: Double array containing local eclipse type ,local eclipse event times,
+ * 			eclipse attributes, and moon position
+ */
+jdoubleArray Java_planets_position_SolarEclipse_solarDataLocal(JNIEnv* env,
+		jobject this, jdouble d_ut, jdoubleArray loc, jint back) {
+
+	char serr[256];
+	double g[3], attr[20], tret[10], tret2[10], az[6], x2[6], rval;
+	int retval, i;
+	int iflag = SEFLG_SWIEPH | SEFLG_EQUATORIAL | SEFLG_TOPOCTR;
+
+	__android_log_print(ANDROID_LOG_INFO, "solarDataLocal", "date: %f", d_ut);
+
+	jdoubleArray result;
+	result = (*env)->NewDoubleArray(env, 19);
+	if (result == NULL) {
+		return NULL; /* out of memory error thrown */
+	}
+
+	/*__android_log_print(ANDROID_LOG_INFO, "MYPROG", "errno = %d, %s", errno, strerror(errno));*/
+
+//	__android_log_print(ANDROID_LOG_INFO, "solarDataLocal",
+//			"load location array");
+	(*env)->GetDoubleArrayRegion(env, loc, 0, 3, g);
 	swe_set_ephe_path("/mnt/sdcard/ephemeris/");
 	swe_set_topo(g[0], g[1], g[2]);
 
-	retval = swe_sol_eclipse_when_glob(d_ut, SEFLG_SWIEPH, 0, tret, 0, serr);
+//	__android_log_print(ANDROID_LOG_INFO, "solarDataLocal",
+//			"calc local eclipse");
+	retval = swe_sol_eclipse_when_loc(d_ut, SEFLG_SWIEPH, g, tret, attr, back,
+			serr);
 	if (retval == ERR) {
 		swe_close();
 		return NULL;
 	} else {
+//		__android_log_print(ANDROID_LOG_INFO, "solarDataLocal",
+//				"calc eclipse data");
 		i = swe_sol_eclipse_how(tret[0], SEFLG_SWIEPH, g, attr, serr);
 		if (i == ERR) {
 			swe_close();
 			return NULL;
 		}
 
+//		__android_log_print(ANDROID_LOG_INFO, "solarDataLocal",
+//				"calc moon position");
 		// calculate moon position at max eclipse
-		iflgret = swe_calc_ut(tret[0], 1, iflag, x2, serr);
+		i = swe_calc_ut(tret[0], 1, iflag, x2, serr);
+		if (i == ERR) {
+			swe_close();
+			return NULL;
+		}
 		swe_azalt(tret[0], SE_EQU2HOR, g, 0, 0, x2, az);
 		az[0] += 180;
 		if (az[0] > 360)
 			az[0] -= 360;
 
+//		__android_log_print(ANDROID_LOG_INFO, "solarDataLocal",
+//				"calc global eclipse");
+
+		rval = retval * 1.0;
 		swe_close();
 
 		// move from the temp structure to the java structure
-		(*env)->SetDoubleArrayRegion(env, result, 0, 3, x2);
-		(*env)->SetDoubleArrayRegion(env, result, 3, 2, az);
-		(*env)->SetDoubleArrayRegion(env, result, 5, 1, &attr[4]);
-		(*env)->SetDoubleArrayRegion(env, result, 6, 1, &setT);
-		(*env)->SetDoubleArrayRegion(env, result, 7, 1, &riseT);
+		(*env)->SetDoubleArrayRegion(env, result, 0, 1, &rval);
+		(*env)->SetDoubleArrayRegion(env, result, 1, 5, tret);
+		(*env)->SetDoubleArrayRegion(env, result, 6, 11, attr);
+		(*env)->SetDoubleArrayRegion(env, result, 17, 2, az);
 		return result;
 	}
 }

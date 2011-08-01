@@ -13,34 +13,35 @@
 			android:text="Previous 10 Eclipses"
 			android:id="@+id/prevSEclButton"
 			android:layout_width="fill_parent"
-			android:layout_height="50dp"
+			android:layout_height="52dp"
+			android:layout_weight="1" />
+		<CheckBox
+			android:text="Local Eclipses"
+			android:id="@+id/localSEclCheck"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
 			android:layout_weight="1" />
 		<Button
 			android:text="Next 10 Eclipses"
 			android:id="@+id/nextSEclButton"
 			android:layout_width="fill_parent"
-			android:layout_height="50dp"
+			android:layout_height="52dp"
 			android:layout_weight="1" />
 	</LinearLayout>
 
-	<CheckBox
-		android:text="Local Eclipses Only"
-		android:id="@+id/localSEclCheck"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content" />
 	<LinearLayout
 		android:id="@+id/linearLayout1"
 		android:layout_gravity="center"
-		android:layout_width="match_parent"
+		android:layout_width="fill_parent"
 		android:layout_height="wrap_content">
 		<TextView
 			android:text="Date"
 			android:id="@+id/textView1"
 			android:textSize="18sp"
-			android:layout_weight="1"
+			android:layout_weight="2"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:paddingLeft="10dp"
+			android:paddingLeft="9dp"
 			android:textColor="@color/text_color" />
 		<TextView
 			android:text="Type"

@@ -5,19 +5,19 @@
 	android:layout_height="fill_parent"
 	android:layout_width="fill_parent">
 	<TextView
-		android:id="@+id/list2"
+		android:id="@+id/eclDate"
 		android:layout_weight="1"
 		android:layout_width="fill_parent"
-		android:padding="12dp"
+		android:padding="9dp"
 		android:textSize="18sp"
 		android:layout_height="fill_parent"
 		android:textColor="@color/text_color" />
 	<TextView
-		android:id="@+id/list3"
-		android:layout_weight="1"
+		android:id="@+id/eclType"
+		android:layout_weight="2"
 		android:layout_width="fill_parent"
 		android:gravity="center_horizontal"
-		android:padding="12dp"
+		android:padding="9dp"
 		android:textSize="18sp"
 		android:layout_height="fill_parent"
 		android:textColor="@color/text_color" />

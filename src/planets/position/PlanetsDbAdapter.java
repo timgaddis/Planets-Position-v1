@@ -59,10 +59,11 @@ public class PlanetsDbAdapter {
 	private static final String SE_DB_CREATE = "create table solarEcl "
 			+ "(_id integer primary key autoincrement, localType integer,globalType integer,"
 			+ "local integer,localMaxTime real,localFirstTime real,localSecondTime real,"
-			+ "localThirdTime real,localFourthTime real,diaRatio real,fracCover real,sunAz real,"
-			+ "sunAlt real,localMag real,sarosNum integer,sarosMemNum integer,moonAz real,"
-			+ "moonAlt real,globalMaxTime real,globalBeginTime real,globalEndTime real,"
-			+ "globalTotBegin real,globalTotEnd real,globalCenterBegin real,globalCenterEnd real);";
+			+ "localThirdTime real,localFourthTime real,diaRatio real,fracCover real,"
+			+ "sunAz real,sunAlt real,localMag real,sarosNum integer,sarosMemNum integer,"
+			+ "moonAz real,moonAlt real,globalMaxTime real,globalBeginTime real,"
+			+ "globalEndTime real,globalTotBegin real,globalTotEnd real,"
+			+ "globalCenterBegin real,globalCenterEnd real,eclipseDate text,eclipseType text);";
 
 	private static final String LE_DB_CREATE = "create table lunarEcl "
 			+ "(_id integer primary key autoincrement, type integer,local integer,maxEclTime real,"
@@ -99,9 +100,10 @@ public class PlanetsDbAdapter {
 					+ "localSecondTime,localThirdTime,localFourthTime,diaRatio,"
 					+ "fracCover,sunAz,sunAlt,localMag,sarosNum,sarosMemNum,moonAz,"
 					+ "moonAlt,globalMaxTime,globalBeginTime,globalEndTime,globalTotBegin,"
-					+ "globalTotEnd,globalCenterBegin,globalCenterEnd) VALUES (";
+					+ "globalTotEnd,globalCenterBegin,globalCenterEnd,eclipseDate,"
+					+ "eclipseType) VALUES (";
 			ip2 = ",0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0,0.0,"
-					+ "0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0);";
+					+ "0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,'D','T');";
 			for (int i = 0; i < 10; i++) {
 				db.execSQL(ip1 + i + ip2);
 			}
@@ -197,7 +199,8 @@ public class PlanetsDbAdapter {
 			int sarosMemNum, double moonAz, double moonAlt,
 			double globalMaxTime, double globalBeginTime, double globalEndTime,
 			double globalTotBegin, double globalTotEnd,
-			double globalCenterBegin, double globalCenterEnd) {
+			double globalCenterBegin, double globalCenterEnd,
+			String eclipseDate, String eclipseType) {
 		ContentValues args = new ContentValues();
 		args.put("localType", localType);
 		args.put("globalType", globalType);
@@ -223,6 +226,8 @@ public class PlanetsDbAdapter {
 		args.put("globalTotEnd", globalTotEnd);
 		args.put("globalCenterBegin", globalCenterBegin);
 		args.put("globalCenterEnd", globalCenterEnd);
+		args.put("eclipseDate", eclipseDate);
+		args.put("eclipseType", eclipseType);
 		return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowID, null) > 0;
 	}
 
@@ -288,9 +293,9 @@ public class PlanetsDbAdapter {
 	 * @return A cursor with the data
 	 */
 	public Cursor fetchAllSolar() {
-		// "alt > 0"
-		return mDb.query(DATABASE_TABLE, new String[] { KEY_ROWID, "az", "alt",
-				"mag" }, null, null, null, null, null);
+		return mDb.query(DATABASE_TABLE, new String[] { KEY_ROWID,
+				"eclipseDate", "eclipseType" }, null, null, null, null,
+				"globalBeginTime");
 	}
 
 	/**

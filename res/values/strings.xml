@@ -4,6 +4,8 @@
 	<string name="pos_title">Planet\'s Position</string>
 	<string name="loc_title">Location</string>
 	<string name="solar_title">Solar Eclipses</string>
+	<string name="solar_title_global">Global Solar Eclipses</string>
+	<string name="solar_title_local">Local Solar Eclipses</string>
     <string name="lunar_title">Lunar Eclipses</string>
 	<string name="alert_title">WiFi is turned off</string>
 	<string name="alert_enable">Goto Settings Page To Enable Wifi</string>

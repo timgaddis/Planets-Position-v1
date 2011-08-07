@@ -10,22 +10,18 @@
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content">
 		<Button
-			android:text="Previous 10 Eclipses"
+			android:text="Previous Eclipses"
+			android:textSize="18sp"
 			android:id="@+id/prevSEclButton"
 			android:layout_width="fill_parent"
-			android:layout_height="52dp"
-			android:layout_weight="1" />
-		<CheckBox
-			android:text="Local Eclipses"
-			android:id="@+id/localSEclCheck"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
+			android:layout_height="55dp"
 			android:layout_weight="1" />
 		<Button
-			android:text="Next 10 Eclipses"
+			android:text="Next Eclipses"
+			android:textSize="18sp"
 			android:id="@+id/nextSEclButton"
 			android:layout_width="fill_parent"
-			android:layout_height="52dp"
+			android:layout_height="55dp"
 			android:layout_weight="1" />
 	</LinearLayout>
 
@@ -38,7 +34,7 @@
 			android:text="Date"
 			android:id="@+id/textView1"
 			android:textSize="18sp"
-			android:layout_weight="2"
+			android:layout_weight="1.5"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:paddingLeft="9dp"
@@ -52,6 +48,14 @@
 			android:layout_height="wrap_content"
 			android:gravity="center_horizontal"
 			android:textColor="@color/text_color" />
+		<TextView
+			android:text="Local"
+			android:id="@+id/textView2"
+			android:textSize="18sp"
+			android:layout_height="wrap_content"
+			android:gravity="center_horizontal"
+			android:textColor="@color/text_color"
+			android:layout_width="wrap_content" />
 	</LinearLayout>
 
 	<View

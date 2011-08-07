@@ -102,9 +102,9 @@ public class PlanetsDbAdapter {
 					+ "moonAlt,globalMaxTime,globalBeginTime,globalEndTime,globalTotBegin,"
 					+ "globalTotEnd,globalCenterBegin,globalCenterEnd,eclipseDate,"
 					+ "eclipseType) VALUES (";
-			ip2 = ",0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0,0.0,"
+			ip2 = ",0,0,-1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0,0.0,"
 					+ "0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,'D','T');";
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < 8; i++) {
 				db.execSQL(ip1 + i + ip2);
 			}
 			db.execSQL(LE_DB_CREATE);
@@ -294,8 +294,8 @@ public class PlanetsDbAdapter {
 	 */
 	public Cursor fetchAllSolar() {
 		return mDb.query(DATABASE_TABLE, new String[] { KEY_ROWID,
-				"eclipseDate", "eclipseType" }, null, null, null, null,
-				"globalBeginTime");
+				"eclipseDate", "eclipseType", "local" }, null, null, null,
+				null, "globalBeginTime");
 	}
 
 	/**

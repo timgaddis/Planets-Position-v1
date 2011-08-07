@@ -59,26 +59,25 @@ jdoubleArray Java_planets_position_SolarEclipse_solarDataPos(JNIEnv* env,
  * Swiss Ephemeris functions called:
  * 		swe_set_ephe_path
  * 		swe_sol_eclipse_when_glob
+ * 		swe_sol_eclipse_how
  * 		swe_close
  * Input: Julian date in ut1, search direction(0=forward|1=back).
  * Output: Double array containing eclipse type and eclipse event times.
  */
 jdoubleArray Java_planets_position_SolarEclipse_solarDataGlobal(JNIEnv* env,
-		jobject this, jdouble d_ut, jint back) {
+		jobject this, jdouble d_ut, jdoubleArray loc, jint back) {
 
 	char serr[256];
-	double tret[10], rval;
-	int retval;
-
-//	__android_log_print(ANDROID_LOG_INFO, "solarDataGlobal", "start date: %f",
-//			d_ut);
+	double tret[10], g[3], attr[20], rval, ii;
+	int retval, i;
 
 	jdoubleArray result;
-	result = (*env)->NewDoubleArray(env, 9);
+	result = (*env)->NewDoubleArray(env, 10);
 	if (result == NULL) {
 		return NULL; /* out of memory error thrown */
 	}
 
+	(*env)->GetDoubleArrayRegion(env, loc, 0, 3, g);
 	swe_set_ephe_path("/mnt/sdcard/ephemeris/");
 
 	retval = swe_sol_eclipse_when_glob(d_ut, SEFLG_SWIEPH, 0, tret, back, serr);
@@ -86,14 +85,21 @@ jdoubleArray Java_planets_position_SolarEclipse_solarDataGlobal(JNIEnv* env,
 		swe_close();
 		return NULL;
 	}
-	__android_log_print(ANDROID_LOG_INFO, "solarDataGlobal", "eclipse date: %f",
-			tret[0]);
+
+	i = swe_sol_eclipse_how(tret[0], SEFLG_SWIEPH, g, attr, serr);
+	if (i == ERR) {
+		swe_close();
+		return NULL;
+	}
+
 	rval = retval * 1.0;
+	ii = i * 1.0;
 	swe_close();
 
 	// move from the temp structure to the java structure
 	(*env)->SetDoubleArrayRegion(env, result, 0, 1, &rval);
 	(*env)->SetDoubleArrayRegion(env, result, 1, 8, tret);
+	(*env)->SetDoubleArrayRegion(env, result, 9, 1, &ii);
 	return result;
 }
 
@@ -115,11 +121,11 @@ jdoubleArray Java_planets_position_SolarEclipse_solarDataLocal(JNIEnv* env,
 		jobject this, jdouble d_ut, jdoubleArray loc, jint back) {
 
 	char serr[256];
-	double g[3], attr[20], tret[10], tret2[10], az[6], x2[6], rval;
+	double g[3], attr[20], tret[10], az[6], x2[6], rval;
 	int retval, i;
 	int iflag = SEFLG_SWIEPH | SEFLG_EQUATORIAL | SEFLG_TOPOCTR;
 
-	__android_log_print(ANDROID_LOG_INFO, "solarDataLocal", "date: %f", d_ut);
+	/*__android_log_print(ANDROID_LOG_INFO, "solarDataLocal", "date: %f", d_ut);*/
 
 	jdoubleArray result;
 	result = (*env)->NewDoubleArray(env, 19);
@@ -127,32 +133,22 @@ jdoubleArray Java_planets_position_SolarEclipse_solarDataLocal(JNIEnv* env,
 		return NULL; /* out of memory error thrown */
 	}
 
-	/*__android_log_print(ANDROID_LOG_INFO, "MYPROG", "errno = %d, %s", errno, strerror(errno));*/
-
-//	__android_log_print(ANDROID_LOG_INFO, "solarDataLocal",
-//			"load location array");
 	(*env)->GetDoubleArrayRegion(env, loc, 0, 3, g);
 	swe_set_ephe_path("/mnt/sdcard/ephemeris/");
 	swe_set_topo(g[0], g[1], g[2]);
 
-//	__android_log_print(ANDROID_LOG_INFO, "solarDataLocal",
-//			"calc local eclipse");
 	retval = swe_sol_eclipse_when_loc(d_ut, SEFLG_SWIEPH, g, tret, attr, back,
 			serr);
 	if (retval == ERR) {
 		swe_close();
 		return NULL;
 	} else {
-//		__android_log_print(ANDROID_LOG_INFO, "solarDataLocal",
-//				"calc eclipse data");
 		i = swe_sol_eclipse_how(tret[0], SEFLG_SWIEPH, g, attr, serr);
 		if (i == ERR) {
 			swe_close();
 			return NULL;
 		}
 
-//		__android_log_print(ANDROID_LOG_INFO, "solarDataLocal",
-//				"calc moon position");
 		// calculate moon position at max eclipse
 		i = swe_calc_ut(tret[0], 1, iflag, x2, serr);
 		if (i == ERR) {
@@ -163,9 +159,6 @@ jdoubleArray Java_planets_position_SolarEclipse_solarDataLocal(JNIEnv* env,
 		az[0] += 180;
 		if (az[0] > 360)
 			az[0] -= 360;
-
-//		__android_log_print(ANDROID_LOG_INFO, "solarDataLocal",
-//				"calc global eclipse");
 
 		rval = retval * 1.0;
 		swe_close();

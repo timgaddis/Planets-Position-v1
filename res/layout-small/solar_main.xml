@@ -11,14 +11,14 @@
 		android:layout_height="wrap_content">
 		<Button
 			android:text="Previous Eclipses"
-			android:textSize="18sp"
+			android:textSize="16sp"
 			android:id="@+id/prevSEclButton"
 			android:layout_width="fill_parent"
 			android:layout_height="55dp"
 			android:layout_weight="1" />
 		<Button
 			android:text="Next Eclipses"
-			android:textSize="18sp"
+			android:textSize="16sp"
 			android:id="@+id/nextSEclButton"
 			android:layout_width="fill_parent"
 			android:layout_height="55dp"
@@ -58,7 +58,7 @@
 		<TextView
 			android:text="Date (UTC)"
 			android:id="@+id/textView1"
-			android:textSize="18sp"
+			android:textSize="16sp"
 			android:layout_weight="1.2"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
@@ -67,7 +67,7 @@
 		<TextView
 			android:text="Type"
 			android:id="@+id/textView2"
-			android:textSize="18sp"
+			android:textSize="16sp"
 			android:layout_weight="1"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"

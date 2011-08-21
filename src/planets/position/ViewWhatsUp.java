@@ -21,9 +21,11 @@ import java.util.Calendar;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -48,6 +50,7 @@ public class ViewWhatsUp extends Activity {
 			"Jupiter", "Saturn", "Uranus", "Neptune", "Pluto" };
 	private Bundle bundle;
 	private PlanetsDbAdapter planetDbHelper;
+	private final int PLANET_DATA = 0;
 
 	// load c library
 	static {
@@ -80,15 +83,17 @@ public class ViewWhatsUp extends Activity {
 		}
 
 		planetDbHelper = new PlanetsDbAdapter(this, "planets");
-		planetDbHelper.open();
+		// planetDbHelper.open();
 
-		computePlanets();
-		fillData(1);
+		// computePlanets();
+		new ComputePlanetsTask().execute();
+		// fillData(1);
 		planetsList.setOnItemClickListener(new PlanetSelectedListener());
 	}
 
 	private void fillData(int list) {
 		Cursor plCursor;
+		planetDbHelper.open();
 		if (list == 1) {
 			plCursor = planetDbHelper.fetchAllList();
 		} else {
@@ -103,78 +108,89 @@ public class ViewWhatsUp extends Activity {
 		SimpleCursorAdapter loc = new SimpleCursorAdapter(this,
 				R.layout.planet_row, plCursor, from, to);
 		planetsList.setAdapter(loc);
+		planetDbHelper.close();
 	}
 
-	private void computePlanets() {
+	private class ComputePlanetsTask extends AsyncTask<Void, Void, Void> {
+		ProgressDialog dialog;
 		double[] data = null, time;
-		int m;
+		Calendar c;
 
-		Calendar c = Calendar.getInstance();
-		// set the title of the activity with the current date and time
-		this.setTitle("What's up on "
-				+ DateFormat.format("MMM d @ hh:mm aa", c));
-		// convert local time to utc
-		m = (int) (offset * 60);
-		c.add(Calendar.MINUTE, m * -1);
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			planetDbHelper.open();
+			c = Calendar.getInstance();
+			// set the title of the activity with the current date and time
+			ViewWhatsUp.this.setTitle("What's up on "
+					+ DateFormat.format("MMM d @ hh:mm aa", c));
+			// convert local time to utc
+			c.add(Calendar.MINUTE, (int) (offset * -60));
 
-		time = utc2jd(c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH),
-				c.get(Calendar.YEAR), c.get(Calendar.HOUR_OF_DAY),
-				c.get(Calendar.MINUTE), c.get(Calendar.SECOND));
-		if (time == null) {
-			Log.e("Position error", "utc2jd error");
-			Toast.makeText(getApplicationContext(),
-					"Date conversion error,\nplease restart the activity",
-					Toast.LENGTH_SHORT).show();
-			this.finish();
-		}
-		// jdTT = time[0];
-		// jdUT = time[1];
-
-		// run calculations on all 10 solar system objects
-		// save data to database
-		for (int i = 0; i < 10; i++) {
-			data = planetUpData(time[0], time[1], i, g, 0.0, 0.0);
-			if (data == null) {
-				Log.e("Position error", "planetUpData error");
-				Toast.makeText(
-						getApplicationContext(),
-						"Planet calculation error,\nplease restart the activity",
+			time = utc2jd(c.get(Calendar.MONTH) + 1,
+					c.get(Calendar.DAY_OF_MONTH), c.get(Calendar.YEAR),
+					c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE),
+					c.get(Calendar.SECOND));
+			if (time == null) {
+				Log.e("Position error", "utc2jd error");
+				Toast.makeText(getApplicationContext(),
+						"Date conversion error,\nplease restart the activity",
 						Toast.LENGTH_SHORT).show();
-				this.finish();
+				ViewWhatsUp.this.finish();
 			}
-			String[] dateArr = jd2utc(data[6]).split("_");
+			// jdTT = time[0];
+			// jdUT = time[1];
+			dialog = ProgressDialog.show(ViewWhatsUp.this, "",
+					"Calculating planets,\nplease wait...", true);
+		}
 
-			c.set(Integer.parseInt(dateArr[1]),
-					Integer.parseInt(dateArr[2]) - 1,
-					Integer.parseInt(dateArr[3]), Integer.parseInt(dateArr[4]),
-					Integer.parseInt(dateArr[5]));
-			c.set(Calendar.MILLISECOND,
-					(int) (Double.parseDouble(dateArr[6]) * 1000));
-			// convert utc to local time
-			c.add(Calendar.MINUTE, m);
+		@Override
+		protected Void doInBackground(Void... params) {
+			for (int i = 0; i < 10; i++) {
+				data = planetUpData(time[0], time[1], i, g, 0.0, 0.0);
+				if (data == null) {
+					Log.e("Position error", "planetUpData error");
+					Toast.makeText(
+							getApplicationContext(),
+							"Planet calculation error,\nplease restart the activity",
+							Toast.LENGTH_SHORT).show();
+					dialog.dismiss();
+					ViewWhatsUp.this.finish();
+				}
+				String[] dateArr = jd2utc(data[6]).split("_");
 
-			planetDbHelper.updatePlanet(i, planetNames[i], data[0], data[1],
-					data[3], data[4], data[2], Math.round(data[5]),
-					c.getTimeInMillis());
+				c.set(Integer.parseInt(dateArr[1]),
+						Integer.parseInt(dateArr[2]) - 1,
+						Integer.parseInt(dateArr[3]),
+						Integer.parseInt(dateArr[4]),
+						Integer.parseInt(dateArr[5]));
+				c.set(Calendar.MILLISECOND,
+						(int) (Double.parseDouble(dateArr[6]) * 1000));
+				// convert utc to local time
+				c.add(Calendar.MINUTE, (int) (offset * 60));
+
+				planetDbHelper.updatePlanet(i, planetNames[i], data[0],
+						data[1], data[3], data[4], data[2],
+						Math.round(data[5]), c.getTimeInMillis());
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			planetDbHelper.close();
+			dialog.dismiss();
+			fillData(1);
 		}
 	}
 
 	private void showPlanetData(int num) {
-		double[] data = new double[6];
-
-		Cursor planetCur = planetDbHelper.fetchEntry(num);
-		startManagingCursor(planetCur);
-		data[0] = planetCur.getDouble(planetCur.getColumnIndexOrThrow("ra"));
-		data[1] = planetCur.getDouble(planetCur.getColumnIndexOrThrow("dec"));
-		data[2] = planetCur.getDouble(planetCur.getColumnIndexOrThrow("az"));
-		data[3] = planetCur.getDouble(planetCur.getColumnIndexOrThrow("alt"));
-		data[4] = planetCur.getDouble(planetCur.getColumnIndexOrThrow("dis"));
-		data[5] = planetCur.getDouble(planetCur.getColumnIndexOrThrow("mag"));
-
-		PlanetDialog planetDialog = new PlanetDialog(this, planetNames[num],
-				data,
-				planetCur.getLong(planetCur.getColumnIndexOrThrow("setT")));
-		planetDialog.show();
+		bundle = new Bundle();
+		bundle.putInt("planetNum", num);
+		Intent i = new Intent(this, PlanetData.class);
+		i.putExtras(bundle);
+		startActivityForResult(i, PLANET_DATA);
 	}
 
 	public class PlanetSelectedListener implements OnItemClickListener {
@@ -205,6 +221,11 @@ public class ViewWhatsUp extends Activity {
 			i.putExtras(b);
 			startActivity(i);
 			return true;
+		case R.id.id_menu_up_update:
+			new ComputePlanetsTask().execute();
+			// computePlanets();
+			// fillData(1);
+			return true;
 		case R.id.id_menu_up_filter:
 			// Filter the planets by magnitude
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -224,7 +245,18 @@ public class ViewWhatsUp extends Activity {
 			alert.show();
 			return true;
 		}
-
 		return super.onMenuItemSelected(featureId, item);
+	}
+
+	protected void onActivityResult(int requestCode, int resultCode,
+			Intent intent) {
+		super.onActivityResult(requestCode, resultCode, intent);
+		switch (requestCode) {
+		case PLANET_DATA:
+			new ComputePlanetsTask().execute();
+			// computePlanets();
+			// fillData(1);
+			return;
+		}
 	}
 }

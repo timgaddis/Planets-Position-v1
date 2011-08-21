@@ -27,11 +27,12 @@ import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
@@ -39,9 +40,10 @@ public class SolarEclipse extends Activity {
 
 	private Button prevEclButton, nextEclButton;
 	private ListView eclipseList;
+	private RadioButton radioLocalEcl, radioGlobalEcl;
 	private Bundle bundle;
-	double[] time, g = new double[3];
-	private double offset, firstEcl, lastEcl;
+	private double[] time, g = new double[3];
+	private double offset, firstEcl, lastEcl, local, direction;
 	private PlanetsDbAdapter planetDbHelper;
 	private Calendar c;
 
@@ -55,7 +57,7 @@ public class SolarEclipse extends Activity {
 
 	public native double[] solarDataLocal(double d2, double[] loc, int back);
 
-	public native double[] solarDataGlobal(double d2, double[] loc, int back);
+	public native double[] solarDataGlobal(double d2, int back);
 
 	public native double[] utc2jd(int m, int d, int y, int hr, int min,
 			double sec);
@@ -70,6 +72,8 @@ public class SolarEclipse extends Activity {
 		prevEclButton = (Button) findViewById(R.id.prevSEclButton);
 		nextEclButton = (Button) findViewById(R.id.nextSEclButton);
 		eclipseList = (ListView) findViewById(R.id.solarEclList);
+		radioLocalEcl = (RadioButton) findViewById(R.id.radioLocalEclipses);
+		radioGlobalEcl = (RadioButton) findViewById(R.id.radioGlobalEclipses);
 
 		// load bundle from previous activity
 		bundle = getIntent().getExtras();
@@ -103,17 +107,46 @@ public class SolarEclipse extends Activity {
 		prevEclButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				new ComputeEclipsesTask().execute(firstEcl, 1.0);
+				direction = 1.0;
+				new ComputeEclipsesTask().execute(firstEcl, 1.0, local, -1.0,
+						-1.0);
 			}
 		});
 
 		nextEclButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				new ComputeEclipsesTask().execute(lastEcl, 0.0);
+				direction = 0.0;
+				new ComputeEclipsesTask().execute(lastEcl, 0.0, local, -1.0,
+						-1.0);
 			}
 		});
 
+		OnClickListener radioListener = new OnClickListener() {
+			public void onClick(View v) {
+				double sd;
+				if (direction == 0.0)
+					sd = firstEcl;
+				else
+					sd = lastEcl;
+				// Perform action on clicks
+				// RadioButton rb = (RadioButton) v;
+				if (v.getId() == R.id.radioGlobalEclipses) {
+					// Global Eclipses
+					local = 0.0;
+					new ComputeEclipsesTask().execute(sd, direction, local,
+							firstEcl, lastEcl);
+				} else {
+					// Local Eclipses
+					local = 1.0;
+					new ComputeEclipsesTask().execute(sd, direction, local,
+							firstEcl, lastEcl);
+				}
+			}
+		};
+
+		radioLocalEcl.setOnClickListener(radioListener);
+		radioGlobalEcl.setOnClickListener(radioListener);
 		eclipseList.setOnItemClickListener(new EclipseSelectedListener());
 	}
 
@@ -122,24 +155,24 @@ public class SolarEclipse extends Activity {
 		planetDbHelper.open();
 		eclCursor = planetDbHelper.fetchAllSolar();
 		startManagingCursor(eclCursor);
-		String[] from = new String[] { "eclipseDate", "eclipseType", "local" };
-		int[] to = new int[] { R.id.eclDate, R.id.eclType, R.id.eclLocal };
+		String[] from = new String[] { "eclipseDate", "eclipseType" };
+		int[] to = new int[] { R.id.eclDate, R.id.eclType };
 		// Now create a simple cursor adapter and set it to display
 		SimpleCursorAdapter loc = new SimpleCursorAdapter(this,
 				R.layout.ecl_row, eclCursor, from, to);
 		// Binds the 'local' field in the db to the checked attribute for the
 		// CheckBox
-		loc.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
-			public boolean setViewValue(View view, Cursor cursor,
-					int columnIndex) {
-				if (columnIndex == 3) {
-					CheckBox cb = (CheckBox) view;
-					cb.setChecked(cursor.getInt(3) > 0);
-					return true;
-				}
-				return false;
-			}
-		});
+		// loc.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+		// public boolean setViewValue(View view, Cursor cursor,
+		// int columnIndex) {
+		// if (columnIndex == 3) {
+		// CheckBox cb = (CheckBox) view;
+		// cb.setChecked(cursor.getInt(3) > 0);
+		// return true;
+		// }
+		// return false;
+		// }
+		// });
 		eclipseList.setAdapter(loc);
 		planetDbHelper.close();
 	}
@@ -163,12 +196,23 @@ public class SolarEclipse extends Activity {
 
 	}
 
+	/**
+	 * Computes the eclipses in a separate thread.
+	 * 
+	 * @author tgaddis
+	 * @params double list for doInBackground: (start date,
+	 *         direction(forward=0.0/back=1.0), local(1.0)/global(0.0), first
+	 *         eclipse date, last eclipse date)
+	 * 
+	 */
 	private class ComputeEclipsesTask extends AsyncTask<Double, Void, Void> {
 		ProgressDialog dialog;
 		String eclDate, eclType;
+		double startDate = 0, endDate = 0;
 
 		@Override
 		protected void onPreExecute() {
+			super.onPreExecute();
 			planetDbHelper.open();
 			dialog = ProgressDialog.show(SolarEclipse.this, "",
 					"Calculating eclipses,\nplease wait...", true);
@@ -182,95 +226,163 @@ public class SolarEclipse extends Activity {
 			double[] data1 = null, data2 = null;
 			int i, backward;
 
+			if (params[3] > 0)
+				startDate = params[3];
+			if (params[4] > 0)
+				endDate = params[4];
 			backward = (int) Math.round(params[1]);
 			start = params[0];
 			for (i = 0; i < 8; i++) {
-				// ***************************************
-				// Global Eclipse Calculations
-				// ***************************************
-				data1 = solarDataGlobal(start, g, backward);
-				if (data1 == null) {
-					Log.e("Solar Eclipse error", "computeEclipses data1g error");
-					Toast.makeText(
-							getApplicationContext(),
-							"computeEclipses error 3,\nplease restart the activity",
-							Toast.LENGTH_LONG).show();
-					break;
-				}
-				// save the beginning time of the eclipse
-				if (i == 0)
-					if (backward == 0)
-						firstEcl = data1[3];
-					else
-						lastEcl = data1[4];
-				// save the ending time of the eclipse
-				if (i == 7)
-					if (backward == 0)
-						lastEcl = data1[4];
-					else
-						firstEcl = data1[3];
-
-				// create date string use data1[1]
-				String[] dateArr = jd2utc(data1[1]).split("_");
-				c.set(Integer.parseInt(dateArr[1]),
-						Integer.parseInt(dateArr[2]) - 1,
-						Integer.parseInt(dateArr[3]),
-						Integer.parseInt(dateArr[4]),
-						Integer.parseInt(dateArr[5]));
-				c.set(Calendar.MILLISECOND,
-						(int) (Double.parseDouble(dateArr[6]) * 1000));
-				// convert c to local time
-				c.add(Calendar.MINUTE, (int) (offset * 60));
-				eclDate = (DateFormat.format("dd MMM yyyy", c)).toString();
-
-				// create type string use data1[0]
-				int val = (int) data1[0];
-				if ((val & 4) == 4) // SE_ECL_TOTAL
-					eclType = "Total";
-				else if ((val & 8) == 8) // SE_ECL_ANNULAR
-					eclType = "Annular";
-				else if ((val & 16) == 16) // SE_ECL_PARTIAL
-					eclType = "Partial";
-				else if ((val & 32) == 32) // SE_ECL_ANNULAR_TOTAL
-					eclType = "Hybrid";
-				else
-					eclType = "Other";
-
-				if (data1[9] > 0) {
-					// eclipse is visible locally
-					data2 = solarDataLocal(data1[1] - 1, g, 0);
-					if (data2 == null) {
+				if (params[2] == 1.0) {
+					// ***************************************
+					// Local Eclipse Calculations
+					// ***************************************
+					data1 = solarDataLocal(start, g, backward);
+					if (data1 == null) {
 						Log.e("Solar Eclipse error",
-								"computeEclipses data2 error");
+								"computeEclipses data1 error");
 						Toast.makeText(
 								getApplicationContext(),
 								"computeEclipses error 1,\nplease restart the activity",
 								Toast.LENGTH_LONG).show();
 						break;
 					}
-					planetDbHelper.updateSolar(i, (int) data2[0],
-							(int) data1[0], 1, data2[1], data2[2], data2[3],
-							data2[4], data2[5], data2[7], data2[8], data2[10],
-							data2[11], data2[14], (int) data2[15],
-							(int) data2[16], data2[17], data2[18], data1[1],
-							data1[3], data1[4], data1[5], data1[6], data1[7],
-							data1[8], eclDate, eclType);
+					data2 = solarDataGlobal(data1[2] - 1, backward);
+					if (data2 == null) {
+						Log.e("Solar Eclipse error",
+								"computeEclipses data2 error");
+						Toast.makeText(
+								getApplicationContext(),
+								"computeEclipses error 2,\nplease restart the activity",
+								Toast.LENGTH_LONG).show();
+						break;
+					}
+					// save the beginning time of the eclipse
+					if (i == 0)
+						if (backward == 0)
+							firstEcl = data2[3];
+						else
+							lastEcl = data2[4];
+					// save the ending time of the eclipse
+					if (i == 7)
+						if (backward == 0)
+							lastEcl = data2[4];
+						else
+							firstEcl = data2[3];
+
+					// create date string use data1[1]
+					String[] dateArr = jd2utc(data1[1]).split("_");
+					c.set(Integer.parseInt(dateArr[1]),
+							Integer.parseInt(dateArr[2]) - 1,
+							Integer.parseInt(dateArr[3]),
+							Integer.parseInt(dateArr[4]),
+							Integer.parseInt(dateArr[5]));
+					c.set(Calendar.MILLISECOND,
+							(int) (Double.parseDouble(dateArr[6]) * 1000));
+					// convert c to local time
+					// c.add(Calendar.MINUTE, (int) (offset * 60));
+					eclDate = (DateFormat.format("dd MMMM yyyy", c)).toString();
+
+					// create type string use data2[0]
+					int val = (int) data2[0];
+					if ((val & 4) == 4) // SE_ECL_TOTAL
+						eclType = "Total";
+					else if ((val & 8) == 8) // SE_ECL_ANNULAR
+						eclType = "Annular";
+					else if ((val & 16) == 16) // SE_ECL_PARTIAL
+						eclType = "Partial";
+					else if ((val & 32) == 32) // SE_ECL_ANNULAR_TOTAL
+						eclType = "Hybrid";
+					else
+						eclType = "Other";
+
+					planetDbHelper.updateSolar(i, (int) data1[0],
+							(int) data2[0], 1, data1[1], data1[2], data1[3],
+							data1[4], data1[5], data1[7], data1[8], data1[10],
+							data1[11], data1[14], (int) data1[15],
+							(int) data1[16], data1[17], data1[18], data2[1],
+							data2[3], data2[4], data2[5], data2[6], data2[7],
+							data2[8], eclDate, eclType);
+
+					if (backward == 0)
+						start = data2[4];
+					else
+						start = data2[3];
+
 				} else {
+					// ***************************************
+					// Global Eclipse Calculations
+					// ***************************************
+					data1 = solarDataGlobal(start, backward);
+					if (data1 == null) {
+						Log.e("Solar Eclipse error",
+								"computeEclipses data1g error");
+						Toast.makeText(
+								getApplicationContext(),
+								"computeEclipses error 3,\nplease restart the activity",
+								Toast.LENGTH_LONG).show();
+						break;
+					}
+					// save the beginning time of the eclipse
+					if (i == 0)
+						if (backward == 0)
+							firstEcl = data1[3];
+						else
+							lastEcl = data1[4];
+					// save the ending time of the eclipse
+					if (i == 7)
+						if (backward == 0)
+							lastEcl = data1[4];
+						else
+							firstEcl = data1[3];
+
+					// create date string use data1[1]
+					String[] dateArr = jd2utc(data1[1]).split("_");
+					c.set(Integer.parseInt(dateArr[1]),
+							Integer.parseInt(dateArr[2]) - 1,
+							Integer.parseInt(dateArr[3]),
+							Integer.parseInt(dateArr[4]),
+							Integer.parseInt(dateArr[5]));
+					c.set(Calendar.MILLISECOND,
+							(int) (Double.parseDouble(dateArr[6]) * 1000));
+					// convert c to local time
+					// c.add(Calendar.MINUTE, (int) (offset * 60));
+					eclDate = (DateFormat.format("dd MMMM yyyy", c)).toString();
+
+					// create type string use data1[0]
+					int val = (int) data1[0];
+					if ((val & 4) == 4) // SE_ECL_TOTAL
+						eclType = "Total";
+					else if ((val & 8) == 8) // SE_ECL_ANNULAR
+						eclType = "Annular";
+					else if ((val & 16) == 16) // SE_ECL_PARTIAL
+						eclType = "Partial";
+					else if ((val & 32) == 32) // SE_ECL_ANNULAR_TOTAL
+						eclType = "Hybrid";
+					else
+						eclType = "Other";
+
 					planetDbHelper.updateSolar(i, -1, (int) data1[0], 0, -1,
 							-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 							data1[1], data1[3], data1[4], data1[5], data1[6],
 							data1[7], data1[8], eclDate, eclType);
+
+					if (backward == 0)
+						start = data1[4];
+					else
+						start = data1[3];
 				}
-				if (backward == 0)
-					start = data1[4];
-				else
-					start = data1[3];
 			}
 			return null;
 		}
 
 		@Override
 		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			if (startDate > 0)
+				firstEcl = startDate;
+			if (endDate > 0)
+				lastEcl = endDate;
 			planetDbHelper.close();
 			dialog.dismiss();
 			fillData();

@@ -59,7 +59,7 @@ public class NewLoc extends Activity {
 		newOffsetSpin = (Spinner) findViewById(R.id.newOffsetSpin);
 
 		planetDbHelper = new PlanetsDbAdapter(this, "location");
-		planetDbHelper.open();
+		// planetDbHelper.open();
 
 		saveLocButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -85,6 +85,7 @@ public class NewLoc extends Activity {
 	 * Loads location data into the fields.
 	 */
 	private void loadData() {
+		planetDbHelper.open();
 		Cursor locCur = planetDbHelper.fetchEntry(0);
 		startManagingCursor(locCur);
 		latitude = locCur.getDouble(locCur.getColumnIndexOrThrow("lat"));
@@ -98,6 +99,7 @@ public class NewLoc extends Activity {
 			newOffsetSpin.setSelection(locCur.getInt(locCur
 					.getColumnIndexOrThrow("ioffset")));
 		}
+		planetDbHelper.close();
 	}
 
 	private int saveLocation() {
@@ -125,9 +127,11 @@ public class NewLoc extends Activity {
 		}
 
 		date = Calendar.getInstance().getTimeInMillis();
+		planetDbHelper.open();
 		// update location
 		planetDbHelper.updateLocation(0, latitude, longitude, 0.0, 0.0, date,
 				offset, ioffset, elevation);
+		planetDbHelper.close();
 		return 0;
 	}
 

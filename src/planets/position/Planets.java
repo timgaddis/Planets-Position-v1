@@ -21,6 +21,9 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Calendar;
@@ -39,6 +42,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -65,6 +69,8 @@ public class Planets extends Activity {
 	private String planetName;
 	private Location loc;
 	private UserLocation userLocation = new UserLocation();
+	private InputStream myInput;
+	private OutputStream myOutput;
 
 	private static final int LOCATION_MANUAL = 0;
 	private static final int WIFI_STATUS = 1;
@@ -90,7 +96,15 @@ public class Planets extends Activity {
 		planetDbHelper = new PlanetsDbAdapter(this, "location");
 		planetDbHelper.open();
 
-		checkWiFi();
+		if (!(checkFiles("semo_18.se1") && checkFiles("sepl_18.se1"))) {
+			// copyDialog = ProgressDialog.show(Planets.this, "",
+			// "Copying files. Please wait...", true);
+			// copy files thread
+			new CopyFilesTask().execute();
+		} else
+			loadLocation();
+
+		// checkWiFi();
 
 		manualButton.setEnabled(true);
 		downloadButton.setEnabled(true);
@@ -180,19 +194,6 @@ public class Planets extends Activity {
 			}
 		} else
 			loadLocation();
-	}
-
-	/**
-	 * Checks to see if the given file exists on the sdcard.
-	 * 
-	 * @param name
-	 *            file name to check
-	 * @return true if exists, false otherwise
-	 */
-	private boolean checkFiles(String name) {
-		File sdCard = Environment.getExternalStorageDirectory();
-		File f = new File(sdCard.getAbsolutePath() + "/ephemeris/" + name);
-		return f.exists();
 	}
 
 	private void getLocation() {
@@ -464,6 +465,89 @@ public class Planets extends Activity {
 		protected void onPreExecute() {
 			dialog = ProgressDialog.show(Planets.this, "",
 					"Downloading Location.\nPlease wait...", true);
+		}
+	}
+
+	private class CopyFilesTask extends AsyncTask<Void, Void, Void> {
+		ProgressDialog copyDialog;
+
+		@Override
+		protected void onPreExecute() {
+			copyDialog = ProgressDialog.show(Planets.this, "",
+					"Copying files. Please wait...", true);
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			// copy the ephermeris files from assets folder to the sd card.
+			try {
+				// copyFile("seas_18.se1"); // 225440
+				copyFile("semo_18.se1"); // 1305686
+				copyFile("sepl_18.se1"); // 484065
+			} catch (IOException e) {
+				// e.printStackTrace();
+				Log.e("CopyFile error", e.getMessage());
+				Toast.makeText(Planets.this, "Error copying assets files",
+						Toast.LENGTH_LONG).show();
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			copyDialog.dismiss();
+			loadLocation();
+		}
+
+	}
+
+	/**
+	 * Checks to see if the given file exists on the sdcard.
+	 * 
+	 * @param name
+	 *            file name to check
+	 * @return true if exists, false otherwise
+	 */
+	private boolean checkFiles(String name) {
+		File sdCard = Environment.getExternalStorageDirectory();
+		File f = new File(sdCard.getAbsolutePath() + "/ephemeris/" + name);
+		return f.exists();
+	}
+
+	/**
+	 * copies the given files from the assets folder to the ephermeris folder on
+	 * the sdcard.
+	 */
+	private void copyFile(String filename) throws IOException {
+		// check if ephemeris dir is on sdcard, if not create dir
+		// Log.d("Copy Files", filename);
+		File sdCard = Environment.getExternalStorageDirectory();
+		File dir = new File(sdCard.getAbsolutePath() + "/ephemeris");
+		if (!dir.isDirectory()) {
+			dir.mkdirs();
+		}
+		// Log.d("File Dir", dir.getCanonicalPath());
+		// check if ephemeris file is on sdcard, if not copy form assets folder
+		File f = new File(dir + "/" + filename);
+		// Log.d("File Exists", "" + f.exists());
+		if (!f.exists()) {
+
+			myInput = this.getAssets().open(filename);
+			// Log.d("InputStream Open", "" + f.exists());
+
+			myOutput = new FileOutputStream(f);
+			// Log.d("OutputStream Open", "" + f.exists());
+
+			byte[] buffer = new byte[1024];
+			int length = 0;
+			while ((length = myInput.read(buffer)) > 0) {
+				myOutput.write(buffer, 0, length);
+			}
+			// Close the streams
+			myOutput.flush();
+			myOutput.close();
+			myInput.close();
+
 		}
 	}
 

@@ -65,19 +65,19 @@ jdoubleArray Java_planets_position_SolarEclipse_solarDataPos(JNIEnv* env,
  * Output: Double array containing eclipse type and eclipse event times.
  */
 jdoubleArray Java_planets_position_SolarEclipse_solarDataGlobal(JNIEnv* env,
-		jobject this, jdouble d_ut, jdoubleArray loc, jint back) {
+		jobject this, jdouble d_ut, jint back) {
 
 	char serr[256];
-	double tret[10], g[3], attr[20], rval, ii;
-	int retval, i;
+	double tret[10], g[3], attr[20], rval;
+	int retval;
 
 	jdoubleArray result;
-	result = (*env)->NewDoubleArray(env, 10);
+	result = (*env)->NewDoubleArray(env, 9);
 	if (result == NULL) {
 		return NULL; /* out of memory error thrown */
 	}
 
-	(*env)->GetDoubleArrayRegion(env, loc, 0, 3, g);
+	/*(*env)->GetDoubleArrayRegion(env, loc, 0, 3, g);*/
 	swe_set_ephe_path("/mnt/sdcard/ephemeris/");
 
 	retval = swe_sol_eclipse_when_glob(d_ut, SEFLG_SWIEPH, 0, tret, back, serr);
@@ -86,20 +86,21 @@ jdoubleArray Java_planets_position_SolarEclipse_solarDataGlobal(JNIEnv* env,
 		return NULL;
 	}
 
-	i = swe_sol_eclipse_how(tret[0], SEFLG_SWIEPH, g, attr, serr);
-	if (i == ERR) {
-		swe_close();
-		return NULL;
-	}
+	/*i = swe_sol_eclipse_how(tret[0], SEFLG_SWIEPH, g, attr, serr);
+	 if (i == ERR) {
+	 swe_close();
+	 return NULL;
+	 }
+	 ii = i * 1.0;*/
 
 	rval = retval * 1.0;
-	ii = i * 1.0;
 	swe_close();
 
 	// move from the temp structure to the java structure
 	(*env)->SetDoubleArrayRegion(env, result, 0, 1, &rval);
 	(*env)->SetDoubleArrayRegion(env, result, 1, 8, tret);
-	(*env)->SetDoubleArrayRegion(env, result, 9, 1, &ii);
+	/*(*env)->SetDoubleArrayRegion(env, result, 9, 1, &ii);
+	 (*env)->SetDoubleArrayRegion(env, result, 10, 1, &attr[5]);*/
 	return result;
 }
 

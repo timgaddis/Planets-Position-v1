@@ -42,17 +42,12 @@
 				android:id="@+id/solarEclButton"
 				android:textSize="18sp"
 				android:layout_width="wrap_content"
-				android:layout_height="65dp"
-				android:layout_weight="1" />
-			<Button
-				android:text="Lunar Eclipses"
-				android:id="@+id/lunarEclButton"
-				android:textSize="18sp"
-				android:layout_width="wrap_content"
-				android:layout_height="65dp"
+				android:layout_height="50dp"
 				android:layout_weight="1" />
 		</LinearLayout>
-
+		<!-- <Button android:text="Lunar Eclipses" android:id="@+id/lunarEclButton" 
+			android:textSize="18sp" android:layout_width="wrap_content" android:layout_height="65dp" 
+			android:layout_weight="1" /> -->
 		<View
 			android:layout_height="15dp"
 			android:layout_width="fill_parent" />

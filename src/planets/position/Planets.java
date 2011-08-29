@@ -58,7 +58,7 @@ import android.widget.Toast;
 public class Planets extends Activity {
 
 	private Button positionButton, whatupButton, downloadButton, manualButton,
-			liveButton, solarButton, lunarButton;
+			liveButton, solarButton;// , lunarButton;
 	private Spinner planetNameSpinner;
 	private TextView locationText;
 	private long date = 0, locDate = 0;
@@ -90,7 +90,7 @@ public class Planets extends Activity {
 		whatupButton = (Button) findViewById(R.id.whatupButton);
 		downloadButton = (Button) findViewById(R.id.downloadButton);
 		solarButton = (Button) findViewById(R.id.solarEclButton);
-		lunarButton = (Button) findViewById(R.id.lunarEclButton);
+		// lunarButton = (Button) findViewById(R.id.lunarEclButton);
 		locationText = (TextView) findViewById(R.id.locationData);
 
 		planetDbHelper = new PlanetsDbAdapter(this, "location");
@@ -158,13 +158,13 @@ public class Planets extends Activity {
 
 		});
 
-		lunarButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				launchLunar();
-			}
-
-		});
+		// lunarButton.setOnClickListener(new View.OnClickListener() {
+		// @Override
+		// public void onClick(View view) {
+		// launchLunar();
+		// }
+		//
+		// });
 
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
 				this, R.array.planets_array,

@@ -17,15 +17,187 @@ package planets.position;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Calendar;
+
 import android.app.Activity;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.text.format.DateFormat;
+import android.view.View;
+import android.widget.TextView;
 
 public class EclipseData extends Activity {
+
+	private TextView eclDateText, eclTypeText, eclGlobalDataText,
+			eclLocalDataText;
+	private Bundle bundle;
+	private int eclipseNum;
+	private double offset;
+	private PlanetsDbAdapter planetDbHelper;
+
+	// load c library
+	static {
+		System.loadLibrary("planets_swiss");
+	}
+
+	// c function prototypes
+	public native String jd2utc(double jdate);
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.eclipse_data);
 
+		eclDateText = (TextView) findViewById(R.id.ecl_date_text);
+		eclTypeText = (TextView) findViewById(R.id.ecl_type_text);
+		eclGlobalDataText = (TextView) findViewById(R.id.ecl_globalData);
+		eclLocalDataText = (TextView) findViewById(R.id.ecl_localData);
+
+		// load bundle from previous activity
+		bundle = getIntent().getExtras();
+		if (bundle != null) {
+			eclipseNum = bundle.getInt("eclipseNum", 0);
+			offset = bundle.getDouble("Offset", 0);
+		}
+
+		planetDbHelper = new PlanetsDbAdapter(this, "solarEcl");
+		fillData();
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		setResult(RESULT_OK);
+		finish();
+	}
+
+	private void fillData() {
+		String eclType, localData, globalData;
+
+		planetDbHelper.open();
+		Cursor planetCur = planetDbHelper.fetchEntry(eclipseNum);
+		startManagingCursor(planetCur);
+
+		int val = planetCur.getInt(planetCur
+				.getColumnIndexOrThrow("globalType"));
+		if ((val & 4) == 4) // SE_ECL_TOTAL
+			eclType = "Total Eclipse";
+		else if ((val & 8) == 8) // SE_ECL_ANNULAR
+			eclType = "Annular Eclipse";
+		else if ((val & 16) == 16) // SE_ECL_PARTIAL
+			eclType = "Partial Eclipse";
+		else if ((val & 32) == 32) // SE_ECL_ANNULAR_TOTAL
+			eclType = "Hybrid Eclipse";
+		else
+			eclType = "Other Eclipse";
+		eclTypeText.setText(eclType);
+		eclDateText.setText(planetCur.getString(planetCur
+				.getColumnIndexOrThrow("eclipseDate")));
+		globalData = "Eclipse Data (UTC)\n------------------\n";
+		// globalData += String.format("%-17s%15s\n", "Eclipse Type", eclType);
+		globalData += String.format(
+				"%-16s%13s\n",
+				"Eclipse Start",
+				convertDate(planetCur.getDouble(planetCur
+						.getColumnIndexOrThrow("globalBeginTime")), false));
+		globalData += String.format(
+				"%-16s%13s\n",
+				"Totality Start",
+				convertDate(planetCur.getDouble(planetCur
+						.getColumnIndexOrThrow("globalTotBegin")), false));
+		globalData += String.format(
+				"%-16s%13s\n",
+				"Maximum Eclipse",
+				convertDate(planetCur.getDouble(planetCur
+						.getColumnIndexOrThrow("globalMaxTime")), false));
+		globalData += String.format(
+				"%-16s%13s\n",
+				"Totality End",
+				convertDate(planetCur.getDouble(planetCur
+						.getColumnIndexOrThrow("globalTotEnd")), false));
+		globalData += String.format(
+				"%-16s%13s",
+				"Eclipse End",
+				convertDate(planetCur.getDouble(planetCur
+						.getColumnIndexOrThrow("globalEndTime")), false));
+
+		// globalData += "Totality Start "
+		// + convertDate(planetCur.getDouble(planetCur
+		// .getColumnIndexOrThrow("globalTotBegin")), false)
+		// + "\n";
+		// globalData += "Maximum Eclipse "
+		// + convertDate(planetCur.getDouble(planetCur
+		// .getColumnIndexOrThrow("globalMaxTime")), false) + "\n";
+		// globalData += "Totality End "
+		// + convertDate(planetCur.getDouble(planetCur
+		// .getColumnIndexOrThrow("globalTotEnd")), false) + "\n";
+		// globalData += "Eclipse End "
+		// + convertDate(planetCur.getDouble(planetCur
+		// .getColumnIndexOrThrow("globalEndTime")), false);
+		eclGlobalDataText.setText(globalData);
+
+		if (planetCur.getInt(planetCur.getColumnIndexOrThrow("local")) > 0) {
+			// local eclipse
+			localData = "Local Eclipse Data\n------------------\n";
+			localData += String.format(
+					"%-16s%13s\n",
+					"Eclipse Start",
+					convertDate(planetCur.getDouble(planetCur
+							.getColumnIndexOrThrow("localFirstTime")), true));
+			localData += String.format(
+					"%-16s%13s\n",
+					"Totality Start",
+					convertDate(planetCur.getDouble(planetCur
+							.getColumnIndexOrThrow("localSecondTime")), true));
+			localData += String.format(
+					"%-16s%13s\n",
+					"Maximum Eclipse",
+					convertDate(planetCur.getDouble(planetCur
+							.getColumnIndexOrThrow("localMaxTime")), true));
+			localData += String.format(
+					"%-16s%13s\n",
+					"Totality End",
+					convertDate(planetCur.getDouble(planetCur
+							.getColumnIndexOrThrow("localThirdTime")), true));
+			localData += String.format(
+					"%-16s%13s",
+					"Eclipse End",
+					convertDate(planetCur.getDouble(planetCur
+							.getColumnIndexOrThrow("localFourthTime")), true));
+			eclLocalDataText.setText(localData);
+		} else {
+			eclLocalDataText.setVisibility(View.GONE);
+		}
+		planetDbHelper.close();
+	}
+
+	/**
+	 * Converts the given Julian Date to a String
+	 * 
+	 * @param jd
+	 *            - Julian Date to convert
+	 * @param local
+	 *            - Set if date/time is local
+	 * @return CharSequence of Date
+	 */
+	private CharSequence convertDate(double jd, boolean local) {
+		if (jd > 0.0) {
+			Calendar c = Calendar.getInstance();
+
+			String[] dateArr = jd2utc(jd).split("_");
+			c.set(Integer.parseInt(dateArr[1]),
+					Integer.parseInt(dateArr[2]) - 1,
+					Integer.parseInt(dateArr[3]), Integer.parseInt(dateArr[4]),
+					Integer.parseInt(dateArr[5]));
+			c.set(Calendar.MILLISECOND,
+					(int) (Double.parseDouble(dateArr[6]) * 1000));
+			if (local) {
+				// convert c to local time
+				c.add(Calendar.MINUTE, (int) (offset * 60));
+			}
+			return DateFormat.format("MMM d kk:mm", c);
+		} else {
+			return "N/A";
+		}
 	}
 }

@@ -51,6 +51,9 @@
 		<activity
 			android:name="PlanetData"
 			android:screenOrientation="portrait" />
+		<activity
+			android:name="EclipseData"
+			android:screenOrientation="portrait" />
 	</application>
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />

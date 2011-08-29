@@ -22,6 +22,27 @@
 #include "swiss/swephexp.h"
 
 /*
+ * Covert a given Julian date to a calendar date in utc.
+ * Swiss Ephemeris function called:
+ * 		swe_jdut1_to_utc
+ * Input: Julian date
+ * Output: String containing a calendar date
+ */
+jstring Java_planets_position_EclipseData_jd2utc(JNIEnv* env, jobject this,
+		jdouble juldate) {
+
+	char *outFormat = "_%i_%i_%i_%i_%i_%2.1f_";
+	char output[30];
+	int i, y, mo, d, h, mi;
+	double s;
+
+	swe_jdut1_to_utc(juldate, SE_GREG_CAL, &y, &mo, &d, &h, &mi, &s);
+
+	i = sprintf(output, outFormat, y, mo, d, h, mi, s);
+	return (*env)->NewStringUTF(env, output);
+}
+
+/*
  * Calculate the geographic position of where a solar eclipse occurs for a
  * 		given date.
  * Swiss Ephemeris functions called:
@@ -144,11 +165,11 @@ jdoubleArray Java_planets_position_SolarEclipse_solarDataLocal(JNIEnv* env,
 		swe_close();
 		return NULL;
 	} else {
-		i = swe_sol_eclipse_how(tret[0], SEFLG_SWIEPH, g, attr, serr);
-		if (i == ERR) {
-			swe_close();
-			return NULL;
-		}
+		/*i = swe_sol_eclipse_how(tret[0], SEFLG_SWIEPH, g, attr, serr);
+		 if (i == ERR) {
+		 swe_close();
+		 return NULL;
+		 }*/
 
 		// calculate moon position at max eclipse
 		i = swe_calc_ut(tret[0], 1, iflag, x2, serr);

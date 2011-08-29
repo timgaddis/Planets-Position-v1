@@ -253,9 +253,9 @@ public class ViewWhatsUp extends Activity {
 		super.onActivityResult(requestCode, resultCode, intent);
 		switch (requestCode) {
 		case PLANET_DATA:
-			new ComputePlanetsTask().execute();
+			// new ComputePlanetsTask().execute();
 			// computePlanets();
-			// fillData(1);
+			fillData(1);
 			return;
 		}
 	}

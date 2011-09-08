@@ -4,8 +4,6 @@
 	<string name="pos_title">Planet\'s Position</string>
 	<string name="loc_title">Location</string>
 	<string name="solar_title">Solar Eclipses</string>
-	<string name="solar_title_global">Global Solar Eclipses</string>
-	<string name="solar_title_local">Local Solar Eclipses</string>
     <string name="lunar_title">Lunar Eclipses</string>
 	<string name="alert_title">WiFi is turned off</string>
 	<string name="alert_enable">Goto Settings Page To Enable Wifi</string>
@@ -66,14 +64,15 @@
 	<string name="main_help">
 		Initially, location data needs to be saved for the position 
 		calculations.\n
-		The three options are to retrieve location data from GPS, download 
-		timezone data or manually enter all of the data, and view real time 
-		positions of the planets.  The location data is then saved to the 
+		The two options are to retrieve location data from GPS or manually 
+		enter all of the data.  The location data is then saved to the 
 		program.\n\n
-		The Planet\'s Position screen will let you select a planet and a date 
+		The Planet\'s Position screen lets you select a planet and a date 
 		and time, then it will calculate the position.\n\n
 		The What\'s Up Now screen lists what planets are up for the current 
 		date and time of the device for the given location.\n\n
+		The Solar Eclipse screen lists solar eclipses and indicates which of 
+		them are visible at the location saved on the device.\n\n
 		The Real Time Position screen is the current real time position of the 
 		selected planet.\n\n
 	</string>
@@ -84,29 +83,29 @@
 		When a planet is selected, 8 values are calculated.\n\n
 		<b>Right Ascension:</b>\n
 		The position on the celestial sphere east of the Vernal Equinox.\n
-		http://en.wikipedia.org/wiki/Right_ascension\n\n
+		http://en.m.wikipedia.org/wiki/Right_ascension\n\n
 		<b>Declination:</b>\n
 		The position on the celestial sphere north or south of the celestial
 		equator.\n
-		http://en.wikipedia.org/wiki/Declination\n\n
+		http://en.m.wikipedia.org/wiki/Declination\n\n
 		<b>Azimuth:</b>\n
 		The compass direction for the planet\'s position for the given
 		location.\n
-		http://en.wikipedia.org/wiki/Azimuth\n\n
+		http://en.m.wikipedia.org/wiki/Azimuth\n\n
 		<b>Altitude:</b>\n
 		The angle above the horizon of the given planet.\n
-		http://en.wikipedia.org/wiki/Altitude_(astronomy)#Altitude\n\n
+		http://en.m.wikipedia.org/wiki/Altitude_(astronomy)\n\n
 		<b>Distance:</b>\n
 		The distance of the planet from the Earth in astronomical units.\n
-		http://en.wikipedia.org/wiki/Astronomical_unit\n\n
+		http://en.m.wikipedia.org/wiki/Astronomical_unit\n\n
 		<b>Magnitude</b>\n
 		The brightness of a planet on a logarithmic scale, where the smaller the
 		number, the brighter the planet.\n
-		http://en.wikipedia.org/wiki/Magnitude_(astronomy)\n\n
+		http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\n
 		<b>Rise and Set Times</b>\n
 		The times at which the planet rises and sets for the given location.\n
-		http://en.wikipedia.org/wiki/Sun_rise\n
-		http://en.wikipedia.org/wiki/Sunset\n\n
+		http://en.m.wikipedia.org/wiki/Sun_rise\n
+		http://en.m.wikipedia.org/wiki/Sunset\n\n
 	</string>
 	<string name="up_help">
 		This is a list of the planets above the horizon at the current date and
@@ -114,27 +113,52 @@
 		7 values are calculated for each planet.\n\n
 		<b>Right Ascension:</b>\n
 		The position on the celestial sphere east of the Vernal Equinox.\n
-		http://en.wikipedia.org/wiki/Right_ascension\n\n
+		http://en.m.wikipedia.org/wiki/Right_ascension\n\n
 		<b>Declination:</b>\n
 		The position on the celestial sphere north or south of the celestial
 		equator.\n
-		http://en.wikipedia.org/wiki/Declination\n\n
+		http://en.m.wikipedia.org/wiki/Declination\n\n
 		<b>Azimuth:</b>\n
 		The compass direction for the planet\'s position for the given
 		location.\n
-		http://en.wikipedia.org/wiki/Azimuth\n\n
+		http://en.m.wikipedia.org/wiki/Azimuth\n\n
 		<b>Altitude:</b>\n
 		The angle above the horizon of the given planet.\n
-		http://en.wikipedia.org/wiki/Altitude_(astronomy)#Altitude\n\n
+		http://en.m.wikipedia.org/wiki/Altitude_(astronomy)\n\n
 		<b>Distance:</b>\n
 		The distance of the planet from the Earth in astronomical units.\n
-		http://en.wikipedia.org/wiki/Astronomical_unit\n\n
+		http://en.m.wikipedia.org/wiki/Astronomical_unit\n\n
 		<b>Magnitude</b>\n
 		The brightness of a planet on a logarithmic scale, where the smaller the
 		number, the brighter the planet.\n
-		http://en.wikipedia.org/wiki/Magnitude_(astronomy)\n\n
+		http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\n
 		<b>Set Time</b>\n
 		The time at which the planet sets for the given location.\n
-		http://en.wikipedia.org/wiki/Sunset\n\n
+		http://en.m.wikipedia.org/wiki/Sunset\n\n
 	</string>
+    <string name="solarEcl_help">
+        When an eclipse is selected, 6 values are calculated.\n\n
+        <b>Eclipse Types:</b>\n
+        \tTotal Eclipse\n
+        \tAnnular Eclipse\n
+        \tPartial Eclipse\n
+        \tHybrid Eclipse\n
+        http://en.m.wikipedia.org/wiki/Solar_eclipse#section_1\n\n
+        <b>Azimuth:</b>\n
+        The compass direction for the Sun\'s position for the given location.\n
+        http://en.m.wikipedia.org/wiki/Azimuth\n\n
+        <b>Altitude:</b>\n
+        The angle above the horizon of the Sun.\n
+        http://en.m.wikipedia.org/wiki/Altitude_(astronomy)\n\n
+        <b>Magnitude:</b>\n
+        The brightness of the eclipse on a logarithmic scale, where the smaller
+        the number, the brighter the eclipse.\n
+        http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\n
+        <b>Saros Number:</b>\n
+        <b>Saros Member Number:</b>\n
+        The saros is a a period of 223 synodic months that can be used to 
+        predict eclipses of the Sun and Moon\n
+        http://eclipse.gsfc.nasa.gov/SEsaros/SEsaros.html\n
+        http://en.m.wikipedia.org/wiki/Saros_number\n\n
+    </string>
 </resources>

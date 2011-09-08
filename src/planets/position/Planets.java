@@ -94,11 +94,8 @@ public class Planets extends Activity {
 		locationText = (TextView) findViewById(R.id.locationData);
 
 		planetDbHelper = new PlanetsDbAdapter(this, "location");
-		planetDbHelper.open();
 
 		if (!(checkFiles("semo_18.se1") && checkFiles("sepl_18.se1"))) {
-			// copyDialog = ProgressDialog.show(Planets.this, "",
-			// "Copying files. Please wait...", true);
 			// copy files thread
 			new CopyFilesTask().execute();
 		} else
@@ -171,13 +168,16 @@ public class Planets extends Activity {
 				android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		planetNameSpinner.setAdapter(adapter);
-		// planetNameSpinner.setSelection(planetNum);
 
 		planetNameSpinner
 				.setOnItemSelectedListener(new PlanetNameSelectedListener());
 
 	}
 
+	/**
+	 * Checks for data files on the sdcard. If not found, checks if WiFi is on,
+	 * then downloads data files
+	 */
 	private void checkWiFi() {
 		if (!(checkFiles("semo_18.se1") && checkFiles("sepl_18.se1"))) {
 			// check wifi for connection
@@ -196,6 +196,9 @@ public class Planets extends Activity {
 			loadLocation();
 	}
 
+	/**
+	 * Gets the GPS location of the device or loads test values.
+	 */
 	private void getLocation() {
 		// get lat/long from GPS
 		if (DEBUG) {
@@ -207,16 +210,18 @@ public class Planets extends Activity {
 			offset = -7.0;
 			saveLocation();
 		} else {
-			boolean result;
 			loc = null;
 			new GetGPSTask().execute();
-			result = userLocation.getLocation(this, locationResult);
+			boolean result = userLocation.getLocation(this, locationResult);
 			if (!result) {
 				loc = new Location(LocationManager.PASSIVE_PROVIDER);
 			}
 		}
 	}
 
+	/**
+	 * Launch the Solar Eclipse activity.
+	 */
 	private void launchSolar() {
 		bundle = new Bundle();
 		bundle.putDouble("Lat", latitude);
@@ -228,17 +233,22 @@ public class Planets extends Activity {
 		startActivity(i);
 	}
 
-	private void launchLunar() {
-		bundle = new Bundle();
-		bundle.putDouble("Lat", latitude);
-		bundle.putDouble("Long", longitude);
-		bundle.putDouble("Elevation", elevation);
-		bundle.putDouble("Offset", offset);
-		Intent i = new Intent(this, LunarEclipse.class);
-		i.putExtras(bundle);
-		startActivity(i);
-	}
-
+	// /**
+	// * Launch the Lunar Eclipse activity.
+	// */
+	// private void launchLunar() {
+	// bundle = new Bundle();
+	// bundle.putDouble("Lat", latitude);
+	// bundle.putDouble("Long", longitude);
+	// bundle.putDouble("Elevation", elevation);
+	// bundle.putDouble("Offset", offset);
+	// Intent i = new Intent(this, LunarEclipse.class);
+	// i.putExtras(bundle);
+	// startActivity(i);
+	// }
+	/**
+	 * Launch the Planet Position activity.
+	 */
 	private void launchPosition() {
 		bundle = new Bundle();
 		bundle.putDouble("Lat", latitude);
@@ -250,6 +260,9 @@ public class Planets extends Activity {
 		startActivity(i);
 	}
 
+	/**
+	 * Launch the What's Up Now activity.
+	 */
 	private void launchWhatsUp() {
 		bundle = new Bundle();
 		bundle.putDouble("Lat", latitude);
@@ -261,6 +274,9 @@ public class Planets extends Activity {
 		startActivity(i);
 	}
 
+	/**
+	 * Launch the Live Position activity.
+	 */
 	private void launchLivePos() {
 		bundle = new Bundle();
 		bundle.putDouble("Lat", latitude);
@@ -274,11 +290,15 @@ public class Planets extends Activity {
 		startActivity(i);
 	}
 
+	/**
+	 * Loads the device location from the DB, or shows the location alert dialog
+	 * box.
+	 */
 	private void loadLocation() {
+		planetDbHelper.open();
 		Cursor locCur = planetDbHelper.fetchEntry(0);
 		startManagingCursor(locCur);
-		locDate = Long.parseLong(locCur.getString(locCur
-				.getColumnIndexOrThrow("date")));
+		locDate = locCur.getLong(locCur.getColumnIndexOrThrow("date"));
 		if (locDate > 0) {
 			latitude = locCur.getDouble(locCur.getColumnIndexOrThrow("lat"));
 			longitude = locCur.getDouble(locCur.getColumnIndexOrThrow("lng"));
@@ -291,18 +311,31 @@ public class Planets extends Activity {
 			data += "\nElevation: " + elevation;
 			data += "\nGMT offset: " + offset;
 			locationText.setText(data);
+			planetDbHelper.close();
 		} else {
+			planetDbHelper.close();
 			showLocationDataAlert();
 		}
 	}
 
+	/**
+	 * Saves the device location to the DB.
+	 */
 	private void saveLocation() {
 		// update location
+		planetDbHelper.open();
 		planetDbHelper.updateLocation(0, latitude, longitude, 0.0, 0.0, date,
 				offset, 13, elevation);
+		planetDbHelper.close();
 		loadLocation();
 	}
 
+	/**
+	 * Downloads the data file to the sdcard in a separate thread.
+	 * 
+	 * @author tgaddis
+	 * 
+	 */
 	private class DownloadFile extends AsyncTask<String, Integer, String> {
 
 		private ProgressDialog progressDialog;
@@ -353,7 +386,7 @@ public class Planets extends Activity {
 				output.close();
 				input.close();
 			} catch (Exception e) {
-				// Log.e("DownloadTest error", "" + e);
+				Log.e("DownloadTest error", "" + e);
 			}
 			return null;
 		}
@@ -372,6 +405,12 @@ public class Planets extends Activity {
 
 	}
 
+	/**
+	 * Extracts the zip file to the sdcard in a separate thread.
+	 * 
+	 * @author tgaddis
+	 * 
+	 */
 	private class UnZipFile extends AsyncTask<Void, Void, Void> {
 
 		private ProgressDialog progressDialog;
@@ -406,6 +445,10 @@ public class Planets extends Activity {
 		}
 	}
 
+	/**
+	 * Dialog box prompting the user to download the location or manually enter
+	 * it.
+	 */
 	private void showLocationDataAlert() {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 		alertDialogBuilder
@@ -432,8 +475,21 @@ public class Planets extends Activity {
 		alert.show();
 	}
 
+	/**
+	 * Loads a dialog box in a separate thread for the GPS location and
+	 * processes the location when finished.
+	 * 
+	 * @author tgaddis
+	 * 
+	 */
 	private class GetGPSTask extends AsyncTask<Void, Void, Void> {
 		ProgressDialog dialog;
+
+		@Override
+		protected void onPreExecute() {
+			dialog = ProgressDialog.show(Planets.this, "",
+					"Downloading Location.\nPlease wait...", true);
+		}
 
 		@Override
 		protected Void doInBackground(Void... params) {
@@ -461,13 +517,14 @@ public class Planets extends Activity {
 			dialog.dismiss();
 		}
 
-		@Override
-		protected void onPreExecute() {
-			dialog = ProgressDialog.show(Planets.this, "",
-					"Downloading Location.\nPlease wait...", true);
-		}
 	}
 
+	/**
+	 * AsyncTask to copy files from the assets directory to the sdcard.
+	 * 
+	 * @author tgaddis
+	 * 
+	 */
 	private class CopyFilesTask extends AsyncTask<Void, Void, Void> {
 		ProgressDialog copyDialog;
 
@@ -551,7 +608,12 @@ public class Planets extends Activity {
 		}
 	}
 
-	// Planet name selection for the live position activity
+	/**
+	 * Planet name selection for the live position activity
+	 * 
+	 * @author tgaddis
+	 * 
+	 */
 	public class PlanetNameSelectedListener implements OnItemSelectedListener {
 		public void onItemSelected(AdapterView<?> parent, View view, int pos,
 				long id) {
@@ -597,6 +659,9 @@ public class Planets extends Activity {
 		return super.onMenuItemSelected(featureId, item);
 	}
 
+	/**
+	 * Launches the manual entry location activity
+	 */
 	private void enterLocManual() {
 		Intent i = new Intent(this, NewLoc.class);
 		startActivityForResult(i, LOCATION_MANUAL);

@@ -27,31 +27,6 @@
 
 	<LinearLayout
 		android:id="@+id/linearLayout1"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content">
-		<RadioGroup
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:id="@+id/radioGroup1"
-			android:orientation="horizontal">
-			<RadioButton
-				android:id="@+id/radioGlobalEclipses"
-				android:text="All Eclipses"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_weight="1"
-				android:checked="true" />
-			<RadioButton
-				android:id="@+id/radioLocalEclipses"
-				android:text="Local Eclipses"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_weight="1" />
-		</RadioGroup>
-	</LinearLayout>
-
-	<LinearLayout
-		android:id="@+id/linearLayout1"
 		android:layout_gravity="center"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content">
@@ -74,11 +49,15 @@
 			android:paddingRight="10dp"
 			android:gravity="center_horizontal"
 			android:textColor="@color/text_color" />
+		<TextView
+			android:text="Local"
+			android:id="@+id/textView2"
+			android:textSize="16sp"
+			android:layout_height="wrap_content"
+			android:gravity="center_horizontal"
+			android:textColor="@color/text_color"
+			android:layout_width="wrap_content" />
 	</LinearLayout>
-	<!-- <TextView android:text="Local" android:id="@+id/textView2" android:textSize="18sp" 
-		android:layout_height="wrap_content" android:gravity="center_horizontal" 
-		android:textColor="@color/text_color" android:layout_width="wrap_content" 
-		/> -->
 	<View
 		android:id="@+id/view1"
 		android:layout_width="wrap_content"

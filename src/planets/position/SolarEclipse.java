@@ -40,7 +40,6 @@ public class SolarEclipse extends Activity {
 
 	private Button prevEclButton, nextEclButton;
 	private ListView eclipseList;
-	// private RadioButton radioLocalEcl, radioGlobalEcl;
 	private double[] time, g = new double[3];
 	private double offset, firstEcl, lastEcl, local, direction;
 	private PlanetsDbAdapter planetDbHelper;
@@ -72,9 +71,6 @@ public class SolarEclipse extends Activity {
 		prevEclButton = (Button) findViewById(R.id.prevSEclButton);
 		nextEclButton = (Button) findViewById(R.id.nextSEclButton);
 		eclipseList = (ListView) findViewById(R.id.solarEclList);
-		// radioLocalEcl = (RadioButton) findViewById(R.id.radioLocalEclipses);
-		// radioGlobalEcl = (RadioButton)
-		// findViewById(R.id.radioGlobalEclipses);
 
 		// load bundle from previous activity
 		Bundle bundle = getIntent().getExtras();
@@ -123,31 +119,6 @@ public class SolarEclipse extends Activity {
 			}
 		});
 
-		// OnClickListener radioListener = new OnClickListener() {
-		// public void onClick(View v) {
-		// double sd;
-		// if (direction == 0.0)
-		// sd = firstEcl;
-		// else
-		// sd = lastEcl;
-		// // Perform action on clicks
-		// // RadioButton rb = (RadioButton) v;
-		// if (v.getId() == R.id.radioGlobalEclipses) {
-		// // Global Eclipses
-		// local = 0.0;
-		// new ComputeEclipsesTask().execute(sd, direction, local,
-		// firstEcl, lastEcl);
-		// } else {
-		// // Local Eclipses
-		// local = 1.0;
-		// new ComputeEclipsesTask().execute(sd, direction, local,
-		// firstEcl, lastEcl);
-		// }
-		// }
-		// };
-		//
-		// radioLocalEcl.setOnClickListener(radioListener);
-		// radioGlobalEcl.setOnClickListener(radioListener);
 		eclipseList.setOnItemClickListener(new EclipseSelectedListener());
 	}
 
@@ -286,14 +257,9 @@ public class SolarEclipse extends Activity {
 				else
 					eclType = "Other";
 
-				// Log.d("Solar Eclipse", "data1[9]:" + data1[9] + " data1[10]:"
-				// + data1[10]);
-
 				if (Math.abs(data2[1] - data1[1]) < 1.0) {
 					// if local eclipse time is within one day of the global
 					// time, then eclipse is visible locally
-					// Log.d("Solar Eclipse", "in local eclipse");
-
 					planetDbHelper.updateSolar(i, (int) data2[0],
 							(int) data1[0], 1, data2[1], data2[2], data2[3],
 							data2[4], data2[5], data2[7], data2[8], data2[10],

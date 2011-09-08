@@ -80,7 +80,6 @@ jdoubleArray Java_planets_position_SolarEclipse_solarDataPos(JNIEnv* env,
  * Swiss Ephemeris functions called:
  * 		swe_set_ephe_path
  * 		swe_sol_eclipse_when_glob
- * 		swe_sol_eclipse_how
  * 		swe_close
  * Input: Julian date in ut1, search direction(0=forward|1=back).
  * Output: Double array containing eclipse type and eclipse event times.
@@ -98,7 +97,6 @@ jdoubleArray Java_planets_position_SolarEclipse_solarDataGlobal(JNIEnv* env,
 		return NULL; /* out of memory error thrown */
 	}
 
-	/*(*env)->GetDoubleArrayRegion(env, loc, 0, 3, g);*/
 	swe_set_ephe_path("/mnt/sdcard/ephemeris/");
 
 	retval = swe_sol_eclipse_when_glob(d_ut, SEFLG_SWIEPH, 0, tret, back, serr);
@@ -107,21 +105,12 @@ jdoubleArray Java_planets_position_SolarEclipse_solarDataGlobal(JNIEnv* env,
 		return NULL;
 	}
 
-	/*i = swe_sol_eclipse_how(tret[0], SEFLG_SWIEPH, g, attr, serr);
-	 if (i == ERR) {
-	 swe_close();
-	 return NULL;
-	 }
-	 ii = i * 1.0;*/
-
 	rval = retval * 1.0;
 	swe_close();
 
 	// move from the temp structure to the java structure
 	(*env)->SetDoubleArrayRegion(env, result, 0, 1, &rval);
 	(*env)->SetDoubleArrayRegion(env, result, 1, 8, tret);
-	/*(*env)->SetDoubleArrayRegion(env, result, 9, 1, &ii);
-	 (*env)->SetDoubleArrayRegion(env, result, 10, 1, &attr[5]);*/
 	return result;
 }
 
@@ -131,7 +120,6 @@ jdoubleArray Java_planets_position_SolarEclipse_solarDataGlobal(JNIEnv* env,
  * 		swe_set_ephe_path
  * 		swe_set_topo
  * 		swe_sol_eclipse_when_loc
- * 		swe_sol_eclipse_how
  * 		swe_calc_ut
  * 		swe_azalt
  * 		swe_close
@@ -148,7 +136,6 @@ jdoubleArray Java_planets_position_SolarEclipse_solarDataLocal(JNIEnv* env,
 	int iflag = SEFLG_SWIEPH | SEFLG_EQUATORIAL | SEFLG_TOPOCTR;
 
 	/*__android_log_print(ANDROID_LOG_INFO, "solarDataLocal", "date: %f", d_ut);*/
-
 	jdoubleArray result;
 	result = (*env)->NewDoubleArray(env, 19);
 	if (result == NULL) {
@@ -165,12 +152,6 @@ jdoubleArray Java_planets_position_SolarEclipse_solarDataLocal(JNIEnv* env,
 		swe_close();
 		return NULL;
 	} else {
-		/*i = swe_sol_eclipse_how(tret[0], SEFLG_SWIEPH, g, attr, serr);
-		 if (i == ERR) {
-		 swe_close();
-		 return NULL;
-		 }*/
-
 		// calculate moon position at max eclipse
 		i = swe_calc_ut(tret[0], 1, iflag, x2, serr);
 		if (i == ERR) {

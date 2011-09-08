@@ -13,9 +13,8 @@
 		<TextView
 			android:id="@+id/ecl_date_text"
 			android:layout_width="fill_parent"
-			android:layout_height="45dp"
+			android:layout_height="wrap_content"
 			android:background="@color/planet_back_color"
-			android:padding="5dp"
 			android:gravity="center"
 			android:text="27 Sept 2011"
 			android:textColor="@color/text_color"
@@ -30,7 +29,6 @@
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:layout_below="@+id/view0"
-			android:padding="5dp"
 			android:gravity="center"
 			android:background="@color/planet_back_color"
 			android:textColor="@color/text_color"
@@ -47,8 +45,8 @@
 			android:layout_height="wrap_content"
 			android:layout_width="fill_parent"
 			android:gravity="center"
-			android:background="#FF555555"
 			android:text="Eclipse Data (UTC)"
+			android:textColor="@color/text_color"
 			android:typeface="monospace" />
 		<View
 			android:id="@+id/view2"
@@ -61,8 +59,8 @@
 			android:layout_height="wrap_content"
 			android:layout_width="fill_parent"
 			android:gravity="center"
-			android:background="#FF555555"
 			android:text="Local Eclipse Data"
+			android:textColor="@color/text_color"
 			android:typeface="monospace" />
 	</RelativeLayout>
 </ScrollView>

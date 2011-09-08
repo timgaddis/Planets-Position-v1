@@ -11,7 +11,7 @@
 		android:gravity="center_horizontal">
 
 		<View
-			android:layout_height="25dp"
+			android:layout_height="5dp"
 			android:layout_width="fill_parent" />
 
 		<Button
@@ -27,11 +27,6 @@
 			android:textSize="@dimen/pos_planet_name"
 			android:layout_width="250dp"
 			android:layout_height="50dp" />
-
-		<View
-			android:layout_height="15dp"
-			android:layout_width="fill_parent" />
-
 		<Button
 			android:text="Solar Eclipses"
 			android:id="@+id/solarEclButton"
@@ -39,15 +34,10 @@
 			android:layout_width="250dp"
 			android:layout_height="50dp"
 			android:layout_weight="1" />
-
 		<!--<LinearLayout android:layout_height="wrap_content" android:id="@+id/linearLayout1" 
 			android:layout_width="250dp" android:gravity="center"> <Button android:text="Lunar 
 			Eclipses" android:id="@+id/lunarEclButton" android:textSize="18sp" android:layout_width="wrap_content" 
 			android:layout_height="65dp" android:layout_weight="1" /> </LinearLayout> -->
-
-		<View
-			android:layout_height="15dp"
-			android:layout_width="fill_parent" />
 
 		<TextView
 			android:text="Real Time Position"
@@ -73,10 +63,6 @@
 				android:layout_height="50dp"
 				android:layout_weight="2" />
 		</LinearLayout>
-
-		<View
-			android:layout_height="15dp"
-			android:layout_width="fill_parent" />
 
 		<LinearLayout
 			android:id="@+id/LinearLayout01"

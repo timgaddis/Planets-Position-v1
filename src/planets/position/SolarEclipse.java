@@ -41,7 +41,7 @@ public class SolarEclipse extends Activity {
 	private Button prevEclButton, nextEclButton;
 	private ListView eclipseList;
 	private double[] time, g = new double[3];
-	private double offset, firstEcl, lastEcl, local, direction;
+	private double offset, firstEcl, lastEcl, direction;
 	private PlanetsDbAdapter planetDbHelper;
 	private Calendar c;
 	private final int ECLIPSE_DATA = 0;
@@ -99,14 +99,13 @@ public class SolarEclipse extends Activity {
 		// jdTT = time[0];
 		// jdUT = time[1];
 
-		new ComputeEclipsesTask().execute(time[1], 0.0, 0.0, -1.0, -1.0);
+		new ComputeEclipsesTask().execute(time[1], 0.0);
 
 		prevEclButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				direction = 1.0;
-				new ComputeEclipsesTask().execute(firstEcl, 1.0, local, -1.0,
-						-1.0);
+				new ComputeEclipsesTask().execute(firstEcl, 1.0);
 			}
 		});
 
@@ -114,8 +113,7 @@ public class SolarEclipse extends Activity {
 			@Override
 			public void onClick(View view) {
 				direction = 0.0;
-				new ComputeEclipsesTask().execute(lastEcl, 0.0, local, -1.0,
-						-1.0);
+				new ComputeEclipsesTask().execute(lastEcl, 0.0);
 			}
 		});
 
@@ -163,14 +161,12 @@ public class SolarEclipse extends Activity {
 	 * 
 	 * @author tgaddis
 	 * @params double list for doInBackground: (start date,
-	 *         direction(forward=0.0/back=1.0), local(1.0)/global(0.0), first
-	 *         eclipse date, last eclipse date)
+	 *         direction(forward=0.0/back=1.0))
 	 * 
 	 */
 	private class ComputeEclipsesTask extends AsyncTask<Double, Void, Void> {
 		ProgressDialog dialog;
 		String eclDate, eclType;
-		double startDate = 0, endDate = 0;
 
 		@Override
 		protected void onPreExecute() {
@@ -188,10 +184,6 @@ public class SolarEclipse extends Activity {
 			double[] data1 = null, data2 = null;
 			int i, backward;
 
-			if (params[3] > 0)
-				startDate = params[3];
-			if (params[4] > 0)
-				endDate = params[4];
 			backward = (int) Math.round(params[1]);
 			start = params[0];
 
@@ -240,8 +232,6 @@ public class SolarEclipse extends Activity {
 						Integer.parseInt(dateArr[5]));
 				c.set(Calendar.MILLISECOND,
 						(int) (Double.parseDouble(dateArr[6]) * 1000));
-				// convert c to local time
-				// c.add(Calendar.MINUTE, (int) (offset * 60));
 				eclDate = (DateFormat.format("dd MMM yyyy", c)).toString();
 
 				// create type string use data1[0]
@@ -295,10 +285,6 @@ public class SolarEclipse extends Activity {
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
-			if (startDate > 0)
-				firstEcl = startDate;
-			if (endDate > 0)
-				lastEcl = endDate;
 			planetDbHelper.close();
 			dialog.dismiss();
 			fillData();

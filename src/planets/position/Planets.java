@@ -179,6 +179,12 @@ public class Planets extends Activity {
 	 * then downloads data files
 	 */
 	private void checkWiFi() {
+		/*
+		 * add these permissions to the manifest file: <uses-permission
+		 * android:name="android.permission.ACCESS_WIFI_STATE"/>
+		 * <uses-permission
+		 * android:name="android.permission.ACCESS_NETWORK_STATE"/>
+		 */
 		if (!(checkFiles("semo_18.se1") && checkFiles("sepl_18.se1"))) {
 			// check wifi for connection
 			ConnectivityManager connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
@@ -337,7 +343,10 @@ public class Planets extends Activity {
 	 * 
 	 */
 	private class DownloadFile extends AsyncTask<String, Integer, String> {
-
+		/*
+		 * add this permission to manifest file: <uses-permission
+		 * android:name="android.permission.INTERNET" />
+		 */
 		private ProgressDialog progressDialog;
 		private File sdCard, dir;
 		private BufferedInputStream input;

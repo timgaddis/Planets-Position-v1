@@ -1,43 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">Planets Position</string>
-	<string name="pos_title">Planet\'s Position</string>
-	<string name="loc_title">Location</string>
-	<string name="solar_title">Solar Eclipses</string>
+
+    <string name="app_name">Planets Position</string>
+    <string name="pos_title">Planet\'s Position</string>
+    <string name="loc_title">Location</string>
+    <string name="solar_title">Solar Eclipses</string>
     <string name="lunar_title">Lunar Eclipses</string>
-	<string name="alert_title">WiFi is turned off</string>
-	<string name="alert_enable">Goto Settings Page To Enable Wifi</string>
-	<string name="alert_message">
-		A 1.8MB data file needs to be downloaded to the SD card.\nThis is a 
-		one time download.\nWiFi can be turned on to minimize your data 
-		usage or you can continue and download over your cell network.
-	</string>
-	<string name="menu_about">About</string>
-	<string name="menu_help">Help</string>
-	<string name="menu_filter">Filter</string>
-	<string name="menu_update">Update</string>
-	<string name="no_planets">No Planets Up</string>
-	<string name="save">Save</string>
-	<string name="filter_prompt">Filter planets</string>
-	<string-array name="filter_array">
-		<item>Naked eye visible</item>
-		<item>View all planets</item>
-	</string-array>
-	<string name="planet_prompt">Choose a planet</string>
-	<string-array name="planets_array">
-		<item>Sun</item>
-		<item>Moon</item>
-		<item>Mercury</item>
-		<item>Venus</item>
-		<item>Mars</item>
-		<item>Jupiter</item>
-		<item>Saturn</item>
-		<item>Uranus</item>
-		<item>Neptune</item>
-		<item>Pluto</item>
-	</string-array>
-	<string name="main_about">
-		<b>Planets Position v1.3</b>\n\n
+    <string name="alert_title">WiFi is turned off</string>
+    <string name="alert_enable">Goto Settings Page To Enable Wifi</string>
+    <string name="menu_about">About</string>
+    <string name="menu_help">Help</string>
+    <string name="menu_filter">Filter</string>
+    <string name="menu_update">Update</string>
+    <string name="no_planets">No Planets Up</string>
+    <string name="save">Save</string>
+    <string name="filter_prompt">Filter planets</string>
+
+    <string-array name="filter_array">
+        <item>Naked eye visible</item>
+        <item>View all planets</item>
+    </string-array>
+
+    <string name="planet_prompt">Choose a planet</string>
+
+    <string-array name="planets_array">
+        <item>Sun</item>
+        <item>Moon</item>
+        <item>Mercury</item>
+        <item>Venus</item>
+        <item>Mars</item>
+        <item>Jupiter</item>
+        <item>Saturn</item>
+        <item>Uranus</item>
+        <item>Neptune</item>
+        <item>Pluto</item>
+    </string-array>
+
+    <string name="main_about"><b>Planets Position v1.4</b>\n\n
 		Planets Position is a program to calculate the position of the planets
 		in the night sky based on a given location on Earth.\n\n
 		<b>License and Copyright</b>\n\n
@@ -61,7 +60,7 @@
 		calculations.\n
 		http://www.astro.com/swisseph/swephinfo_e.htm?lang=e\n\n
 	</string>
-	<string name="main_help">
+    <string name="main_help">
 		Initially, location data needs to be saved for the position 
 		calculations.\n
 		The two options are to retrieve location data from GPS or manually 
@@ -73,10 +72,12 @@
 		date and time of the device for the given location.\n\n
 		The Solar Eclipse screen lists solar eclipses and indicates which of 
 		them are visible at the location saved on the device.\n\n
+		The Lunar Eclipse screen lists lunar eclipses and indicates which of 
+		them are visible at the location saved on the device.\n\n
 		The Real Time Position screen is the current real time position of the 
 		selected planet.\n\n
 	</string>
-	<string name="pos_help">
+    <string name="pos_help">
 		The Planet, Local Date, and Local Time fields are user changeable.
 		Initially the Local Date and Local Time are set to the current date and
 		time of the device.\n\n
@@ -107,7 +108,7 @@
 		http://en.m.wikipedia.org/wiki/Sun_rise\n
 		http://en.m.wikipedia.org/wiki/Sunset\n\n
 	</string>
-	<string name="up_help">
+    <string name="up_help">
 		This is a list of the planets above the horizon at the current date and
 		time.\n\n
 		7 values are calculated for each planet.\n\n
@@ -143,7 +144,7 @@
         \tAnnular Eclipse\n
         \tPartial Eclipse\n
         \tHybrid Eclipse\n
-        http://en.m.wikipedia.org/wiki/Solar_eclipse#section_1\n\n
+        http://en.m.wikipedia.org/wiki/Solar_eclipse#Types\n\n
         <b>Azimuth:</b>\n
         The compass direction for the Sun\'s position for the given location.\n
         http://en.m.wikipedia.org/wiki/Azimuth\n\n
@@ -161,4 +162,29 @@
         http://eclipse.gsfc.nasa.gov/SEsaros/SEsaros.html\n
         http://en.m.wikipedia.org/wiki/Saros_number\n\n
     </string>
+    <string name="lunarEcl_help">
+        When an eclipse is selected, 6 values are calculated.\n\n
+        <b>Eclipse Types:</b>\n
+        \tTotal Eclipse\n
+        \tPartial Eclipse\n
+        \tPenumbral Eclipse\n
+        http://en.m.wikipedia.org/wiki/Lunar_eclipse#Types_of_lunar_eclipse\n\n
+        <b>Azimuth:</b>\n
+        The compass direction for the Moon\'s position for the given location.\n
+        http://en.m.wikipedia.org/wiki/Azimuth\n\n
+        <b>Altitude:</b>\n
+        The angle above the horizon of the Moon.\n
+        http://en.m.wikipedia.org/wiki/Altitude_(astronomy)\n\n
+        <b>Magnitude:</b>\n
+        The brightness of the eclipse on a logarithmic scale, where the smaller
+        the number, the brighter the eclipse.\n
+        http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\n
+        <b>Saros Number:</b>\n
+        <b>Saros Member Number:</b>\n
+        The saros is a a period of 223 synodic months that can be used to 
+        predict eclipses of the Sun and Moon\n
+        http://eclipse.gsfc.nasa.gov/SEsaros/SEsaros.html\n
+        http://en.m.wikipedia.org/wiki/Saros_number\n\n
+    </string>
+
 </resources>

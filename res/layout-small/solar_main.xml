@@ -1,72 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="match_parent"
-	android:layout_height="fill_parent"
-	android:orientation="vertical">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
-	<LinearLayout
-		android:id="@+id/linearLayout1"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content">
-		<Button
-			android:text="Previous Eclipses"
-			android:textSize="16sp"
-			android:id="@+id/prevSEclButton"
-			android:layout_width="fill_parent"
-			android:layout_height="55dp"
-			android:layout_weight="1" />
-		<Button
-			android:text="Next Eclipses"
-			android:textSize="16sp"
-			android:id="@+id/nextSEclButton"
-			android:layout_width="fill_parent"
-			android:layout_height="55dp"
-			android:layout_weight="1" />
-	</LinearLayout>
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
 
-	<LinearLayout
-		android:id="@+id/linearLayout1"
-		android:layout_gravity="center"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content">
-		<TextView
-			android:text="Date (UTC)"
-			android:id="@+id/textView1"
-			android:textSize="16sp"
-			android:layout_weight="1.2"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:paddingLeft="10dp"
-			android:textColor="@color/text_color" />
-		<TextView
-			android:text="Type"
-			android:id="@+id/textView2"
-			android:textSize="16sp"
-			android:layout_weight="1"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:paddingRight="10dp"
-			android:gravity="center_horizontal"
-			android:textColor="@color/text_color" />
-		<TextView
-			android:text="Local"
-			android:id="@+id/textView2"
-			android:textSize="16sp"
-			android:layout_height="wrap_content"
-			android:gravity="center_horizontal"
-			android:textColor="@color/text_color"
-			android:layout_width="wrap_content" />
-	</LinearLayout>
-	<View
-		android:id="@+id/view1"
-		android:layout_width="wrap_content"
-		android:background="@color/text_color"
-		android:layout_height="1dp" />
+        <Button
+            android:id="@+id/prevSEclButton"
+            android:layout_width="fill_parent"
+            android:layout_height="55dp"
+            android:layout_weight="1"
+            android:text="Previous Eclipses"
+            android:textSize="16sp" />
 
-	<ListView
-		android:layout_width="fill_parent"
-		android:id="@+id/solarEclList"
-		android:layout_height="fill_parent" />
+        <Button
+            android:id="@+id/nextSEclButton"
+            android:layout_width="fill_parent"
+            android:layout_height="55dp"
+            android:layout_weight="1"
+            android:text="Next Eclipses"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.2"
+            android:paddingLeft="10dp"
+            android:text="Date (UTC)"
+            android:textColor="@color/text_color"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:paddingRight="10dp"
+            android:text="Type"
+            android:textColor="@color/text_color"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="Local"
+            android:textColor="@color/text_color"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/view1"
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:background="@color/text_color" />
+
+    <ListView
+        android:id="@+id/solarEclList"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
 
 </LinearLayout>

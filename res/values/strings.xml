@@ -58,7 +58,7 @@
 		https://github.com/timgaddis/Planets-Position\n\n
 		Swiss Ephemeris code is used in this program for planetary position
 		calculations.\n
-		http://www.astro.com/swisseph/swephinfo_e.htm?lang=e\n\n
+		http://www.astro.com/swisseph/swephinfo_e.htm?lang=e\n
 	</string>
     <string name="main_help">
 		Initially, location data needs to be saved for the position 
@@ -75,7 +75,7 @@
 		The Lunar Eclipse screen lists lunar eclipses and indicates which of 
 		them are visible at the location saved on the device.\n\n
 		The Real Time Position screen is the current real time position of the 
-		selected planet.\n\n
+		selected planet.\n
 	</string>
     <string name="pos_help">
 		The Planet, Local Date, and Local Time fields are user changeable.
@@ -106,7 +106,7 @@
 		<b>Rise and Set Times</b>\n
 		The times at which the planet rises and sets for the given location.\n
 		http://en.m.wikipedia.org/wiki/Sun_rise\n
-		http://en.m.wikipedia.org/wiki/Sunset\n\n
+		http://en.m.wikipedia.org/wiki/Sunset\n
 	</string>
     <string name="up_help">
 		This is a list of the planets above the horizon at the current date and
@@ -135,7 +135,7 @@
 		http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\n
 		<b>Set Time</b>\n
 		The time at which the planet sets for the given location.\n
-		http://en.m.wikipedia.org/wiki/Sunset\n\n
+		http://en.m.wikipedia.org/wiki/Sunset\n
 	</string>
     <string name="solarEcl_help">
         When an eclipse is selected, 6 values are calculated.\n\n
@@ -160,7 +160,7 @@
         The saros is a a period of 223 synodic months that can be used to 
         predict eclipses of the Sun and Moon\n
         http://eclipse.gsfc.nasa.gov/SEsaros/SEsaros.html\n
-        http://en.m.wikipedia.org/wiki/Saros_number\n\n
+        http://en.m.wikipedia.org/wiki/Saros_number\n
     </string>
     <string name="lunarEcl_help">
         When an eclipse is selected, 6 values are calculated.\n\n
@@ -184,7 +184,7 @@
         The saros is a a period of 223 synodic months that can be used to 
         predict eclipses of the Sun and Moon\n
         http://eclipse.gsfc.nasa.gov/SEsaros/SEsaros.html\n
-        http://en.m.wikipedia.org/wiki/Saros_number\n\n
+        http://en.m.wikipedia.org/wiki/Saros_number\n
     </string>
 
 </resources>

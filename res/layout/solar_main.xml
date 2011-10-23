@@ -12,7 +12,7 @@
         <Button
             android:id="@+id/prevSEclButton"
             android:layout_width="fill_parent"
-            android:layout_height="55dp"
+            android:layout_height="50dp"
             android:layout_weight="1"
             android:text="Previous Eclipses"
             android:textSize="18sp" />
@@ -20,7 +20,7 @@
         <Button
             android:id="@+id/nextSEclButton"
             android:layout_width="fill_parent"
-            android:layout_height="55dp"
+            android:layout_height="50dp"
             android:layout_weight="1"
             android:text="Next Eclipses"
             android:textSize="18sp" />

@@ -3,8 +3,7 @@
     android:id="@+id/scrollView1"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_alignParentLeft="true"
-    android:background="@color/planet_back_color" >
+    android:layout_alignParentLeft="true" >
 
     <RelativeLayout
         android:id="@+id/relativeLayout1"
@@ -15,7 +14,6 @@
             android:id="@+id/ecl_date_text"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:background="@color/planet_back_color"
             android:gravity="center"
             android:text="27 Sept 2011"
             android:textColor="@color/text_color"
@@ -32,7 +30,6 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/view0"
-            android:background="@color/planet_back_color"
             android:gravity="center"
             android:text="Total Eclipse"
             android:textColor="@color/text_color"

@@ -1,34 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <View
+        android:id="@+id/view01"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp" />
 
     <TextView
-        android:id="@+id/pTap"
-        android:layout_width="fill_parent"
+        android:id="@+id/text01"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
+        android:layout_alignBaseline="@+id/refreshButton"
+        android:layout_alignLeft="@+id/view01"
+        android:layout_below="@+id/view01"
+        android:layout_weight="1"
+        android:gravity="center"
         android:text="Select a planet to view its position data"
         android:textColor="@color/text_color"
-        android:textSize="12sp" />
+        android:textSize="14sp" />
+
+    <Button
+        android:id="@+id/refreshButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/view01"
+        android:layout_below="@+id/view01"
+        android:layout_weight="4"
+        android:background="@drawable/ic_menu_update" />
+
+    <View
+        android:id="@+id/view03"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/refreshButton" />
 
     <LinearLayout
         android:id="@+id/linearLayout1"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/view03" >
 
         <TextView
+            android:id="@+id/text02"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@color/list_color"
-            android:paddingLeft="5dip"
             android:text="Name"
             android:textColor="@color/text_color"
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/text03"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -39,6 +66,7 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/text04"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -49,6 +77,7 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/text05"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -60,14 +89,16 @@
     </LinearLayout>
 
     <View
-        android:id="@+id/view1"
+        android:id="@+id/view02"
         android:layout_width="wrap_content"
         android:layout_height="1dp"
+        android:layout_below="@+id/linearLayout1"
         android:background="@color/text_color" />
 
     <ListView
         android:id="@+id/listView1"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/view02" />
 
-</LinearLayout>
+</RelativeLayout>

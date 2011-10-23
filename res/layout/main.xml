@@ -69,7 +69,8 @@
 
         <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical" >
 
             <Spinner
                 android:id="@+id/planetSpin"
@@ -80,7 +81,7 @@
             <Button
                 android:id="@+id/goButton"
                 android:layout_width="fill_parent"
-                android:layout_height="50dp"
+                android:layout_height="47dp"
                 android:layout_weight="2"
                 android:text="GO"
                 android:textSize="@dimen/pos_planet_name" />

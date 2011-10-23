@@ -7,11 +7,6 @@
         android:title="@string/menu_filter"/>
 
     <item
-        android:id="@+id/id_menu_up_update"
-        android:icon="@drawable/ic_menu_update"
-        android:title="@string/menu_update"/>
-
-    <item
         android:id="@+id/id_menu_up_help"
         android:icon="@drawable/ic_menu_help"
         android:title="@string/menu_help"/>

@@ -93,9 +93,6 @@ public class Planets extends Activity {
 		} else
 			loadLocation();
 
-		manualButton.setEnabled(true);
-		downloadButton.setEnabled(true);
-
 		downloadButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {

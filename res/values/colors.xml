@@ -5,7 +5,6 @@
     <color name="list_color">#FF222222</color>
     <color name="alert_color">#FFFF0000</color>
     <color name="text_color">#FFFFFFFF</color>
-    <color name="planet_back_color">#FF000000</color>
     <color name="location_back">#FF222222</color>
 
 </resources>

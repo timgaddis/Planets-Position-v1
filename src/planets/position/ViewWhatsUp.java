@@ -36,6 +36,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
@@ -43,6 +44,7 @@ import android.widget.Toast;
 public class ViewWhatsUp extends Activity {
 
 	private ListView planetsList;
+	private Button refreshButton;
 	private double offset;
 	private double[] g = new double[3];
 	private int filter = 1;
@@ -72,6 +74,7 @@ public class ViewWhatsUp extends Activity {
 		setContentView(R.layout.planet_list);
 
 		planetsList = (ListView) findViewById(R.id.listView1);
+		refreshButton = (Button) findViewById(R.id.refreshButton);
 
 		// load bundle from previous activity
 		bundle = getIntent().getExtras();
@@ -83,11 +86,18 @@ public class ViewWhatsUp extends Activity {
 		}
 
 		planetDbHelper = new PlanetsDbAdapter(this, "planets");
-		// planetDbHelper.open();
 
-		// computePlanets();
 		new ComputePlanetsTask().execute();
-		// fillData(1);
+
+		refreshButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				// re-calculates the planet's positions
+				new ComputePlanetsTask().execute();
+			}
+
+		});
+
 		planetsList.setOnItemClickListener(new PlanetSelectedListener());
 	}
 
@@ -121,9 +131,6 @@ public class ViewWhatsUp extends Activity {
 			super.onPreExecute();
 			planetDbHelper.open();
 			c = Calendar.getInstance();
-			// set the title of the activity with the current date and time
-			ViewWhatsUp.this.setTitle("What's up on "
-					+ DateFormat.format("MMM d @ hh:mm aa", c));
 			// convert local time to utc
 			c.add(Calendar.MINUTE, (int) (offset * -60));
 
@@ -179,6 +186,10 @@ public class ViewWhatsUp extends Activity {
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
+			c = Calendar.getInstance();
+			// set the title of the activity with the current date and time
+			ViewWhatsUp.this.setTitle("What's up on "
+					+ DateFormat.format("MMM d @ hh:mm aa", c));
 			planetDbHelper.close();
 			dialog.dismiss();
 			fillData(1);
@@ -210,21 +221,14 @@ public class ViewWhatsUp extends Activity {
 
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		Bundle b;
-		Intent i;
 		switch (item.getItemId()) {
 		case R.id.id_menu_up_help:
 			// Show Help Screen
-			b = new Bundle();
+			Bundle b = new Bundle();
 			b.putInt("res", R.string.up_help);
-			i = new Intent(this, About.class);
+			Intent i = new Intent(this, About.class);
 			i.putExtras(b);
-			startActivity(i);
-			return true;
-		case R.id.id_menu_up_update:
-			new ComputePlanetsTask().execute();
-			// computePlanets();
-			// fillData(1);
+			startActivityForResult(i, PLANET_DATA);
 			return true;
 		case R.id.id_menu_up_filter:
 			// Filter the planets by magnitude
@@ -253,8 +257,6 @@ public class ViewWhatsUp extends Activity {
 		super.onActivityResult(requestCode, resultCode, intent);
 		switch (requestCode) {
 		case PLANET_DATA:
-			// new ComputePlanetsTask().execute();
-			// computePlanets();
 			fillData(1);
 			return;
 		}

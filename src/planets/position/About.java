@@ -39,4 +39,10 @@ public class About extends Activity {
 
 	}
 
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		setResult(RESULT_OK);
+		finish();
+	}
 }

@@ -1,110 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@+id/scrollView1"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content">
-	<LinearLayout
-		android:orientation="vertical"
-		android:layout_width="fill_parent"
-		android:layout_height="fill_parent"
-		android:gravity="center_horizontal">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
 
-		<View
-			android:layout_height="25dp"
-			android:layout_width="fill_parent" />
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="10dp" >
 
-		<Button
-			android:id="@+id/positionButton"
-			android:text="Planet's Position"
-			android:textSize="@dimen/pos_planet_name"
-			android:layout_width="250dp"
-			android:layout_height="50dp" />
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="25dp" />
 
-		<Button
-			android:id="@+id/whatupButton"
-			android:text="What's Up Now"
-			android:textSize="@dimen/pos_planet_name"
-			android:layout_width="250dp"
-			android:layout_height="50dp" />
+        <Button
+            android:id="@+id/positionButton"
+            android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:text="Planet&apos;s Position"
+            android:textSize="@dimen/pos_planet_name" />
 
-		<View
-			android:layout_height="15dp"
-			android:layout_width="fill_parent" />
+        <Button
+            android:id="@+id/whatupButton"
+            android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:text="What&apos;s Up Now"
+            android:textSize="@dimen/pos_planet_name" />
 
-		<Button
-			android:text="Solar Eclipses"
-			android:id="@+id/solarEclButton"
-			android:textSize="20sp"
-			android:layout_width="250dp"
-			android:layout_height="50dp"
-			android:layout_weight="1" />
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="15dp" />
 
-		<!--<LinearLayout android:layout_height="wrap_content" android:id="@+id/linearLayout1" 
-			android:layout_width="250dp" android:gravity="center"> <Button android:text="Lunar 
-			Eclipses" android:id="@+id/lunarEclButton" android:textSize="18sp" android:layout_width="wrap_content" 
-			android:layout_height="65dp" android:layout_weight="1" /> </LinearLayout> -->
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center" >
 
-		<View
-			android:layout_height="15dp"
-			android:layout_width="fill_parent" />
+            <Button
+                android:id="@+id/solarEclButton"
+                android:layout_width="wrap_content"
+                android:layout_height="70dp"
+                android:layout_weight="1"
+                android:text="Solar Eclipses"
+                android:textSize="20sp" />
 
-		<TextView
-			android:text="Real Time Position"
-			android:textSize="14sp"
-			android:id="@+id/textView1"
-			android:layout_width="250dp"
-			android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/lunarEclButton"
+                android:layout_width="wrap_content"
+                android:layout_height="70dp"
+                android:layout_weight="1"
+                android:text="Lunar Eclipses"
+                android:textSize="20sp" />
+        </LinearLayout>
 
-		<LinearLayout
-			android:id="@+id/LinearLayout01"
-			android:layout_width="250dp"
-			android:layout_height="wrap_content">
-			<Spinner
-				android:layout_height="wrap_content"
-				android:id="@+id/planetSpin"
-				android:layout_width="fill_parent"
-				android:layout_weight="1" />
-			<Button
-				android:id="@+id/goButton"
-				android:text="GO"
-				android:textSize="16sp"
-				android:layout_width="fill_parent"
-				android:layout_height="50dp"
-				android:layout_weight="2" />
-		</LinearLayout>
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="15dp" />
 
-		<View
-			android:layout_height="15dp"
-			android:layout_width="fill_parent" />
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Real Time Position"
+            android:textColor="@color/text_color"
+            android:textSize="14sp" />
 
-		<LinearLayout
-			android:id="@+id/LinearLayout01"
-			android:layout_width="250dp"
-			android:layout_height="wrap_content">
-			<Button
-				android:id="@+id/downloadButton"
-				android:text="Download Location Data"
-				android:layout_width="fill_parent"
-				android:layout_height="60dp"
-				android:layout_weight="1" />
-			<Button
-				android:id="@+id/manualEnterButton"
-				android:text="Manually Enter Location Data"
-				android:layout_width="fill_parent"
-				android:layout_height="60dp"
-				android:layout_weight="1" />
-		</LinearLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical" >
 
-		<TextView
-			android:id="@+id/locationData"
-			android:background="@color/location_back"
-			android:textColor="@color/text_color"
-			android:layout_width="240dp"
-			android:layout_height="wrap_content"
-			android:lines="4"
-			android:textSize="14sp"
-			android:padding="5dp" />
+            <Spinner
+                android:id="@+id/planetSpin"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
 
-	</LinearLayout>
+            <Button
+                android:id="@+id/goButton"
+                android:layout_width="fill_parent"
+                android:layout_height="47dp"
+                android:layout_weight="2"
+                android:text="GO"
+                android:textSize="@dimen/pos_planet_name" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="15dp" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/downloadButton"
+                android:layout_width="fill_parent"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:text="Download Location Data" />
+
+            <Button
+                android:id="@+id/manualEnterButton"
+                android:layout_width="fill_parent"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:text="Manually Enter Location Data" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/locationData"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/location_back"
+            android:lines="4"
+            android:padding="5dp"
+            android:textColor="@color/text_color"
+            android:textSize="14sp" />
+    </LinearLayout>
+
 </ScrollView>

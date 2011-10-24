@@ -41,7 +41,7 @@ public class SolarEclipse extends Activity {
 	private Button prevEclButton, nextEclButton;
 	private ListView eclipseList;
 	private double[] time, g = new double[3];
-	private double offset, firstEcl, lastEcl, direction;
+	private double offset, firstEcl, lastEcl;
 	private PlanetsDbAdapter planetDbHelper;
 	private Calendar c;
 	private final int ECLIPSE_DATA = 0;
@@ -104,7 +104,7 @@ public class SolarEclipse extends Activity {
 		prevEclButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				direction = 1.0;
+				// direction = 1.0;
 				new ComputeEclipsesTask().execute(firstEcl, 1.0);
 			}
 		});
@@ -112,7 +112,7 @@ public class SolarEclipse extends Activity {
 		nextEclButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				direction = 0.0;
+				// direction = 0.0;
 				new ComputeEclipsesTask().execute(lastEcl, 0.0);
 			}
 		});
@@ -151,6 +151,7 @@ public class SolarEclipse extends Activity {
 		Bundle bundle = new Bundle();
 		bundle.putInt("eclipseNum", num);
 		bundle.putDouble("Offset", offset);
+		bundle.putBoolean("db", true);
 		Intent i = new Intent(this, EclipseData.class);
 		i.putExtras(bundle);
 		startActivityForResult(i, ECLIPSE_DATA);
@@ -187,6 +188,7 @@ public class SolarEclipse extends Activity {
 			backward = (int) Math.round(params[1]);
 			start = params[0];
 
+			// Log.i("Solar Eclipse Type", "params[2]: " + params[2]);
 			data2 = solarDataLocal(start, g, backward);
 			if (data2 == null) {
 				Log.e("Solar Eclipse error", "computeEclipses data1 error");
@@ -196,6 +198,7 @@ public class SolarEclipse extends Activity {
 						Toast.LENGTH_LONG).show();
 				finish();
 			}
+			Log.i("Solar Eclipse", "Local date1: " + data2[1]);
 
 			for (i = 0; i < 8; i++) {
 				// ***************************************
@@ -210,6 +213,8 @@ public class SolarEclipse extends Activity {
 							Toast.LENGTH_LONG).show();
 					break;
 				}
+				// Log.i("Solar Eclipse", "Global number: " + (i + 1)
+				// + " - date: " + data1[1]);
 				// save the beginning time of the eclipse
 				if (i == 0)
 					if (backward == 0)
@@ -247,7 +252,7 @@ public class SolarEclipse extends Activity {
 				else
 					eclType = "Other";
 
-				if (Math.abs(data2[1] - data1[1]) < 1.0) {
+				if (Math.abs(data2[1] - data1[1]) <= 1.0) {
 					// if local eclipse time is within one day of the global
 					// time, then eclipse is visible locally
 					planetDbHelper.updateSolar(i, (int) data2[0],
@@ -261,13 +266,14 @@ public class SolarEclipse extends Activity {
 					data2 = solarDataLocal(data2[5], g, backward);
 					if (data2 == null) {
 						Log.e("Solar Eclipse error",
-								"computeEclipses data2 error");
+								"computeEclipses data2a error");
 						Toast.makeText(
 								getApplicationContext(),
 								"computeEclipses error 1,\nplease restart the activity",
 								Toast.LENGTH_LONG).show();
 						break;
 					}
+					// Log.i("Solar Eclipse", "Local date2: " + data2[1]);
 				} else {
 					planetDbHelper.updateSolar(i, -1, (int) data1[0], 0, -1,
 							-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,

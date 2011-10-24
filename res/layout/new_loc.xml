@@ -1,118 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent"
-	android:stretchColumns="1">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:padding="10dp" >
 
-	<TableRow
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content">
-		<TextView
-			android:id="@+id/title"
-			android:layout_width="fill_parent"
-			android:background="#FF222222"
-			android:layout_weight="1"
-			android:textSize="21sp"
-			android:gravity="center_horizontal"
-			android:layout_height="wrap_content"
-			android:text="Enter Location Data" />
-	</TableRow>
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center_horizontal"
+        android:text="Enter Location Data"
+        android:textColor="@color/text_color"
+        android:textSize="21sp" />
 
-	<View
-		android:layout_height="1dip"
-		android:background="#FFFFFFFF" />
+    <View
+        android:id="@+id/view01"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/title"
+        android:background="#FFFFFFFF" />
 
-	<TableRow
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content">
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="Latitude" />
-	</TableRow>
+    <TextView
+        android:id="@+id/text01"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view01"
+        android:text="Latitude"
+        android:textColor="@color/text_color" />
 
-	<TableRow>
-		<EditText
-			android:id="@+id/newLatText"
-			android:layout_weight="1"
-			android:layout_height="40dip"
-			android:layout_width="fill_parent"
-			android:inputType="numberSigned|numberDecimal" />
-	</TableRow>
+    <EditText
+        android:id="@+id/newLatText"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:layout_below="@+id/text01"
+        android:layout_weight="1"
+        android:inputType="numberSigned|numberDecimal" />
 
-	<TableRow
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content">
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="Longitude" />
-	</TableRow>
+    <TextView
+        android:id="@+id/text02"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/newLatText"
+        android:text="Longitude"
+        android:textColor="@color/text_color" />
 
-	<TableRow>
-		<EditText
-			android:id="@+id/newLongText"
-			android:layout_weight="1"
-			android:inputType="numberSigned|numberDecimal"
-			android:layout_height="40dip"
-			android:layout_width="fill_parent" />
-	</TableRow>
+    <EditText
+        android:id="@+id/newLongText"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:layout_below="@+id/text02"
+        android:layout_weight="1"
+        android:inputType="numberSigned|numberDecimal" />
 
-	<View
-		android:layout_height="5dip"
-		android:background="#FF000000" />
+    <View
+        android:id="@+id/view02"
+        android:layout_width="fill_parent"
+        android:layout_height="5dp"
+        android:layout_below="@+id/newLongText" />
 
-	<TableRow
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content">
-		<TextView
-			android:layout_width="fill_parent"
-			android:layout_weight="0.5"
-			android:layout_height="wrap_content"
-			android:gravity="center_horizontal"
-			android:text="Elevation (m)"
-			android:layout_gravity="center" />
-		<TextView
-			android:layout_width="fill_parent"
-			android:gravity="center_horizontal"
-			android:layout_weight="0.5"
-			android:layout_height="wrap_content"
-			android:text="GMT offset +/- (hr)"
-			android:layout_gravity="center" />
-	</TableRow>
+    <TextView
+        android:id="@+id/text03"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view02"
+        android:layout_gravity="center"
+        android:layout_weight="0.5"
+        android:text="Elevation (m)"
+        android:textColor="@color/text_color" />
 
-	<TableRow
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content">
-		<EditText
-			android:id="@+id/newElevationText"
-			android:layout_weight="0.5"
-			android:layout_height="40dip"
-			android:inputType="numberSigned|numberDecimal"
-			android:layout_width="fill_parent"
-			android:gravity="center_horizontal" />
-		<Spinner
-			android:id="@+id/newOffsetSpin"
-			android:layout_width="fill_parent"
-			android:gravity="center_horizontal"
-			android:layout_height="42dip"
-			android:layout_weight="0.5" />
-	</TableRow>
+    <EditText
+        android:id="@+id/newElevationText"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:layout_below="@+id/text03"
+        android:layout_weight="0.5"
+        android:inputType="numberSigned|numberDecimal" />
 
-	<View
-		android:layout_height="20dip"
-		android:background="#FF000000" />
+    <TextView
+        android:id="@+id/text04"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/newElevationText"
+        android:layout_gravity="center"
+        android:layout_weight="0.5"
+        android:text="GMT offset +/- (hr)"
+        android:textColor="@color/text_color" />
 
-	<TableRow
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content">
-		<Button
-			android:text="@string/save"
-			android:id="@+id/saveLocButton"
-			android:layout_width="fill_parent"
-			android:layout_height="45dip"
-			android:layout_weight="1" />
-	</TableRow>
+    <Spinner
+        android:id="@+id/newOffsetSpin"
+        android:layout_width="fill_parent"
+        android:layout_height="42dp"
+        android:layout_below="@+id/text04"
+        android:layout_weight="0.5"
+        android:gravity="center_horizontal" />
 
-</TableLayout>
+    <View
+        android:id="@+id/view03"
+        android:layout_width="fill_parent"
+        android:layout_height="20dp"
+        android:layout_below="@+id/newOffsetSpin" />
+
+    <Button
+        android:id="@+id/saveLocButton"
+        android:layout_width="fill_parent"
+        android:layout_height="45dp"
+        android:layout_below="@+id/view03"
+        android:layout_weight="1"
+        android:text="@string/save"
+        android:textSize="@dimen/pos_planet_name" />
+
+</RelativeLayout>

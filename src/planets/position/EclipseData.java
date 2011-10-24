@@ -34,8 +34,8 @@ public class EclipseData extends Activity {
 
 	private TextView eclDateText, eclTypeText, eclGlobalDataText,
 			eclLocalDataText;
-	private Bundle bundle;
 	private int eclipseNum;
+	private boolean helpSE;
 	private double offset;
 	private PlanetsDbAdapter planetDbHelper;
 
@@ -58,14 +58,20 @@ public class EclipseData extends Activity {
 		eclLocalDataText = (TextView) findViewById(R.id.ecl_localData);
 
 		// load bundle from previous activity
-		bundle = getIntent().getExtras();
+		Bundle bundle = getIntent().getExtras();
 		if (bundle != null) {
 			eclipseNum = bundle.getInt("eclipseNum", 0);
 			offset = bundle.getDouble("Offset", 0);
+			if (bundle.getBoolean("db")) {
+				planetDbHelper = new PlanetsDbAdapter(this, "solarEcl");
+				helpSE = true;
+				fillSolarData();
+			} else {
+				planetDbHelper = new PlanetsDbAdapter(this, "lunarEcl");
+				helpSE = false;
+				fillLunarData();
+			}
 		}
-
-		planetDbHelper = new PlanetsDbAdapter(this, "solarEcl");
-		fillData();
 	}
 
 	@Override
@@ -75,28 +81,131 @@ public class EclipseData extends Activity {
 		finish();
 	}
 
-	private void fillData() {
+	private void fillLunarData() {
+		String localData, globalData;
+		planetDbHelper.open();
+		Cursor planetCur = planetDbHelper.fetchEntry(eclipseNum);
+		startManagingCursor(planetCur);
+		eclTypeText.setText(planetCur.getString(planetCur
+				.getColumnIndexOrThrow("eclipseType")) + " Eclipse");
+		eclDateText.setText(planetCur.getString(planetCur
+				.getColumnIndexOrThrow("eclipseDate")));
+		globalData = "Eclipse Times (UTC)\n";// -------------------\n";
+		globalData += String.format(
+				"%-16s%13s\n",
+				"Penumbral Start",
+				convertDate(planetCur.getDouble(planetCur
+						.getColumnIndexOrThrow("penBegin")), false));
+		globalData += String.format(
+				"%-16s%13s\n",
+				"Partial Start",
+				convertDate(planetCur.getDouble(planetCur
+						.getColumnIndexOrThrow("partBegin")), false));
+		globalData += String.format(
+				"%-16s%13s\n",
+				"Totality Start",
+				convertDate(planetCur.getDouble(planetCur
+						.getColumnIndexOrThrow("totBegin")), false));
+		globalData += String.format(
+				"%-16s%13s\n",
+				"Maximum Eclipse",
+				convertDate(planetCur.getDouble(planetCur
+						.getColumnIndexOrThrow("maxEclTime")), false));
+		globalData += String.format(
+				"%-16s%13s\n",
+				"Totality End",
+				convertDate(planetCur.getDouble(planetCur
+						.getColumnIndexOrThrow("totEnd")), false));
+		globalData += String.format(
+				"%-16s%13s\n",
+				"Partial End",
+				convertDate(planetCur.getDouble(planetCur
+						.getColumnIndexOrThrow("partEnd")), false));
+		globalData += String.format(
+				"%-16s%13s",
+				"Penumbral End",
+				convertDate(planetCur.getDouble(planetCur
+						.getColumnIndexOrThrow("penEnd")), false));
+		eclGlobalDataText.setText(globalData);
+		if (planetCur.getInt(planetCur.getColumnIndexOrThrow("local")) > 0) {
+			// local eclipse
+			localData = "Local Eclipse Data\n";// ------------------\n";
+			localData += String.format(
+					"%-16s%13s\n",
+					"Penumbral Start",
+					convertDate(planetCur.getDouble(planetCur
+							.getColumnIndexOrThrow("penBegin")), true));
+			localData += String.format(
+					"%-16s%13s\n",
+					"Partial Start",
+					convertDate(planetCur.getDouble(planetCur
+							.getColumnIndexOrThrow("partBegin")), true));
+			localData += String.format(
+					"%-16s%13s\n",
+					"Totality Start",
+					convertDate(planetCur.getDouble(planetCur
+							.getColumnIndexOrThrow("totBegin")), true));
+			localData += String.format(
+					"%-16s%13s\n",
+					"Maximum Eclipse",
+					convertDate(planetCur.getDouble(planetCur
+							.getColumnIndexOrThrow("maxEclTime")), true));
+			localData += String.format(
+					"%-16s%13s\n",
+					"Totality End",
+					convertDate(planetCur.getDouble(planetCur
+							.getColumnIndexOrThrow("totEnd")), true));
+			localData += String.format(
+					"%-16s%13s\n",
+					"Partial End",
+					convertDate(planetCur.getDouble(planetCur
+							.getColumnIndexOrThrow("partEnd")), true));
+			localData += String.format(
+					"%-16s%13s\n\n",
+					"Penumbral End",
+					convertDate(planetCur.getDouble(planetCur
+							.getColumnIndexOrThrow("penEnd")), true));
+			localData += "Moon Position @ Max Eclipse\n";
+			localData += String.format("%-17s%8.1f\u00b0\n", "Azimuth",
+					planetCur.getDouble(planetCur
+							.getColumnIndexOrThrow("moonAz")));
+			localData += String.format("%-17s%8.1f\u00b0\n\n", "Altitude",
+					planetCur.getDouble(planetCur
+							.getColumnIndexOrThrow("moonAlt")));
+			// localData += String.format(
+			// "%-13s%13s\n",
+			// "Moon Rise",
+			// convertDate(planetCur.getDouble(planetCur
+			// .getColumnIndexOrThrow("rTime")), true));
+			// localData += String.format(
+			// "%-13s%13s\n",
+			// "Moon Set",
+			// convertDate(planetCur.getDouble(planetCur
+			// .getColumnIndexOrThrow("sTime")), true));
+			localData += String.format("%-18s%8.1f\n", "Magnitude", planetCur
+					.getDouble(planetCur.getColumnIndexOrThrow("eclipseMag")));
+			localData += String.format("%-18s%8d\n", "Saros Number", planetCur
+					.getInt(planetCur.getColumnIndexOrThrow("sarosNum")));
+			localData += String.format("%-18s%8d", "Saros Member #", planetCur
+					.getInt(planetCur.getColumnIndexOrThrow("sarosMemNum")));
+			eclLocalDataText.setText(localData);
+		} else {
+			eclLocalDataText.setVisibility(View.GONE);
+		}
+		planetDbHelper.close();
+	}
+
+	private void fillSolarData() {
 		String eclType, localData, globalData;
 		int val;
 		planetDbHelper.open();
 		Cursor planetCur = planetDbHelper.fetchEntry(eclipseNum);
 		startManagingCursor(planetCur);
-
-		val = planetCur.getInt(planetCur.getColumnIndexOrThrow("globalType"));
-		if ((val & 4) == 4) // SE_ECL_TOTAL
-			eclType = "Total Eclipse";
-		else if ((val & 8) == 8) // SE_ECL_ANNULAR
-			eclType = "Annular Eclipse";
-		else if ((val & 16) == 16) // SE_ECL_PARTIAL
-			eclType = "Partial Eclipse";
-		else if ((val & 32) == 32) // SE_ECL_ANNULAR_TOTAL
-			eclType = "Hybrid Eclipse";
-		else
-			eclType = "Other Eclipse";
-		eclTypeText.setText(eclType);
+		eclTypeText.setText(planetCur.getString(planetCur
+				.getColumnIndexOrThrow("eclipseType")) + " Eclipse");
 		eclDateText.setText(planetCur.getString(planetCur
 				.getColumnIndexOrThrow("eclipseDate")));
-		globalData = "Eclipse Times (UTC)\n-------------------\n";
+		globalData = "Eclipse Times (UTC)\n";// -------------------\n";
 		globalData += String.format(
 				"%-16s%13s\n",
 				"Eclipse Start",
@@ -138,7 +247,7 @@ public class EclipseData extends Activity {
 				eclType = "Hybrid Eclipse";
 			else
 				eclType = "Other Eclipse";
-			localData = "Local Eclipse Data\n------------------\n";
+			localData = "Local Eclipse Data\n";// ------------------\n";
 			localData += "Type: " + eclType + "\n";
 			localData += String.format(
 					"%-16s%13s\n",
@@ -232,7 +341,10 @@ public class EclipseData extends Activity {
 		switch (item.getItemId()) {
 		case R.id.id_menu_help:
 			b = new Bundle();
-			b.putInt("res", R.string.solarEcl_help);
+			if (helpSE)
+				b.putInt("res", R.string.solarEcl_help);
+			else
+				b.putInt("res", R.string.lunarEcl_help);
 			i = new Intent(this, About.class);
 			i.putExtras(b);
 			startActivity(i);

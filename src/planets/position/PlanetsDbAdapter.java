@@ -68,11 +68,12 @@ public class PlanetsDbAdapter {
 	private static final String LE_DB_CREATE = "create table lunarEcl "
 			+ "(_id integer primary key autoincrement, type integer,local integer,maxEclTime real,"
 			+ "partBegin real,partEnd real,totBegin real,totEnd real,penBegin real,penEnd real,"
-			+ "eclipseMag real,penMag real,sarosNum integer,sarosMemNum integer);";
+			+ "eclipseMag real,sarosNum integer,sarosMemNum integer,"
+			+ "eclipseDate text,eclipseType text,moonAz real,moonAlt real,rTime real,sTime real);";
 
 	private static final String DATABASE_NAME = "PlanetsDB";
 	private static String DATABASE_TABLE;
-	private static final int DATABASE_VERSION = 5;
+	private static final int DATABASE_VERSION = 6;
 
 	private final Context mCtx;
 
@@ -110,10 +111,12 @@ public class PlanetsDbAdapter {
 			db.execSQL(LE_DB_CREATE);
 			ip1 = "insert into lunarEcl "
 					+ "(_id,type,local,maxEclTime,partBegin,partEnd,totBegin,"
-					+ "totEnd,penBegin,penEnd,eclipseMag,penMag,sarosNum,"
-					+ "sarosMemNum) VALUES (";
-			ip2 = ",0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0);";
-			for (int i = 0; i < 10; i++) {
+					+ "totEnd,penBegin,penEnd,eclipseMag,sarosNum,"
+					+ "sarosMemNum,eclipseDate,eclipseType,moonAz,moonAlt,rTime,"
+					+ "sTime) VALUES (";
+			ip2 = ",0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0,'D','T',0.0,0.0,"
+					+ "0.0,0.0);";
+			for (int i = 0; i < 8; i++) {
 				db.execSQL(ip1 + i + ip2);
 			}
 		}
@@ -234,7 +237,9 @@ public class PlanetsDbAdapter {
 	public boolean updateLunar(long rowID, int type, int local,
 			double maxEclTime, double partBegin, double partEnd,
 			double totBegin, double totEnd, double penBegin, double penEnd,
-			double eclipseMag, double penMag, int sarosNum, int sarosMemNum) {
+			double eclipseMag, int sarosNum, int sarosMemNum,
+			String eclipseDate, String eclipseType, double moonAz,
+			double moonAlt, double rTime, double sTime) {
 		ContentValues args = new ContentValues();
 		args.put("type", type);
 		args.put("local", local);
@@ -246,9 +251,14 @@ public class PlanetsDbAdapter {
 		args.put("penBegin", penBegin);
 		args.put("penEnd", penEnd);
 		args.put("eclipseMag", eclipseMag);
-		args.put("penMag", penMag);
 		args.put("sarosNum", sarosNum);
 		args.put("sarosMemNum", sarosMemNum);
+		args.put("eclipseDate", eclipseDate);
+		args.put("eclipseType", eclipseType);
+		args.put("moonAz", moonAz);
+		args.put("moonAlt", moonAlt);
+		args.put("rTime", rTime);
+		args.put("sTime", sTime);
 		return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowID, null) > 0;
 	}
 
@@ -305,8 +315,9 @@ public class PlanetsDbAdapter {
 	 */
 	public Cursor fetchAllLunar() {
 		// "alt > 0"
-		return mDb.query(DATABASE_TABLE, new String[] { KEY_ROWID, "az", "alt",
-				"mag" }, null, null, null, null, null);
+		return mDb.query(DATABASE_TABLE, new String[] { KEY_ROWID,
+				"eclipseDate", "eclipseType", "local" }, null, null, null,
+				null, "penBegin");
 	}
 
 	/**

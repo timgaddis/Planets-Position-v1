@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     android:installLocation="auto"
     package="planets.position"
-    android:versionCode="12"
-    android:versionName="1.4" >
+    android:versionCode="13"
+    android:versionName="1.4.1" >
 
     <application
         android:icon="@drawable/ic_mars"

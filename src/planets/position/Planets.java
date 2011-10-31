@@ -357,8 +357,8 @@ public class Planets extends Activity {
 				latitude = loc.getLatitude();
 				longitude = loc.getLongitude();
 				elevation = loc.getAltitude();
-				offset = Calendar.getInstance().getTimeZone().getRawOffset() / 3600000.0;
 				date = Calendar.getInstance().getTimeInMillis();
+				offset = Calendar.getInstance().getTimeZone().getOffset(date) / 3600000.0;
 				saveLocation();
 			} else {
 				Toast.makeText(Planets.this,
@@ -367,7 +367,6 @@ public class Planets extends Activity {
 			}
 			dialog.dismiss();
 		}
-
 	}
 
 	/**

@@ -25,17 +25,25 @@ import java.io.OutputStream;
 import java.util.Calendar;
 
 import planets.position.UserLocation.LocationResult;
-import android.app.Activity;
+import planets.position.data.PlanetsDbAdapter;
+import planets.position.data.PlanetsDbProvider;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -49,14 +57,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class Planets extends Activity {
+public class Planets extends FragmentActivity implements
+		LoaderManager.LoaderCallbacks<Cursor> {
 
 	private Button positionButton, whatupButton, downloadButton, manualButton,
 			liveButton, solarButton, lunarButton;
 	private Spinner planetNameSpinner;
 	private TextView locationText;
 	private long date = 0, locDate = 0;
-	private PlanetsDbAdapter planetDbHelper;
 	private double elevation, latitude, longitude, offset;
 	private Bundle bundle;
 	private int planetNum = 0;
@@ -65,10 +73,13 @@ public class Planets extends Activity {
 	private UserLocation userLocation = new UserLocation();
 	private InputStream myInput;
 	private OutputStream myOutput;
+	private boolean DEBUG = false;
 
 	private static final int LOCATION_MANUAL = 0;
-
-	private boolean DEBUG = false;
+	private static final int PLANET_LOADER = 1;
+	private String[] projection = { PlanetsDbAdapter.KEY_ROWID, "date", "lat",
+			"lng", "elevation", "offset" };
+	private ContentResolver cr;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -85,7 +96,8 @@ public class Planets extends Activity {
 		lunarButton = (Button) findViewById(R.id.lunarEclButton);
 		locationText = (TextView) findViewById(R.id.locationData);
 
-		planetDbHelper = new PlanetsDbAdapter(this, "location");
+		cr = getApplicationContext().getContentResolver();
+		getSupportLoaderManager().initLoader(PLANET_LOADER, null, this);
 
 		if (!(checkFiles("semo_18.se1") && checkFiles("sepl_18.se1"))) {
 			// copy files thread
@@ -261,9 +273,10 @@ public class Planets extends Activity {
 	 * box.
 	 */
 	private void loadLocation() {
-		planetDbHelper.open();
-		Cursor locCur = planetDbHelper.fetchEntry(0);
-		startManagingCursor(locCur);
+		Cursor locCur = cr.query(
+				Uri.withAppendedPath(PlanetsDbProvider.LOCATION_URI,
+						String.valueOf(0)), projection, null, null, null);
+		locCur.moveToFirst();
 		locDate = locCur.getLong(locCur.getColumnIndexOrThrow("date"));
 		if (locDate > 0) {
 			latitude = locCur.getDouble(locCur.getColumnIndexOrThrow("lat"));
@@ -277,9 +290,7 @@ public class Planets extends Activity {
 			data += "\nElevation: " + elevation;
 			data += "\nGMT offset: " + offset;
 			locationText.setText(data);
-			planetDbHelper.close();
 		} else {
-			planetDbHelper.close();
 			showLocationDataAlert();
 		}
 	}
@@ -289,10 +300,18 @@ public class Planets extends Activity {
 	 */
 	private void saveLocation() {
 		// update location
-		planetDbHelper.open();
-		planetDbHelper.updateLocation(0, latitude, longitude, 0.0, 0.0, date,
-				offset, 13, elevation);
-		planetDbHelper.close();
+		ContentValues values = new ContentValues();
+		values.put("lat", latitude);
+		values.put("lng", longitude);
+		values.put("temp", 0.0);
+		values.put("pressure", 0.0);
+		values.put("elevation", elevation);
+		values.put("date", date);
+		values.put("offset", offset);
+
+		cr.update(
+				Uri.withAppendedPath(PlanetsDbProvider.LOCATION_URI,
+						String.valueOf(0)), values, null, null);
 		loadLocation();
 	}
 
@@ -535,4 +554,20 @@ public class Planets extends Activity {
 			loc = location;
 		};
 	};
+
+	// *** Loader Manager methods ***
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		CursorLoader cursorLoader = new CursorLoader(this,
+				PlanetsDbProvider.LOCATION_URI, projection, null, null, null);
+		return cursorLoader;
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor arg1) {
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+	}
 }

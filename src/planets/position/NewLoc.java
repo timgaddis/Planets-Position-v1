@@ -19,9 +19,17 @@ package planets.position;
 
 import java.util.Calendar;
 
-import android.app.Activity;
+import planets.position.data.PlanetsDbAdapter;
+import planets.position.data.PlanetsDbProvider;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -31,13 +39,14 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-public class NewLoc extends Activity {
+public class NewLoc extends FragmentActivity implements
+		LoaderManager.LoaderCallbacks<Cursor> {
 
 	private Button saveLocButton;
 	private EditText newLongText, newLatText, newElevationText;
 	private Spinner newOffsetSpin;
 	private long date = 0;
-	private PlanetsDbAdapter planetDbHelper;
+	// private PlanetsDbAdapter planetDbHelper;
 	private int ioffset = 13;
 	private double elevation = 0, latitude = 0, longitude = 0, offset = 0;
 	static final String[] timeZones = new String[] { "-12:00", "-11:00",
@@ -46,6 +55,10 @@ public class NewLoc extends Activity {
 			"+3:00", "+3:30", "+4:00", "+4:30", "+5:00", "+5:30", "+5:45",
 			"+6:00", "+7:00", "+8:00", "+9:00", "+9:30", "+10:00", "+11:00",
 			"+12:00" };
+	private static final int LOC_LOADER = 1;
+	private String[] projection = { PlanetsDbAdapter.KEY_ROWID, "lat", "lng",
+			"elevation", "ioffset" };
+	private ContentResolver cr;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -58,8 +71,8 @@ public class NewLoc extends Activity {
 		newLongText = (EditText) findViewById(R.id.newLongText);
 		newOffsetSpin = (Spinner) findViewById(R.id.newOffsetSpin);
 
-		planetDbHelper = new PlanetsDbAdapter(this, "location");
-		// planetDbHelper.open();
+		cr = getApplicationContext().getContentResolver();
+		getSupportLoaderManager().initLoader(LOC_LOADER, null, this);
 
 		saveLocButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -85,9 +98,10 @@ public class NewLoc extends Activity {
 	 * Loads location data into the fields.
 	 */
 	private void loadData() {
-		planetDbHelper.open();
-		Cursor locCur = planetDbHelper.fetchEntry(0);
-		startManagingCursor(locCur);
+		Cursor locCur = cr.query(
+				Uri.withAppendedPath(PlanetsDbProvider.LOCATION_URI,
+						String.valueOf(0)), projection, null, null, null);
+		locCur.moveToFirst();
 		latitude = locCur.getDouble(locCur.getColumnIndexOrThrow("lat"));
 		if (latitude != -1.0) {
 			newLatText.setText(locCur.getString(locCur
@@ -99,10 +113,10 @@ public class NewLoc extends Activity {
 			newOffsetSpin.setSelection(locCur.getInt(locCur
 					.getColumnIndexOrThrow("ioffset")));
 		}
-		planetDbHelper.close();
 	}
 
 	private int saveLocation() {
+		ContentValues values = new ContentValues();
 		if (!newLatText.getText().toString().equals(""))
 			latitude = Double.parseDouble(newLatText.getText().toString());
 		else {
@@ -127,11 +141,19 @@ public class NewLoc extends Activity {
 		}
 
 		date = Calendar.getInstance().getTimeInMillis();
-		planetDbHelper.open();
-		// update location
-		planetDbHelper.updateLocation(0, latitude, longitude, 0.0, 0.0, date,
-				offset, ioffset, elevation);
-		planetDbHelper.close();
+
+		values.put("lat", latitude);
+		values.put("lng", longitude);
+		values.put("temp", 0.0);
+		values.put("pressure", 0.0);
+		values.put("elevation", elevation);
+		values.put("date", date);
+		values.put("offset", offset);
+		values.put("ioffset", ioffset);
+
+		cr.update(
+				Uri.withAppendedPath(PlanetsDbProvider.LOCATION_URI,
+						String.valueOf(0)), values, null, null);
 		return 0;
 	}
 
@@ -156,5 +178,22 @@ public class NewLoc extends Activity {
 		public void onNothingSelected(AdapterView<?> parent) {
 			// Do nothing.
 		}
+	}
+
+	// *** Loader Manager methods ***
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		CursorLoader cursorLoader = new CursorLoader(this,
+				PlanetsDbProvider.LOCATION_URI, projection, null, null, null);
+		return cursorLoader;
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor data) {
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
 	}
 }

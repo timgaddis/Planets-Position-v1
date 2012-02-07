@@ -19,12 +19,21 @@ package planets.position;
 
 import java.util.Calendar;
 
-import android.app.Activity;
+import planets.position.data.PlanetsDbAdapter;
+import planets.position.data.PlanetsDbProvider;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
@@ -33,18 +42,22 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
-public class SolarEclipse extends Activity {
+public class SolarEclipse extends FragmentActivity implements
+		LoaderManager.LoaderCallbacks<Cursor> {
 
 	private Button prevEclButton, nextEclButton;
 	private ListView eclipseList;
 	private double[] time, g = new double[3];
 	private double offset, firstEcl, lastEcl;
-	private PlanetsDbAdapter planetDbHelper;
 	private Calendar c;
 	private final int ECLIPSE_DATA = 0;
+	private static final int SOLAR_LOADER = 1;
+	private String[] projection = { PlanetsDbAdapter.KEY_ROWID, "eclipseDate",
+			"eclipseType", "local" };
+	private SimpleCursorAdapter cursorAdapter;
+	private ContentResolver cr;
 
 	// load c library
 	static {
@@ -80,7 +93,9 @@ public class SolarEclipse extends Activity {
 			g[0] = bundle.getDouble("Long", 0);
 			g[2] = bundle.getDouble("Elevation", 0);
 		}
-		planetDbHelper = new PlanetsDbAdapter(this, "solarEcl");
+
+		cr = getApplicationContext().getContentResolver();
+		getSupportLoaderManager().initLoader(SOLAR_LOADER, null, this);
 
 		c = Calendar.getInstance();
 		// convert local time to utc
@@ -121,18 +136,17 @@ public class SolarEclipse extends Activity {
 	}
 
 	private void fillData() {
-		Cursor eclCursor;
-		planetDbHelper.open();
-		eclCursor = planetDbHelper.fetchAllSolar();
-		startManagingCursor(eclCursor);
+		Cursor eclCursor = cr.query(PlanetsDbProvider.SOLAR_URI, projection,
+				null, null, "globalBeginTime");
 		String[] from = new String[] { "eclipseDate", "eclipseType", "local" };
 		int[] to = new int[] { R.id.eclDate, R.id.eclType, R.id.eclLocal };
 		// Now create a simple cursor adapter and set it to display
-		SimpleCursorAdapter loc = new SimpleCursorAdapter(this,
-				R.layout.ecl_row, eclCursor, from, to);
+		cursorAdapter = new SimpleCursorAdapter(getApplicationContext(),
+				R.layout.ecl_row, eclCursor, from, to, 0);
 		// Binds the 'local' field in the db to the checked attribute for the
 		// CheckBox
-		loc.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+		cursorAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+			@Override
 			public boolean setViewValue(View view, Cursor cursor,
 					int columnIndex) {
 				if (columnIndex == 3) {
@@ -143,18 +157,7 @@ public class SolarEclipse extends Activity {
 				return false;
 			}
 		});
-		eclipseList.setAdapter(loc);
-		planetDbHelper.close();
-	}
-
-	private void showEclipseData(int num) {
-		Bundle bundle = new Bundle();
-		bundle.putInt("eclipseNum", num);
-		bundle.putDouble("Offset", offset);
-		bundle.putBoolean("db", true);
-		Intent i = new Intent(this, EclipseData.class);
-		i.putExtras(bundle);
-		startActivityForResult(i, ECLIPSE_DATA);
+		eclipseList.setAdapter(cursorAdapter);
 	}
 
 	/**
@@ -168,11 +171,19 @@ public class SolarEclipse extends Activity {
 	private class ComputeEclipsesTask extends AsyncTask<Double, Void, Void> {
 		ProgressDialog dialog;
 		String eclDate, eclType;
+		ContentValues values;
+
+		@Override
+		protected void onCancelled() {
+			super.onCancelled();
+
+		}
 
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
-			planetDbHelper.open();
+			values = new ContentValues();
+			eclipseList.setVisibility(View.INVISIBLE);
 			dialog = ProgressDialog.show(SolarEclipse.this, "",
 					"Calculating eclipses,\nplease wait...", true);
 		}
@@ -201,6 +212,7 @@ public class SolarEclipse extends Activity {
 			Log.i("Solar Eclipse", "Local date1: " + data2[1]);
 
 			for (i = 0; i < 8; i++) {
+				values.clear();
 				// ***************************************
 				// Global Eclipse Calculations
 				// ***************************************
@@ -255,13 +267,32 @@ public class SolarEclipse extends Activity {
 				if (Math.abs(data2[1] - data1[1]) <= 1.0) {
 					// if local eclipse time is within one day of the global
 					// time, then eclipse is visible locally
-					planetDbHelper.updateSolar(i, (int) data2[0],
-							(int) data1[0], 1, data2[1], data2[2], data2[3],
-							data2[4], data2[5], data2[7], data2[8], data2[10],
-							data2[11], data2[14], (int) data2[15],
-							(int) data2[16], data2[17], data2[18], data1[1],
-							data1[3], data1[4], data1[5], data1[6], data1[7],
-							data1[8], eclDate, eclType);
+					values.put("localType", (int) data2[0]);
+					values.put("globalType", (int) data1[0]);
+					values.put("local", 1);
+					values.put("localMaxTime", data2[1]);
+					values.put("localFirstTime", data2[2]);
+					values.put("localSecondTime", data2[3]);
+					values.put("localThirdTime", data2[4]);
+					values.put("localFourthTime", data2[5]);
+					values.put("diaRatio", data2[7]);
+					values.put("fracCover", data2[8]);
+					values.put("sunAz", data2[10]);
+					values.put("sunAlt", data2[11]);
+					values.put("localMag", data2[14]);
+					values.put("sarosNum", (int) data2[15]);
+					values.put("sarosMemNum", (int) data2[16]);
+					values.put("moonAz", data2[17]);
+					values.put("moonAlt", data2[18]);
+					values.put("globalMaxTime", data1[1]);
+					values.put("globalBeginTime", data1[3]);
+					values.put("globalEndTime", data1[4]);
+					values.put("globalTotBegin", data1[5]);
+					values.put("globalTotEnd", data1[6]);
+					values.put("globalCenterBegin", data1[7]);
+					values.put("globalCenterEnd", data1[8]);
+					values.put("eclipseDate", eclDate);
+					values.put("eclipseType", eclType);
 
 					data2 = solarDataLocal(data2[5], g, backward);
 					if (data2 == null) {
@@ -273,13 +304,38 @@ public class SolarEclipse extends Activity {
 								Toast.LENGTH_LONG).show();
 						break;
 					}
-					// Log.i("Solar Eclipse", "Local date2: " + data2[1]);
 				} else {
-					planetDbHelper.updateSolar(i, -1, (int) data1[0], 0, -1,
-							-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-							data1[1], data1[3], data1[4], data1[5], data1[6],
-							data1[7], data1[8], eclDate, eclType);
+					// Global Eclipse
+					values.put("localType", -1);
+					values.put("globalType", (int) data1[0]);
+					values.put("local", 0);
+					values.put("localMaxTime", -1);
+					values.put("localFirstTime", -1);
+					values.put("localSecondTime", -1);
+					values.put("localThirdTime", -1);
+					values.put("localFourthTime", -1);
+					values.put("diaRatio", -1);
+					values.put("fracCover", -1);
+					values.put("sunAz", -1);
+					values.put("sunAlt", -1);
+					values.put("localMag", -1);
+					values.put("sarosNum", -1);
+					values.put("sarosMemNum", -1);
+					values.put("moonAz", -1);
+					values.put("moonAlt", -1);
+					values.put("globalMaxTime", data1[1]);
+					values.put("globalBeginTime", data1[3]);
+					values.put("globalEndTime", data1[4]);
+					values.put("globalTotBegin", data1[5]);
+					values.put("globalTotEnd", data1[6]);
+					values.put("globalCenterBegin", data1[7]);
+					values.put("globalCenterEnd", data1[8]);
+					values.put("eclipseDate", eclDate);
+					values.put("eclipseType", eclType);
 				}
+				cr.update(Uri.withAppendedPath(PlanetsDbProvider.SOLAR_URI,
+						String.valueOf(i)), values, null, null);
+
 				if (backward == 0)
 					start = data1[4];
 				else
@@ -291,18 +347,30 @@ public class SolarEclipse extends Activity {
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
-			planetDbHelper.close();
 			dialog.dismiss();
+			eclipseList.setVisibility(View.VISIBLE);
 			fillData();
 		}
+	}
 
+	private void showEclipseData(int num, boolean local) {
+		Bundle bundle = new Bundle();
+		bundle.putInt("eclipseNum", num);
+		bundle.putDouble("Offset", offset);
+		bundle.putBoolean("db", true);
+		bundle.putBoolean("local", local);
+		Intent i = new Intent(this, EclipseData.class);
+		i.putExtras(bundle);
+		startActivityForResult(i, ECLIPSE_DATA);
 	}
 
 	public class EclipseSelectedListener implements OnItemClickListener {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int pos,
 				long id) {
-			showEclipseData((int) id);
+			// Log.i("SolarEclipse list", "selected id:" + id + " pos:" + pos);
+			CheckBox cb = (CheckBox) view.findViewById(R.id.eclLocal);
+			showEclipseData((int) id, cb.isChecked());
 		}
 	}
 
@@ -314,5 +382,25 @@ public class SolarEclipse extends Activity {
 			fillData();
 			return;
 		}
+	}
+
+	// *** Loader Manager methods ***
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		CursorLoader cursorLoader = new CursorLoader(this,
+				PlanetsDbProvider.SOLAR_URI, projection, null, null, null);
+		return cursorLoader;
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		if (cursorAdapter != null)
+			cursorAdapter.swapCursor(null);
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor data) {
+		if (cursorAdapter != null)
+			cursorAdapter.swapCursor(data);
 	}
 }

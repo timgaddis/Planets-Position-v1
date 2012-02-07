@@ -19,10 +19,17 @@ package planets.position;
 
 import java.util.Calendar;
 
-import android.app.Activity;
+import planets.position.data.PlanetsDbAdapter;
+import planets.position.data.PlanetsDbProvider;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,14 +37,36 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-public class EclipseData extends Activity {
+public class EclipseData extends FragmentActivity implements
+		LoaderManager.LoaderCallbacks<Cursor> {
 
 	private TextView eclDateText, eclTypeText, eclGlobalDataText,
 			eclLocalDataText;
 	private int eclipseNum;
-	private boolean helpSE;
+	private boolean helpSE, localEcl;
 	private double offset;
-	private PlanetsDbAdapter planetDbHelper;
+
+	private static final int SOLAR_LOADER = 1;
+	private static final int LUNAR_LOADER = 2;
+	private static final int SOLAR_LOCAL_LOADER = 3;
+	private static final int LUNAR_LOCAL_LOADER = 4;
+	private String[] le_projection = { PlanetsDbAdapter.KEY_ROWID,
+			"eclipseType", "eclipseDate", "penBegin", "partBegin", "totBegin",
+			"maxEclTime", "totEnd", "partEnd", "penEnd" };
+	private String[] se_projection = { PlanetsDbAdapter.KEY_ROWID,
+			"eclipseType", "eclipseDate", "globalBeginTime", "globalTotBegin",
+			"globalMaxTime", "globalTotEnd", "globalEndTime" };
+	private String[] lel_projection = { PlanetsDbAdapter.KEY_ROWID,
+			"eclipseType", "eclipseDate", "penBegin", "partBegin", "totBegin",
+			"maxEclTime", "totEnd", "partEnd", "penEnd", "moonAz", "moonAlt",
+			"eclipseMag", "sarosNum", "sarosMemNum", "rTime", "sTime" };
+	private String[] sel_projection = { PlanetsDbAdapter.KEY_ROWID,
+			"eclipseType", "eclipseDate", "globalBeginTime", "globalTotBegin",
+			"globalMaxTime", "globalTotEnd", "globalEndTime", "localType",
+			"localFirstTime", "localSecondTime", "localMaxTime",
+			"localThirdTime", "localFourthTime", "sunAz", "sunAlt",
+			"fracCover", "localMag", "sarosNum", "sarosMemNum" };
+	private ContentResolver cr;
 
 	// load c library
 	static {
@@ -57,17 +86,31 @@ public class EclipseData extends Activity {
 		eclGlobalDataText = (TextView) findViewById(R.id.ecl_globalData);
 		eclLocalDataText = (TextView) findViewById(R.id.ecl_localData);
 
+		cr = getApplicationContext().getContentResolver();
 		// load bundle from previous activity
 		Bundle bundle = getIntent().getExtras();
 		if (bundle != null) {
 			eclipseNum = bundle.getInt("eclipseNum", 0);
 			offset = bundle.getDouble("Offset", 0);
+			localEcl = bundle.getBoolean("local");
 			if (bundle.getBoolean("db")) {
-				planetDbHelper = new PlanetsDbAdapter(this, "solarEcl");
+				if (localEcl) {
+					getSupportLoaderManager().initLoader(SOLAR_LOCAL_LOADER,
+							null, this);
+				} else {
+					getSupportLoaderManager().initLoader(SOLAR_LOADER, null,
+							this);
+				}
 				helpSE = true;
 				fillSolarData();
 			} else {
-				planetDbHelper = new PlanetsDbAdapter(this, "lunarEcl");
+				if (localEcl) {
+					getSupportLoaderManager().initLoader(LUNAR_LOCAL_LOADER,
+							null, this);
+				} else {
+					getSupportLoaderManager().initLoader(LUNAR_LOADER, null,
+							this);
+				}
 				helpSE = false;
 				fillLunarData();
 			}
@@ -83,94 +126,104 @@ public class EclipseData extends Activity {
 
 	private void fillLunarData() {
 		String localData, globalData;
-		planetDbHelper.open();
-		Cursor planetCur = planetDbHelper.fetchEntry(eclipseNum);
-		startManagingCursor(planetCur);
-		eclTypeText.setText(planetCur.getString(planetCur
+		Cursor eclipseCursor;
+		if (localEcl) {
+			eclipseCursor = cr.query(
+					Uri.withAppendedPath(PlanetsDbProvider.LUNAR_URI,
+							String.valueOf(eclipseNum)), lel_projection, null,
+					null, null);
+		} else {
+			eclipseCursor = cr.query(
+					Uri.withAppendedPath(PlanetsDbProvider.LUNAR_URI,
+							String.valueOf(eclipseNum)), le_projection, null,
+					null, null);
+		}
+		eclipseCursor.moveToFirst();
+		eclTypeText.setText(eclipseCursor.getString(eclipseCursor
 				.getColumnIndexOrThrow("eclipseType")) + " Eclipse");
-		eclDateText.setText(planetCur.getString(planetCur
+		eclDateText.setText(eclipseCursor.getString(eclipseCursor
 				.getColumnIndexOrThrow("eclipseDate")));
 		globalData = "Eclipse Times (UTC)\n";// -------------------\n";
 		globalData += String.format(
 				"%-16s%13s\n",
 				"Penumbral Start",
-				convertDate(planetCur.getDouble(planetCur
+				convertDate(eclipseCursor.getDouble(eclipseCursor
 						.getColumnIndexOrThrow("penBegin")), false));
 		globalData += String.format(
 				"%-16s%13s\n",
 				"Partial Start",
-				convertDate(planetCur.getDouble(planetCur
+				convertDate(eclipseCursor.getDouble(eclipseCursor
 						.getColumnIndexOrThrow("partBegin")), false));
 		globalData += String.format(
 				"%-16s%13s\n",
 				"Totality Start",
-				convertDate(planetCur.getDouble(planetCur
+				convertDate(eclipseCursor.getDouble(eclipseCursor
 						.getColumnIndexOrThrow("totBegin")), false));
 		globalData += String.format(
 				"%-16s%13s\n",
 				"Maximum Eclipse",
-				convertDate(planetCur.getDouble(planetCur
+				convertDate(eclipseCursor.getDouble(eclipseCursor
 						.getColumnIndexOrThrow("maxEclTime")), false));
 		globalData += String.format(
 				"%-16s%13s\n",
 				"Totality End",
-				convertDate(planetCur.getDouble(planetCur
+				convertDate(eclipseCursor.getDouble(eclipseCursor
 						.getColumnIndexOrThrow("totEnd")), false));
 		globalData += String.format(
 				"%-16s%13s\n",
 				"Partial End",
-				convertDate(planetCur.getDouble(planetCur
+				convertDate(eclipseCursor.getDouble(eclipseCursor
 						.getColumnIndexOrThrow("partEnd")), false));
 		globalData += String.format(
 				"%-16s%13s",
 				"Penumbral End",
-				convertDate(planetCur.getDouble(planetCur
+				convertDate(eclipseCursor.getDouble(eclipseCursor
 						.getColumnIndexOrThrow("penEnd")), false));
 		eclGlobalDataText.setText(globalData);
-		if (planetCur.getInt(planetCur.getColumnIndexOrThrow("local")) > 0) {
+		if (localEcl) {
 			// local eclipse
 			localData = "Local Eclipse Data\n";// ------------------\n";
 			localData += String.format(
 					"%-16s%13s\n",
 					"Penumbral Start",
-					convertDate(planetCur.getDouble(planetCur
+					convertDate(eclipseCursor.getDouble(eclipseCursor
 							.getColumnIndexOrThrow("penBegin")), true));
 			localData += String.format(
 					"%-16s%13s\n",
 					"Partial Start",
-					convertDate(planetCur.getDouble(planetCur
+					convertDate(eclipseCursor.getDouble(eclipseCursor
 							.getColumnIndexOrThrow("partBegin")), true));
 			localData += String.format(
 					"%-16s%13s\n",
 					"Totality Start",
-					convertDate(planetCur.getDouble(planetCur
+					convertDate(eclipseCursor.getDouble(eclipseCursor
 							.getColumnIndexOrThrow("totBegin")), true));
 			localData += String.format(
 					"%-16s%13s\n",
 					"Maximum Eclipse",
-					convertDate(planetCur.getDouble(planetCur
+					convertDate(eclipseCursor.getDouble(eclipseCursor
 							.getColumnIndexOrThrow("maxEclTime")), true));
 			localData += String.format(
 					"%-16s%13s\n",
 					"Totality End",
-					convertDate(planetCur.getDouble(planetCur
+					convertDate(eclipseCursor.getDouble(eclipseCursor
 							.getColumnIndexOrThrow("totEnd")), true));
 			localData += String.format(
 					"%-16s%13s\n",
 					"Partial End",
-					convertDate(planetCur.getDouble(planetCur
+					convertDate(eclipseCursor.getDouble(eclipseCursor
 							.getColumnIndexOrThrow("partEnd")), true));
 			localData += String.format(
 					"%-16s%13s\n\n",
 					"Penumbral End",
-					convertDate(planetCur.getDouble(planetCur
+					convertDate(eclipseCursor.getDouble(eclipseCursor
 							.getColumnIndexOrThrow("penEnd")), true));
 			localData += "Moon Position @ Max Eclipse\n";
 			localData += String.format("%-17s%8.1f\u00b0\n", "Azimuth",
-					planetCur.getDouble(planetCur
+					eclipseCursor.getDouble(eclipseCursor
 							.getColumnIndexOrThrow("moonAz")));
 			localData += String.format("%-17s%8.1f\u00b0\n\n", "Altitude",
-					planetCur.getDouble(planetCur
+					eclipseCursor.getDouble(eclipseCursor
 							.getColumnIndexOrThrow("moonAlt")));
 			// localData += String.format(
 			// "%-13s%13s\n",
@@ -182,61 +235,73 @@ public class EclipseData extends Activity {
 			// "Moon Set",
 			// convertDate(planetCur.getDouble(planetCur
 			// .getColumnIndexOrThrow("sTime")), true));
-			localData += String.format("%-18s%8.1f\n", "Magnitude", planetCur
-					.getDouble(planetCur.getColumnIndexOrThrow("eclipseMag")));
-			localData += String.format("%-18s%8d\n", "Saros Number", planetCur
-					.getInt(planetCur.getColumnIndexOrThrow("sarosNum")));
-			localData += String.format("%-18s%8d", "Saros Member #", planetCur
-					.getInt(planetCur.getColumnIndexOrThrow("sarosMemNum")));
+			localData += String.format("%-18s%8.1f\n", "Magnitude",
+					eclipseCursor.getDouble(eclipseCursor
+							.getColumnIndexOrThrow("eclipseMag")));
+			localData += String.format("%-18s%8d\n", "Saros Number",
+					eclipseCursor.getInt(eclipseCursor
+							.getColumnIndexOrThrow("sarosNum")));
+			localData += String.format("%-18s%8d", "Saros Member #",
+					eclipseCursor.getInt(eclipseCursor
+							.getColumnIndexOrThrow("sarosMemNum")));
 			eclLocalDataText.setText(localData);
 		} else {
 			eclLocalDataText.setVisibility(View.GONE);
 		}
-		planetDbHelper.close();
 	}
 
 	private void fillSolarData() {
 		String eclType, localData, globalData;
 		int val;
-		planetDbHelper.open();
-		Cursor planetCur = planetDbHelper.fetchEntry(eclipseNum);
-		startManagingCursor(planetCur);
-		eclTypeText.setText(planetCur.getString(planetCur
+		Cursor eclipseCursor;
+		if (localEcl) {
+			eclipseCursor = cr.query(
+					Uri.withAppendedPath(PlanetsDbProvider.SOLAR_URI,
+							String.valueOf(eclipseNum)), sel_projection, null,
+					null, null);
+		} else {
+			eclipseCursor = cr.query(
+					Uri.withAppendedPath(PlanetsDbProvider.SOLAR_URI,
+							String.valueOf(eclipseNum)), se_projection, null,
+					null, null);
+		}
+		eclipseCursor.moveToFirst();
+		eclTypeText.setText(eclipseCursor.getString(eclipseCursor
 				.getColumnIndexOrThrow("eclipseType")) + " Eclipse");
-		eclDateText.setText(planetCur.getString(planetCur
+		eclDateText.setText(eclipseCursor.getString(eclipseCursor
 				.getColumnIndexOrThrow("eclipseDate")));
 		globalData = "Eclipse Times (UTC)\n";// -------------------\n";
 		globalData += String.format(
 				"%-16s%13s\n",
 				"Eclipse Start",
-				convertDate(planetCur.getDouble(planetCur
+				convertDate(eclipseCursor.getDouble(eclipseCursor
 						.getColumnIndexOrThrow("globalBeginTime")), false));
 		globalData += String.format(
 				"%-16s%13s\n",
 				"Totality Start",
-				convertDate(planetCur.getDouble(planetCur
+				convertDate(eclipseCursor.getDouble(eclipseCursor
 						.getColumnIndexOrThrow("globalTotBegin")), false));
 		globalData += String.format(
 				"%-16s%13s\n",
 				"Maximum Eclipse",
-				convertDate(planetCur.getDouble(planetCur
+				convertDate(eclipseCursor.getDouble(eclipseCursor
 						.getColumnIndexOrThrow("globalMaxTime")), false));
 		globalData += String.format(
 				"%-16s%13s\n",
 				"Totality End",
-				convertDate(planetCur.getDouble(planetCur
+				convertDate(eclipseCursor.getDouble(eclipseCursor
 						.getColumnIndexOrThrow("globalTotEnd")), false));
 		globalData += String.format(
 				"%-16s%13s",
 				"Eclipse End",
-				convertDate(planetCur.getDouble(planetCur
+				convertDate(eclipseCursor.getDouble(eclipseCursor
 						.getColumnIndexOrThrow("globalEndTime")), false));
 		eclGlobalDataText.setText(globalData);
 
-		if (planetCur.getInt(planetCur.getColumnIndexOrThrow("local")) > 0) {
+		if (localEcl) {
 			// local eclipse
-			val = planetCur
-					.getInt(planetCur.getColumnIndexOrThrow("localType"));
+			val = eclipseCursor.getInt(eclipseCursor
+					.getColumnIndexOrThrow("localType"));
 			if ((val & 4) == 4) // SE_ECL_TOTAL
 				eclType = "Total Eclipse";
 			else if ((val & 8) == 8) // SE_ECL_ANNULAR
@@ -252,49 +317,51 @@ public class EclipseData extends Activity {
 			localData += String.format(
 					"%-16s%13s\n",
 					"Eclipse Start",
-					convertDate(planetCur.getDouble(planetCur
+					convertDate(eclipseCursor.getDouble(eclipseCursor
 							.getColumnIndexOrThrow("localFirstTime")), true));
 			localData += String.format(
 					"%-16s%13s\n",
 					"Totality Start",
-					convertDate(planetCur.getDouble(planetCur
+					convertDate(eclipseCursor.getDouble(eclipseCursor
 							.getColumnIndexOrThrow("localSecondTime")), true));
 			localData += String.format(
 					"%-16s%13s\n",
 					"Maximum Eclipse",
-					convertDate(planetCur.getDouble(planetCur
+					convertDate(eclipseCursor.getDouble(eclipseCursor
 							.getColumnIndexOrThrow("localMaxTime")), true));
 			localData += String.format(
 					"%-16s%13s\n",
 					"Totality End",
-					convertDate(planetCur.getDouble(planetCur
+					convertDate(eclipseCursor.getDouble(eclipseCursor
 							.getColumnIndexOrThrow("localThirdTime")), true));
 			localData += String.format(
 					"%-16s%13s\n\n",
 					"Eclipse End",
-					convertDate(planetCur.getDouble(planetCur
+					convertDate(eclipseCursor.getDouble(eclipseCursor
 							.getColumnIndexOrThrow("localFourthTime")), true));
 			localData += "Sun Position @ Max Eclipse\n";
 			localData += String.format("%-17s%8.1f\u00b0\n", "Azimuth",
-					planetCur.getDouble(planetCur
+					eclipseCursor.getDouble(eclipseCursor
 							.getColumnIndexOrThrow("sunAz")));
 			localData += String.format("%-17s%8.1f\u00b0\n\n", "Altitude",
-					planetCur.getDouble(planetCur
+					eclipseCursor.getDouble(eclipseCursor
 							.getColumnIndexOrThrow("sunAlt")));
 			localData += String.format("%-16s%7.1f%%\n", "Sun Coverage",
-					planetCur.getDouble(planetCur
+					eclipseCursor.getDouble(eclipseCursor
 							.getColumnIndexOrThrow("fracCover")) * 100);
-			localData += String.format("%-16s%8.1f\n", "Magnitude", planetCur
-					.getDouble(planetCur.getColumnIndexOrThrow("localMag")));
-			localData += String.format("%-16s%8d\n", "Saros Number", planetCur
-					.getInt(planetCur.getColumnIndexOrThrow("sarosNum")));
-			localData += String.format("%-16s%8d", "Saros Member #", planetCur
-					.getInt(planetCur.getColumnIndexOrThrow("sarosMemNum")));
+			localData += String.format("%-16s%8.1f\n", "Magnitude",
+					eclipseCursor.getDouble(eclipseCursor
+							.getColumnIndexOrThrow("localMag")));
+			localData += String.format("%-16s%8d\n", "Saros Number",
+					eclipseCursor.getInt(eclipseCursor
+							.getColumnIndexOrThrow("sarosNum")));
+			localData += String.format("%-16s%8d", "Saros Member #",
+					eclipseCursor.getInt(eclipseCursor
+							.getColumnIndexOrThrow("sarosMemNum")));
 			eclLocalDataText.setText(localData);
 		} else {
 			eclLocalDataText.setVisibility(View.GONE);
 		}
-		planetDbHelper.close();
 	}
 
 	/**
@@ -351,5 +418,41 @@ public class EclipseData extends Activity {
 			return true;
 		}
 		return super.onMenuItemSelected(featureId, item);
+	}
+
+	// *** Loader Manager methods ***
+	@Override
+	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+		CursorLoader cursorLoader = null;
+		if (id == SOLAR_LOADER) {
+			if (localEcl) {
+				cursorLoader = new CursorLoader(this,
+						PlanetsDbProvider.SOLAR_URI, sel_projection, null,
+						null, null);
+			} else {
+				cursorLoader = new CursorLoader(this,
+						PlanetsDbProvider.SOLAR_URI, se_projection, null, null,
+						null);
+			}
+		} else if (id == LUNAR_LOADER) {
+			if (localEcl) {
+				cursorLoader = new CursorLoader(this,
+						PlanetsDbProvider.LUNAR_URI, lel_projection, null,
+						null, null);
+			} else {
+				cursorLoader = new CursorLoader(this,
+						PlanetsDbProvider.LUNAR_URI, le_projection, null, null,
+						null);
+			}
+		}
+		return cursorLoader;
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor data) {
 	}
 }

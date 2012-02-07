@@ -19,14 +19,23 @@ package planets.position;
 
 import java.util.Calendar;
 
-import android.app.Activity;
+import planets.position.data.PlanetsDbAdapter;
+import planets.position.data.PlanetsDbProvider;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
@@ -38,21 +47,28 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
-public class ViewWhatsUp extends Activity {
+public class ViewWhatsUp extends FragmentActivity implements
+		LoaderManager.LoaderCallbacks<Cursor> {
 
 	private ListView planetsList;
 	private Button refreshButton;
 	private double offset;
 	private double[] g = new double[3];
 	private int filter = 1;
+	private long startTime;
 	private String[] planetNames = { "Sun", "Moon", "Mercury", "Venus", "Mars",
 			"Jupiter", "Saturn", "Uranus", "Neptune", "Pluto" };
 	private Bundle bundle;
-	private PlanetsDbAdapter planetDbHelper;
+	private boolean done = false;
 	private final int PLANET_DATA = 0;
+	private static final int UP_LOADER = 1;
+	private String[] projection = { PlanetsDbAdapter.KEY_ROWID, "name", "az",
+			"alt", "mag" };
+	private SimpleCursorAdapter cursorAdapter;
+	private ContentResolver cr;
+	private ComputePlanetsTask computePlanetsTask;
 
 	// load c library
 	static {
@@ -84,16 +100,21 @@ public class ViewWhatsUp extends Activity {
 			g[0] = bundle.getDouble("Long", 0);
 			g[2] = bundle.getDouble("Elevation", 0);
 		}
+		cr = getApplicationContext().getContentResolver();
+		getSupportLoaderManager().initLoader(UP_LOADER, null, this);
 
-		planetDbHelper = new PlanetsDbAdapter(this, "planets");
-
-		new ComputePlanetsTask().execute();
+		if (!done)
+			computePlanetsTask = (ComputePlanetsTask) new ComputePlanetsTask()
+					.execute();
+		else
+			fillData(filter);
 
 		refreshButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				// re-calculates the planet's positions
-				new ComputePlanetsTask().execute();
+				computePlanetsTask = (ComputePlanetsTask) new ComputePlanetsTask()
+						.execute();
 			}
 
 		});
@@ -103,34 +124,40 @@ public class ViewWhatsUp extends Activity {
 
 	private void fillData(int list) {
 		Cursor plCursor;
-		planetDbHelper.open();
 		if (list == 1) {
-			plCursor = planetDbHelper.fetchAllList();
+			// plCursor = planetDbHelper.fetchAllList();
+			plCursor = cr.query(PlanetsDbProvider.PLANETS_URI, projection,
+					"alt > 0.0", null, null);
 		} else {
-			plCursor = planetDbHelper.fetchEyeList();
+			// plCursor = planetDbHelper.fetchEyeList();
+			plCursor = cr.query(PlanetsDbProvider.PLANETS_URI, projection,
+					"alt > 0.0 AND mag <= 6", null, null);
 		}
-		startManagingCursor(plCursor);
-		String[] from = new String[] { PlanetsDbAdapter.KEY_NAME, "az", "alt",
-				"mag" };
+		String[] from = new String[] { "name", "az", "alt", "mag" };
 		int[] to = new int[] { R.id.list2, R.id.list3, R.id.list4, R.id.list5 };
-
-		// Now create a simple cursor adapter and set it to display
-		SimpleCursorAdapter loc = new SimpleCursorAdapter(this,
-				R.layout.planet_row, plCursor, from, to);
-		planetsList.setAdapter(loc);
-		planetDbHelper.close();
+		cursorAdapter = new SimpleCursorAdapter(getApplicationContext(),
+				R.layout.planet_row, plCursor, from, to, 0);
+		planetsList.setAdapter(cursorAdapter);
 	}
 
 	private class ComputePlanetsTask extends AsyncTask<Void, Void, Void> {
 		ProgressDialog dialog;
 		double[] data = null, time;
 		Calendar c;
+		ContentValues values;
 
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
-			planetDbHelper.open();
+			// planetDbHelper.open();
+			done = false;
+			values = new ContentValues();
+			planetsList.setVisibility(View.INVISIBLE);
 			c = Calendar.getInstance();
+			startTime = c.getTimeInMillis();
+			// set the title of the activity with the current date and time
+			ViewWhatsUp.this.setTitle("What's up on "
+					+ DateFormat.format("MMM d @ hh:mm aa", c));
 			// convert local time to utc
 			c.add(Calendar.MINUTE, (int) (offset * -60));
 
@@ -154,15 +181,20 @@ public class ViewWhatsUp extends Activity {
 		@Override
 		protected Void doInBackground(Void... params) {
 			for (int i = 0; i < 10; i++) {
+				if (this.isCancelled())
+					break;
+				values.clear();
 				data = planetUpData(time[0], time[1], i, g, 0.0, 0.0);
 				if (data == null) {
-					Log.e("Position error", "planetUpData error");
-					Toast.makeText(
-							getApplicationContext(),
-							"Planet calculation error,\nplease restart the activity",
-							Toast.LENGTH_SHORT).show();
+					Log.e("Position error", "ViewWhatsUp - planetUpData error");
+					// Toast.makeText(
+					// getApplicationContext(),
+					// "Planet calculation error,\nplease restart the activity",
+					// Toast.LENGTH_SHORT).show();
 					dialog.dismiss();
-					ViewWhatsUp.this.finish();
+					this.cancel(false);
+					break;
+					// ViewWhatsUp.this.finish();
 				}
 				String[] dateArr = jd2utc(data[6]).split("_");
 
@@ -176,9 +208,20 @@ public class ViewWhatsUp extends Activity {
 				// convert utc to local time
 				c.add(Calendar.MINUTE, (int) (offset * 60));
 
-				planetDbHelper.updatePlanet(i, planetNames[i], data[0],
-						data[1], data[3], data[4], data[2],
-						Math.round(data[5]), c.getTimeInMillis());
+				// (long rowID, String name, double ra, double dec,
+				// double az, double alt, double dis, long mag, long setT)
+
+				values.put("name", planetNames[i]);
+				values.put("ra", data[0]);
+				values.put("dec", data[1]);
+				values.put("az", data[3]);
+				values.put("alt", data[4]);
+				values.put("dis", data[2]);
+				values.put("mag", Math.round(data[5]));
+				values.put("setT", c.getTimeInMillis());
+
+				cr.update(Uri.withAppendedPath(PlanetsDbProvider.PLANETS_URI,
+						String.valueOf(i)), values, null, null);
 			}
 			return null;
 		}
@@ -186,14 +229,12 @@ public class ViewWhatsUp extends Activity {
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
-			c = Calendar.getInstance();
-			// set the title of the activity with the current date and time
-			ViewWhatsUp.this.setTitle("What's up on "
-					+ DateFormat.format("MMM d @ hh:mm aa", c));
-			planetDbHelper.close();
+			done = true;
 			dialog.dismiss();
+			planetsList.setVisibility(View.VISIBLE);
 			fillData(1);
 		}
+
 	}
 
 	private void showPlanetData(int num) {
@@ -260,5 +301,26 @@ public class ViewWhatsUp extends Activity {
 			fillData(1);
 			return;
 		}
+	}
+
+	// *** Loader Manager methods ***
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		CursorLoader cursorLoader = new CursorLoader(this,
+				PlanetsDbProvider.PLANETS_URI, projection, "alt > 0.0", null,
+				null);
+		return cursorLoader;
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		// if (cursorAdapter != null)
+		// cursorAdapter.swapCursor(null);
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor data) {
+		// if (cursorAdapter != null)
+		// cursorAdapter.swapCursor(data);
 	}
 }

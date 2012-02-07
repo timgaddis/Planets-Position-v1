@@ -19,19 +19,31 @@ package planets.position;
 
 import java.util.Calendar;
 
-import android.app.Activity;
+import planets.position.data.PlanetsDbAdapter;
+import planets.position.data.PlanetsDbProvider;
+import android.content.ContentResolver;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.text.format.DateFormat;
 import android.widget.TextView;
 
-public class PlanetData extends Activity {
+public class PlanetData extends FragmentActivity implements
+		LoaderManager.LoaderCallbacks<Cursor> {
 
 	private TextView planetName, raText, decText, azText, altText, disText,
 			magText, setTimeText;
 	private int planetNum;
 	private Bundle bundle;
-	private PlanetsDbAdapter planetDbHelper;
+
+	private static final int PLANET_LOADER = 1;
+	private String[] projection = { PlanetsDbAdapter.KEY_ROWID, "name", "ra",
+			"dec", "az", "alt", "dis", "mag", "setT" };
+	private ContentResolver cr;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -52,8 +64,8 @@ public class PlanetData extends Activity {
 		if (bundle != null) {
 			planetNum = bundle.getInt("planetNum", 0);
 		}
-
-		planetDbHelper = new PlanetsDbAdapter(this, "planets");
+		cr = getApplicationContext().getContentResolver();
+		getSupportLoaderManager().initLoader(PLANET_LOADER, null, this);
 
 		fillData();
 	}
@@ -66,12 +78,12 @@ public class PlanetData extends Activity {
 	}
 
 	private void fillData() {
-		Cursor plCursor;
 		Calendar c = Calendar.getInstance();
-		planetDbHelper.open();
-		plCursor = planetDbHelper.fetchEntry(planetNum);
-		startManagingCursor(plCursor);
-
+		Cursor plCursor = cr.query(
+				Uri.withAppendedPath(PlanetsDbProvider.PLANETS_URI,
+						String.valueOf(planetNum)), projection, null, null,
+				null);
+		plCursor.moveToFirst();
 		planetName.setText(plCursor.getString(plCursor
 				.getColumnIndexOrThrow("name")));
 		raText.setText(convertRaDec(
@@ -89,8 +101,6 @@ public class PlanetData extends Activity {
 		c.setTimeInMillis(plCursor.getLong(plCursor
 				.getColumnIndexOrThrow("setT")));
 		setTimeText.setText(DateFormat.format("MMM dd h:mm aa", c));
-
-		planetDbHelper.close();
 	}
 
 	private String convertRaDec(double value, int type) {
@@ -139,5 +149,21 @@ public class PlanetData extends Activity {
 			return "";
 		}
 
+	}
+
+	// *** Loader Manager methods ***
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		CursorLoader cursorLoader = new CursorLoader(this,
+				PlanetsDbProvider.PLANETS_URI, projection, null, null, null);
+		return cursorLoader;
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor data) {
 	}
 }

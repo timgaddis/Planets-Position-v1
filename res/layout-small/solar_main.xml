@@ -14,7 +14,7 @@
             android:layout_width="fill_parent"
             android:layout_height="55dp"
             android:layout_weight="1"
-            android:text="Previous Eclipses"
+            android:text="@string/ecl_prev"
             android:textSize="16sp" />
 
         <Button
@@ -22,12 +22,12 @@
             android:layout_width="fill_parent"
             android:layout_height="55dp"
             android:layout_weight="1"
-            android:text="Next Eclipses"
+            android:text="@string/ecl_next"
             android:textSize="16sp" />
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/linearLayout1"
+        android:id="@+id/linearLayout2"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center" >
@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1.2"
             android:paddingLeft="10dp"
-            android:text="Date (UTC)"
+            android:text="@string/ecl_date"
             android:textColor="@color/text_color"
             android:textSize="16sp" />
 
@@ -49,16 +49,16 @@
             android:layout_weight="1"
             android:gravity="center_horizontal"
             android:paddingRight="10dp"
-            android:text="Type"
+            android:text="@string/ecl_type"
             android:textColor="@color/text_color"
             android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="Local"
+            android:text="@string/ecl_local"
             android:textColor="@color/text_color"
             android:textSize="16sp" />
     </LinearLayout>

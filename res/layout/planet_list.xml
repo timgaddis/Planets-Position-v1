@@ -16,9 +16,8 @@
         android:layout_alignBaseline="@+id/refreshButton"
         android:layout_alignLeft="@+id/view01"
         android:layout_below="@+id/view01"
-        android:layout_weight="1"
         android:gravity="center"
-        android:text="Select a planet to view its position data"
+        android:text="@string/planet_sel"
         android:textColor="@color/text_color"
         android:textSize="14sp" />
 
@@ -28,7 +27,6 @@
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/view01"
         android:layout_below="@+id/view01"
-        android:layout_weight="4"
         android:background="@drawable/ic_menu_update" />
 
     <View
@@ -50,7 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@color/list_color"
-            android:text="Name"
+            android:text="@string/planet_name"
             android:textColor="@color/text_color"
             android:textSize="16sp" />
 
@@ -61,7 +59,7 @@
             android:layout_weight="1"
             android:background="@color/list_color"
             android:gravity="center_horizontal"
-            android:text="Azimuth"
+            android:text="@string/data_az"
             android:textColor="@color/text_color"
             android:textSize="16sp" />
 
@@ -72,7 +70,7 @@
             android:layout_weight="1"
             android:background="@color/list_color"
             android:gravity="center_horizontal"
-            android:text="Altitude"
+            android:text="@string/data_alt"
             android:textColor="@color/text_color"
             android:textSize="16sp" />
 
@@ -83,7 +81,7 @@
             android:layout_weight="1"
             android:background="@color/list_color"
             android:gravity="center_horizontal"
-            android:text="Magnitude"
+            android:text="@string/data_mag"
             android:textColor="@color/text_color"
             android:textSize="16sp" />
     </LinearLayout>

@@ -9,9 +9,8 @@
         android:id="@+id/title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:gravity="center_horizontal"
-        android:text="Enter Location Data"
+        android:text="@string/loc_enter"
         android:textColor="@color/text_color"
         android:textSize="21sp" />
 
@@ -27,7 +26,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/view01"
-        android:text="Latitude"
+        android:text="@string/loc_lat"
         android:textColor="@color/text_color" />
 
     <EditText
@@ -35,7 +34,6 @@
         android:layout_width="fill_parent"
         android:layout_height="40dp"
         android:layout_below="@+id/text01"
-        android:layout_weight="1"
         android:inputType="numberSigned|numberDecimal" />
 
     <TextView
@@ -43,7 +41,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/newLatText"
-        android:text="Longitude"
+        android:text="@string/loc_lng"
         android:textColor="@color/text_color" />
 
     <EditText
@@ -51,7 +49,6 @@
         android:layout_width="fill_parent"
         android:layout_height="40dp"
         android:layout_below="@+id/text02"
-        android:layout_weight="1"
         android:inputType="numberSigned|numberDecimal" />
 
     <View
@@ -66,8 +63,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/view02"
         android:layout_gravity="center"
-        android:layout_weight="0.5"
-        android:text="Elevation (m)"
+        android:text="@string/loc_ele"
         android:textColor="@color/text_color" />
 
     <EditText
@@ -75,7 +71,6 @@
         android:layout_width="fill_parent"
         android:layout_height="40dp"
         android:layout_below="@+id/text03"
-        android:layout_weight="0.5"
         android:inputType="numberSigned|numberDecimal" />
 
     <TextView
@@ -84,8 +79,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/newElevationText"
         android:layout_gravity="center"
-        android:layout_weight="0.5"
-        android:text="GMT offset +/- (hr)"
+        android:text="@string/loc_gmt"
         android:textColor="@color/text_color" />
 
     <Spinner
@@ -93,7 +87,6 @@
         android:layout_width="fill_parent"
         android:layout_height="42dp"
         android:layout_below="@+id/text04"
-        android:layout_weight="0.5"
         android:gravity="center_horizontal" />
 
     <View
@@ -107,7 +100,6 @@
         android:layout_width="fill_parent"
         android:layout_height="45dp"
         android:layout_below="@+id/view03"
-        android:layout_weight="1"
         android:text="@string/save"
         android:textSize="@dimen/pos_planet_name" />
 

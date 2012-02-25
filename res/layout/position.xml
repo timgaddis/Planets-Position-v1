@@ -50,7 +50,7 @@
             android:layout_alignLeft="@+id/view1"
             android:layout_below="@+id/view1"
             android:padding="@dimen/pos_data_pad"
-            android:text="Right Ascension"
+            android:text="@string/data_ra"
             android:textColor="@color/text_color"
             android:textSize="@dimen/pos_data_text" />
 
@@ -78,7 +78,7 @@
             android:layout_alignLeft="@+id/view2"
             android:layout_below="@+id/view2"
             android:padding="@dimen/pos_data_pad"
-            android:text="Declination"
+            android:text="@string/data_dec"
             android:textColor="@color/text_color"
             android:textSize="@dimen/pos_data_text" />
 
@@ -106,7 +106,7 @@
             android:layout_alignLeft="@+id/view3"
             android:layout_below="@+id/view3"
             android:padding="@dimen/pos_data_pad"
-            android:text="Azimuth"
+            android:text="@string/data_az"
             android:textColor="@color/text_color"
             android:textSize="@dimen/pos_data_text" />
 
@@ -134,7 +134,7 @@
             android:layout_alignLeft="@+id/view4"
             android:layout_below="@+id/view4"
             android:padding="@dimen/pos_data_pad"
-            android:text="Altitude"
+            android:text="@string/data_alt"
             android:textColor="@color/text_color"
             android:textSize="@dimen/pos_data_text" />
 
@@ -162,7 +162,7 @@
             android:layout_alignLeft="@+id/view5"
             android:layout_below="@+id/view5"
             android:padding="@dimen/pos_data_pad"
-            android:text="Distance"
+            android:text="@string/data_dis"
             android:textColor="@color/text_color"
             android:textSize="@dimen/pos_data_text" />
 
@@ -190,7 +190,7 @@
             android:layout_alignLeft="@+id/view6"
             android:layout_below="@+id/view6"
             android:padding="@dimen/pos_data_pad"
-            android:text="Magnitude"
+            android:text="@string/data_mag"
             android:textColor="@color/text_color"
             android:textSize="@dimen/pos_data_text" />
 
@@ -218,7 +218,7 @@
             android:layout_alignLeft="@+id/view7"
             android:layout_below="@+id/view7"
             android:padding="@dimen/pos_data_pad"
-            android:text="Rise Time"
+            android:text="@string/data_rise"
             android:textColor="@color/text_color"
             android:textSize="@dimen/pos_data_text" />
 
@@ -246,7 +246,7 @@
             android:layout_alignLeft="@+id/view8"
             android:layout_below="@+id/view8"
             android:padding="@dimen/pos_data_pad"
-            android:text="Set Time"
+            android:text="@string/data_set"
             android:textColor="@color/text_color"
             android:textSize="@dimen/pos_data_text" />
 
@@ -273,7 +273,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/view9"
             android:layout_centerHorizontal="true"
-            android:text="Object is below the horizon"
+            android:text="@string/below_hor"
             android:textColor="@color/alert_color"
             android:textSize="@dimen/pos_data_text"
             android:visibility="invisible" />

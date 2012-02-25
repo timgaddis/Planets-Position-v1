@@ -6,7 +6,7 @@
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:padding="10dp" >
@@ -19,14 +19,14 @@
             android:id="@+id/positionButton"
             android:layout_width="fill_parent"
             android:layout_height="50dp"
-            android:text="Planet&apos;s Position"
+            android:text="@string/pos_title"
             android:textSize="@dimen/pos_planet_name" />
 
         <Button
             android:id="@+id/whatupButton"
             android:layout_width="fill_parent"
             android:layout_height="50dp"
-            android:text="What&apos;s Up Now"
+            android:text="@string/up_title"
             android:textSize="@dimen/pos_planet_name" />
 
         <LinearLayout
@@ -40,7 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="65dp"
                 android:layout_weight="1"
-                android:text="Solar Eclipses"
+                android:text="@string/solar_title"
                 android:textSize="20sp" />
 
             <Button
@@ -48,7 +48,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="65dp"
                 android:layout_weight="1"
-                android:text="Lunar Eclipses"
+                android:text="@string/lunar_title"
                 android:textSize="18sp" />
         </LinearLayout>
 
@@ -56,7 +56,7 @@
             android:id="@+id/textView1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Real Time Position"
+            android:text="@string/real_title"
             android:textSize="14sp" />
 
         <LinearLayout
@@ -80,7 +80,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/LinearLayout01"
+            android:id="@+id/LinearLayout02"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" >
 
@@ -88,15 +88,15 @@
                 android:id="@+id/downloadButton"
                 android:layout_width="fill_parent"
                 android:layout_height="60dp"
-                android:layout_weight="1"
-                android:text="Download Location Data" />
+                android:layout_weight="0.5"
+                android:text="@string/loc_down" />
 
             <Button
                 android:id="@+id/manualEnterButton"
                 android:layout_width="fill_parent"
                 android:layout_height="60dp"
-                android:layout_weight="1"
-                android:text="Manually Enter Location Data" />
+                android:layout_weight="0.5"
+                android:text="@string/loc_man" />
         </LinearLayout>
 
         <TextView

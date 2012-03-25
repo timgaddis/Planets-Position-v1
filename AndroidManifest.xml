@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    android:installLocation="auto"
     package="planets.position"
+    android:installLocation="auto"
     android:versionCode="14"
     android:versionName="1.5" >
 
@@ -11,7 +11,7 @@
 
     <uses-sdk
         android:minSdkVersion="4"
-        android:targetSdkVersion="10" />
+        android:targetSdkVersion="14" />
 
     <application
         android:icon="@drawable/ic_mars"
@@ -35,6 +35,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name="ViewWhatsUp"
+            android:label="@string/up_title"
             android:screenOrientation="portrait" />
         <activity
             android:name="Position"

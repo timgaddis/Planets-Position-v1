@@ -19,45 +19,48 @@ package planets.position;
 
 import java.util.Calendar;
 
+import planets.position.UserLocation.LocationResult;
 import planets.position.data.PlanetsDbAdapter;
 import planets.position.data.PlanetsDbProvider;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.database.Cursor;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 public class NewLoc extends FragmentActivity implements
 		LoaderManager.LoaderCallbacks<Cursor> {
 
-	private Button saveLocButton;
+	private Button saveLocButton, offsetButton, gpsButton;
 	private EditText newLongText, newLatText, newElevationText;
-	private Spinner newOffsetSpin;
 	private long date = 0;
-	// private PlanetsDbAdapter planetDbHelper;
-	private int ioffset = 13;
+	private Location loc;
+	private UserLocation userLocation = new UserLocation();
 	private double elevation = 0, latitude = 0, longitude = 0, offset = 0;
 	static final String[] timeZones = new String[] { "-12:00", "-11:00",
-			"-10:00", "-9:00", "-8:00", "-7:00", "-6:00", "-5:00", "-4:00",
-			"-3:30", "-3:00", "-2:00", "-1:00", "0:00", "+1:00", "+2:00",
-			"+3:00", "+3:30", "+4:00", "+4:30", "+5:00", "+5:30", "+5:45",
-			"+6:00", "+7:00", "+8:00", "+9:00", "+9:30", "+10:00", "+11:00",
-			"+12:00" };
+			"-10:00", "-9:30", "-9:00", "-8:00", "-7:00", "-6:00", "-5:00",
+			"-4:30", "-4:00", "-3:30", "-3:00", "-2:00", "-1:00", "0:00",
+			"+1:00", "+2:00", "+3:00", "+3:30", "+4:00", "+4:30", "+5:00",
+			"+5:30", "+5:45", "+6:00", "+7:00", "+8:00", "+8:45", "+9:00",
+			"+9:30", "+10:00", "+10:30", "+11:00", "+11:30", "+12:00",
+			"+12:45", "+13:00", "+14:00" };
 	private static final int LOC_LOADER = 1;
 	private String[] projection = { PlanetsDbAdapter.KEY_ROWID, "lat", "lng",
-			"elevation", "ioffset" };
+			"elevation", "offset" };
 	private ContentResolver cr;
 
 	@Override
@@ -65,11 +68,12 @@ public class NewLoc extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.new_loc);
 
+		gpsButton = (Button) findViewById(R.id.gpsButton);
 		saveLocButton = (Button) findViewById(R.id.saveLocButton);
+		offsetButton = (Button) findViewById(R.id.offsetButton);
 		newElevationText = (EditText) findViewById(R.id.newElevationText);
 		newLatText = (EditText) findViewById(R.id.newLatText);
 		newLongText = (EditText) findViewById(R.id.newLongText);
-		newOffsetSpin = (Spinner) findViewById(R.id.newOffsetSpin);
 
 		cr = getApplicationContext().getContentResolver();
 		getSupportLoaderManager().initLoader(LOC_LOADER, null, this);
@@ -85,13 +89,35 @@ public class NewLoc extends FragmentActivity implements
 			}
 		});
 
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_spinner_item, timeZones);
-		adapter.setDropDownViewResource(android.R.layout.select_dialog_singlechoice);
-		newOffsetSpin.setAdapter(adapter);
-		newOffsetSpin.setSelection(ioffset);
-		newOffsetSpin.setOnItemSelectedListener(new OffsetSelectedListener());
+		offsetButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				showOffsetDialog();
+			}
+		});
+
+		gpsButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				getLocation();
+			}
+		});
+
+		// offsetButton.setText(timeZones[ioffset]);
 		loadData();
+	}
+
+	/**
+	 * Gets the GPS location of the device or loads test values.
+	 */
+	private void getLocation() {
+		// get lat/long from GPS
+		loc = null;
+		new GetGPSTask().execute();
+		boolean result = userLocation.getLocation(this, locationResult);
+		if (!result) {
+			loc = new Location(LocationManager.PASSIVE_PROVIDER);
+		}
 	}
 
 	/**
@@ -104,14 +130,27 @@ public class NewLoc extends FragmentActivity implements
 		locCur.moveToFirst();
 		latitude = locCur.getDouble(locCur.getColumnIndexOrThrow("lat"));
 		if (latitude != -1.0) {
-			newLatText.setText(locCur.getString(locCur
-					.getColumnIndexOrThrow("lat")));
-			newLongText.setText(locCur.getString(locCur
-					.getColumnIndexOrThrow("lng")));
-			newElevationText.setText(locCur.getString(locCur
-					.getColumnIndexOrThrow("elevation")));
-			newOffsetSpin.setSelection(locCur.getInt(locCur
-					.getColumnIndexOrThrow("ioffset")));
+			newLatText.setText(String.format("%.8f",
+					locCur.getDouble(locCur.getColumnIndexOrThrow("lat"))));
+			newLongText.setText(String.format("%.8f",
+					locCur.getDouble(locCur.getColumnIndexOrThrow("lng"))));
+			newElevationText
+					.setText(String.format("%.1f", locCur.getDouble(locCur
+							.getColumnIndexOrThrow("elevation"))));
+			offset = locCur.getDouble(locCur.getColumnIndexOrThrow("offset"));
+			String off = "";
+			if (offset < 0)
+				off += "-";
+			else if (offset > 0)
+				off += "+";
+			int h = (int) Math.abs(offset);
+			off += h + ":";
+			int m = (int) ((Math.abs(offset) - h) * 60);
+			if (m > 0)
+				off += m;
+			else
+				off += "00";
+			offsetButton.setText(off);
 		}
 	}
 
@@ -149,7 +188,7 @@ public class NewLoc extends FragmentActivity implements
 		values.put("elevation", elevation);
 		values.put("date", date);
 		values.put("offset", offset);
-		values.put("ioffset", ioffset);
+		values.put("ioffset", 0);
 
 		cr.update(
 				Uri.withAppendedPath(PlanetsDbProvider.LOCATION_URI,
@@ -157,28 +196,95 @@ public class NewLoc extends FragmentActivity implements
 		return 0;
 	}
 
-	// offset spinner selection
-	public class OffsetSelectedListener implements OnItemSelectedListener {
+	private void showOffsetDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("GMT Offset");
+		builder.setItems(timeZones, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int item) {
+				// ioffset = item;
+				offsetButton.setText(timeZones[item]);
+				String tz[] = timeZones[item].split(":");
+				double h = Double.parseDouble(tz[0]);
+				double m = Double.parseDouble(tz[1]);
+				m /= 60.0;
+				if (h >= 0)
+					h += m;
+				else
+					h -= m;
+				offset = h;
+			}
+		});
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+
+	/**
+	 * Loads a dialog box in a separate thread for the GPS location and
+	 * processes the location when finished.
+	 * 
+	 * @author tgaddis
+	 * 
+	 */
+	private class GetGPSTask extends AsyncTask<Void, Void, Void> {
+		ProgressDialog dialog;
+
 		@Override
-		public void onItemSelected(AdapterView<?> parent, View view, int pos,
-				long id) {
-			NewLoc.this.ioffset = pos;
-			String tz[] = parent.getItemAtPosition(pos).toString().split(":");
-			double h = Double.parseDouble(tz[0]);
-			double m = Double.parseDouble(tz[1]);
-			m /= 60.0;
-			if (h >= 0)
-				h += m;
-			else
-				h -= m;
-			NewLoc.this.offset = h;
+		protected void onPreExecute() {
+			dialog = ProgressDialog.show(NewLoc.this, "",
+					"Downloading Location.\nPlease wait...", true);
 		}
 
 		@Override
-		public void onNothingSelected(AdapterView<?> parent) {
-			// Do nothing.
+		protected Void doInBackground(Void... params) {
+			while (true) {
+				if (loc != null)
+					break;
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			if (loc.getTime() > 0) {
+				latitude = loc.getLatitude();
+				longitude = loc.getLongitude();
+				elevation = loc.getAltitude();
+				date = Calendar.getInstance().getTimeInMillis();
+				offset = Calendar.getInstance().getTimeZone().getOffset(date) / 3600000.0;
+				// saveLocation();
+				newLatText.setText(String.format("%.8f", latitude));
+				newLongText.setText(String.format("%.8f", longitude));
+				newElevationText.setText(String.format("%.1f", elevation));
+				String off = "";
+				if (offset < 0)
+					off += "-";
+				else if (offset > 0)
+					off += "+";
+				int h = (int) Math.abs(offset);
+				off += h + ":";
+				int m = (int) ((Math.abs(offset) - h) * 60);
+				if (m > 0)
+					off += m;
+				else
+					off += "00";
+				offsetButton.setText(off);
+
+			} else {
+				Toast.makeText(NewLoc.this,
+						"Unable to download location data.\nPlease try again",
+						Toast.LENGTH_LONG).show();
+			}
+			dialog.dismiss();
 		}
 	}
+
+	public LocationResult locationResult = new LocationResult() {
+		@Override
+		public void gotLocation(final Location location) {
+			// Log.i("Location", "Got Location");
+			loc = location;
+		};
+	};
 
 	// *** Loader Manager methods ***
 

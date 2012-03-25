@@ -248,6 +248,7 @@ public class EclipseData extends FragmentActivity implements
 		} else {
 			eclLocalDataText.setVisibility(View.GONE);
 		}
+		// planetDbHelper.close();
 	}
 
 	private void fillSolarData() {

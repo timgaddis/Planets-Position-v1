@@ -34,19 +34,15 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
 public class Position extends Activity {
 
-	private Button dateButton, timeButton;
-	private Spinner planetNameSpinner;
+	private Button dateButton, timeButton, nameButton;
 	private TextView pRAText, pDecText, pMagText, pRiseText, pSetText;
 	private TextView pAzText, pAltText, pBelowText, pDistText;
 	private Bundle bundle;
@@ -80,7 +76,7 @@ public class Position extends Activity {
 
 		dateButton = (Button) findViewById(R.id.pos_date_button);
 		timeButton = (Button) findViewById(R.id.pos_time_button);
-		planetNameSpinner = (Spinner) findViewById(R.id.pos_name_spin);
+		nameButton = (Button) findViewById(R.id.pos_name_button);
 		pAzText = (TextView) findViewById(R.id.pos_az_text);
 		pAltText = (TextView) findViewById(R.id.pos_alt_text);
 		pRAText = (TextView) findViewById(R.id.pos_ra_text);
@@ -108,22 +104,21 @@ public class Position extends Activity {
 		mMonth = c.get(Calendar.MONTH);
 		mDay = c.get(Calendar.DAY_OF_MONTH);
 
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-				this, R.array.planets_array,
-				android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		planetNameSpinner.setAdapter(adapter);
-
 		// display the current date (this method is below)
 		updateDisplay();
-
-		planetNameSpinner
-				.setOnItemSelectedListener(new PlanetNameSelectedListener());
+		showPlanetDialog();
 
 		dateButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				showDialog(DATE_DIALOG_ID);
+			}
+		});
+
+		nameButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				showPlanetDialog();
 			}
 		});
 
@@ -146,6 +141,7 @@ public class Position extends Activity {
 			char decSign;
 			String[] dateArr;
 
+			nameButton.setText(planetName);
 			utc = new GregorianCalendar(mYear, mMonth, mDay, mHour, mMinute, 0);
 			m = (int) (offset * 60);
 			utc.add(Calendar.MINUTE, m * -1);
@@ -243,7 +239,7 @@ public class Position extends Activity {
 		computeLocation();
 	}
 
-	private void planetDialog() {
+	private void showPlanetDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.planet_prompt);
 		final ArrayAdapter<CharSequence> adapter = ArrayAdapter
@@ -259,19 +255,6 @@ public class Position extends Activity {
 		});
 		AlertDialog alert = builder.create();
 		alert.show();
-	}
-
-	public class PlanetNameSelectedListener implements OnItemSelectedListener {
-		public void onItemSelected(AdapterView<?> parent, View view, int pos,
-				long id) {
-			planetNum = pos;
-			planetName = (String) planetNameSpinner.getItemAtPosition(pos);
-			computeLocation();
-		}
-
-		public void onNothingSelected(AdapterView<?> parent) {
-			// Do nothing.
-		}
 	}
 
 	// the callback received when the user "sets" the date in the dialog

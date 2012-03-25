@@ -22,7 +22,6 @@ import java.util.Calendar;
 import planets.position.data.PlanetsDbAdapter;
 import planets.position.data.PlanetsDbProvider;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -31,7 +30,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -47,28 +49,29 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 public class ViewWhatsUp extends FragmentActivity implements
 		LoaderManager.LoaderCallbacks<Cursor> {
 
 	private ListView planetsList;
 	private Button refreshButton;
+	private TextView viewDate;
 	private double offset;
 	private double[] g = new double[3];
 	private int filter = 1;
-	private long startTime;
 	private String[] planetNames = { "Sun", "Moon", "Mercury", "Venus", "Mars",
 			"Jupiter", "Saturn", "Uranus", "Neptune", "Pluto" };
 	private Bundle bundle;
-	private boolean done = false;
 	private final int PLANET_DATA = 0;
 	private static final int UP_LOADER = 1;
+	private static final String TAG = ViewWhatsUp.class.getSimpleName();
 	private String[] projection = { PlanetsDbAdapter.KEY_ROWID, "name", "az",
 			"alt", "mag" };
 	private SimpleCursorAdapter cursorAdapter;
 	private ContentResolver cr;
 	private ComputePlanetsTask computePlanetsTask;
+	private DialogFragment calcDialog;
 
 	// load c library
 	static {
@@ -91,6 +94,9 @@ public class ViewWhatsUp extends FragmentActivity implements
 
 		planetsList = (ListView) findViewById(R.id.listView1);
 		refreshButton = (Button) findViewById(R.id.refreshButton);
+		viewDate = (TextView) findViewById(R.id.text01);
+
+		planetsList.setVisibility(View.INVISIBLE);
 
 		// load bundle from previous activity
 		bundle = getIntent().getExtras();
@@ -100,21 +106,29 @@ public class ViewWhatsUp extends FragmentActivity implements
 			g[0] = bundle.getDouble("Long", 0);
 			g[2] = bundle.getDouble("Elevation", 0);
 		}
+
 		cr = getApplicationContext().getContentResolver();
 		getSupportLoaderManager().initLoader(UP_LOADER, null, this);
 
-		if (!done)
-			computePlanetsTask = (ComputePlanetsTask) new ComputePlanetsTask()
-					.execute();
-		else
-			fillData(filter);
+		Object retained = getLastCustomNonConfigurationInstance();
+		if (retained instanceof ComputePlanetsTask) {
+			Log.i(TAG, "Reclaiming previous background task.");
+			computePlanetsTask = (ComputePlanetsTask) retained;
+			computePlanetsTask.setActivity(this);
+		} else {
+			Log.i(TAG, "Creating new background task.");
+			computePlanetsTask = new ComputePlanetsTask(this, g, offset);
+			computePlanetsTask.execute();
+		}
 
 		refreshButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				// re-calculates the planet's positions
-				computePlanetsTask = (ComputePlanetsTask) new ComputePlanetsTask()
-						.execute();
+				planetsList.setVisibility(View.INVISIBLE);
+				computePlanetsTask = new ComputePlanetsTask(ViewWhatsUp.this,
+						g, offset);
+				computePlanetsTask.execute();
 			}
 
 		});
@@ -122,14 +136,18 @@ public class ViewWhatsUp extends FragmentActivity implements
 		planetsList.setOnItemClickListener(new PlanetSelectedListener());
 	}
 
+	@Override
+	public Object onRetainCustomNonConfigurationInstance() {
+		computePlanetsTask.setActivity(null);
+		return computePlanetsTask;
+	}
+
 	private void fillData(int list) {
 		Cursor plCursor;
 		if (list == 1) {
-			// plCursor = planetDbHelper.fetchAllList();
 			plCursor = cr.query(PlanetsDbProvider.PLANETS_URI, projection,
 					"alt > 0.0", null, null);
 		} else {
-			// plCursor = planetDbHelper.fetchEyeList();
 			plCursor = cr.query(PlanetsDbProvider.PLANETS_URI, projection,
 					"alt > 0.0 AND mag <= 6", null, null);
 		}
@@ -141,23 +159,27 @@ public class ViewWhatsUp extends FragmentActivity implements
 	}
 
 	private class ComputePlanetsTask extends AsyncTask<Void, Void, Void> {
-		ProgressDialog dialog;
 		double[] data = null, time;
-		Calendar c;
-		ContentValues values;
+		private double offset;
+		private double[] g = new double[3];
+		private long startTime;
+		private Calendar c;
+		private ContentValues values;
+		private ViewWhatsUp activity;
+		private boolean completed = false;
+
+		public ComputePlanetsTask(ViewWhatsUp activity, double[] g, double off) {
+			this.activity = activity;
+			this.g = g;
+			this.offset = off;
+		}
 
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
-			// planetDbHelper.open();
-			done = false;
 			values = new ContentValues();
-			planetsList.setVisibility(View.INVISIBLE);
 			c = Calendar.getInstance();
 			startTime = c.getTimeInMillis();
-			// set the title of the activity with the current date and time
-			ViewWhatsUp.this.setTitle("What's up on "
-					+ DateFormat.format("MMM d @ hh:mm aa", c));
 			// convert local time to utc
 			c.add(Calendar.MINUTE, (int) (offset * -60));
 
@@ -167,34 +189,23 @@ public class ViewWhatsUp extends FragmentActivity implements
 					c.get(Calendar.SECOND));
 			if (time == null) {
 				Log.e("Position error", "utc2jd error");
-				Toast.makeText(getApplicationContext(),
-						"Date conversion error,\nplease restart the activity",
-						Toast.LENGTH_SHORT).show();
-				ViewWhatsUp.this.finish();
+				activity.finish();
 			}
 			// jdTT = time[0];
 			// jdUT = time[1];
-			dialog = ProgressDialog.show(ViewWhatsUp.this, "",
-					"Calculating planets,\nplease wait...", true);
+			calcDialog = CalcDialog.newInstance(R.string.up_dialog);
+			calcDialog.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
+			calcDialog.show(getSupportFragmentManager(), "calcDialog");
 		}
 
 		@Override
 		protected Void doInBackground(Void... params) {
 			for (int i = 0; i < 10; i++) {
-				if (this.isCancelled())
-					break;
 				values.clear();
 				data = planetUpData(time[0], time[1], i, g, 0.0, 0.0);
 				if (data == null) {
 					Log.e("Position error", "ViewWhatsUp - planetUpData error");
-					// Toast.makeText(
-					// getApplicationContext(),
-					// "Planet calculation error,\nplease restart the activity",
-					// Toast.LENGTH_SHORT).show();
-					dialog.dismiss();
-					this.cancel(false);
-					break;
-					// ViewWhatsUp.this.finish();
+					activity.finish();
 				}
 				String[] dateArr = jd2utc(data[6]).split("_");
 
@@ -207,9 +218,6 @@ public class ViewWhatsUp extends FragmentActivity implements
 						(int) (Double.parseDouble(dateArr[6]) * 1000));
 				// convert utc to local time
 				c.add(Calendar.MINUTE, (int) (offset * 60));
-
-				// (long rowID, String name, double ra, double dec,
-				// double az, double alt, double dis, long mag, long setT)
 
 				values.put("name", planetNames[i]);
 				values.put("ra", data[0]);
@@ -229,12 +237,44 @@ public class ViewWhatsUp extends FragmentActivity implements
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
-			done = true;
-			dialog.dismiss();
-			planetsList.setVisibility(View.VISIBLE);
-			fillData(1);
+			completed = true;
+			notifyActivityTaskCompleted();
 		}
 
+		private void setActivity(ViewWhatsUp activity) {
+			this.activity = activity;
+			if (completed) {
+				notifyActivityTaskCompleted();
+			}
+		}
+
+		/**
+		 * Helper method to notify the activity that this task was completed.
+		 */
+		private void notifyActivityTaskCompleted() {
+			if (null != activity) {
+				activity.onTaskCompleted(startTime);
+			}
+		}
+	}
+
+	private void onTaskCompleted(long time) {
+		Log.i(TAG, "Activity " + this
+				+ " has been notified the task is complete.");
+		// Remove the dialog if it is visible.
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		Fragment prev = getSupportFragmentManager().findFragmentByTag(
+				"calcDialog");
+		if (prev != null) {
+			ft.remove(prev);
+		}
+		ft.addToBackStack(null);
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(time);
+		viewDate.setText("What's up on "
+				+ DateFormat.format("MMM d @ hh:mm aa", cal));
+		planetsList.setVisibility(View.VISIBLE);
+		fillData(filter);
 	}
 
 	private void showPlanetData(int num) {
@@ -314,13 +354,9 @@ public class ViewWhatsUp extends FragmentActivity implements
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> arg0) {
-		// if (cursorAdapter != null)
-		// cursorAdapter.swapCursor(null);
 	}
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor data) {
-		// if (cursorAdapter != null)
-		// cursorAdapter.swapCursor(data);
 	}
 }

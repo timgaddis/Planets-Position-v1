@@ -85,7 +85,7 @@ public class LivePosition extends Activity {
 			g[1] = bundle.getDouble("Lat", 0);
 			g[0] = bundle.getDouble("Long", 0);
 			g[2] = bundle.getDouble("Elevation", 0);
-			planetNum = bundle.getInt("planet");
+			planetNum = bundle.getInt("planet", 0);
 			pNameText.setText(bundle.getString("name"));
 		}
 

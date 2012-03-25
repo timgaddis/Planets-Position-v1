@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ButtonText">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">#e5e5e5</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_margin">3dp</item>
+        <item name="android:textSize">22dp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ButtonText_progress" parent="ButtonText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">14dp</item>
+    </style>
+
+    <style name="ButtonText_small" parent="ButtonText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">20dp</item>
+    </style>
+
+    <style name="ButtonText_ecl" parent="ButtonText">
+        <item name="android:textSize">20dp</item>
+    </style>
+
+    <style name="ButtonText_medium" parent="ButtonText">
+        <item name="android:textSize">26dp</item>
+    </style>
+
+    <style name="ButtonText_large" parent="ButtonText">
+        <item name="android:textSize">32dp</item>
+    </style>
+
+    <style name="ButtonText_xlarge" parent="ButtonText">
+        <item name="android:textSize">40dp</item>
+        <item name="android:layout_margin">5dp</item>
+    </style>
+
+    <style name="ButtonText_xxlarge" parent="ButtonText">
+        <item name="android:layout_margin">5dp</item>
+        <item name="android:textSize">48dp</item>
+    </style>
+
+    <style name="ButtonText_xxxlarge" parent="ButtonText">
+        <item name="android:textSize">56dp</item>
+    </style>
+
+</resources>

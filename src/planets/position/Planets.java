@@ -28,7 +28,6 @@ import planets.position.UserLocation.LocationResult;
 import planets.position.data.PlanetsDbAdapter;
 import planets.position.data.PlanetsDbProvider;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -40,7 +39,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -49,31 +51,23 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class Planets extends FragmentActivity implements
 		LoaderManager.LoaderCallbacks<Cursor> {
 
-	private Button positionButton, whatupButton, downloadButton, manualButton,
-			liveButton, solarButton, lunarButton;
-	private Spinner planetNameSpinner;
-	private TextView locationText;
+	private Button positionButton, whatupButton, solarButton, lunarButton,
+			locationButton, realButton, titleButton;
 	private long date = 0, locDate = 0;
 	private double elevation, latitude, longitude, offset;
-	private Bundle bundle;
-	private int planetNum = 0;
-	private String planetName;
 	private Location loc;
 	private UserLocation userLocation = new UserLocation();
 	private InputStream myInput;
 	private OutputStream myOutput;
 	private boolean DEBUG = false;
+	private DialogFragment locationDialog, gpsDialog, copyDialog;
 
 	private static final int LOCATION_MANUAL = 0;
 	private static final int PLANET_LOADER = 1;
@@ -84,17 +78,15 @@ public class Planets extends FragmentActivity implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
+		setContentView(R.layout.main_linear);
 
-		planetNameSpinner = (Spinner) findViewById(R.id.planetSpin);
-		liveButton = (Button) findViewById(R.id.goButton);
+		titleButton = (Button) findViewById(R.id.titleButton);
 		positionButton = (Button) findViewById(R.id.positionButton);
-		manualButton = (Button) findViewById(R.id.manualEnterButton);
 		whatupButton = (Button) findViewById(R.id.whatupButton);
-		downloadButton = (Button) findViewById(R.id.downloadButton);
 		solarButton = (Button) findViewById(R.id.solarEclButton);
 		lunarButton = (Button) findViewById(R.id.lunarEclButton);
-		locationText = (TextView) findViewById(R.id.locationData);
+		locationButton = (Button) findViewById(R.id.locationButton);
+		realButton = (Button) findViewById(R.id.realButton);
 
 		cr = getApplicationContext().getContentResolver();
 		getSupportLoaderManager().initLoader(PLANET_LOADER, null, this);
@@ -105,24 +97,34 @@ public class Planets extends FragmentActivity implements
 		} else
 			loadLocation();
 
-		downloadButton.setOnClickListener(new View.OnClickListener() {
+		titleButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				getLocation();
+				// about description
+				Bundle b = new Bundle();
+				b.putInt("res", R.string.main_about);
+				Intent i = new Intent(Planets.this, About.class);
+				i.putExtras(b);
+				startActivity(i);
 			}
-
 		});
 
 		positionButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				// save data
-				launchPosition();
+				// Launch the Planet Position activity
+				Bundle b = new Bundle();
+				b.putDouble("Lat", latitude);
+				b.putDouble("Long", longitude);
+				b.putDouble("Elevation", elevation);
+				b.putDouble("Offset", offset);
+				Intent i = new Intent(Planets.this, Position.class);
+				i.putExtras(b);
+				startActivity(i);
 			}
-
 		});
 
-		manualButton.setOnClickListener(new View.OnClickListener() {
+		locationButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				enterLocManual();
@@ -133,15 +135,23 @@ public class Planets extends FragmentActivity implements
 		whatupButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				launchWhatsUp();
+				// Launch the What's Up Now activity
+				Bundle b = new Bundle();
+				b.putDouble("Lat", latitude);
+				b.putDouble("Long", longitude);
+				b.putDouble("Elevation", elevation);
+				b.putDouble("Offset", offset);
+				Intent i = new Intent(Planets.this, ViewWhatsUp.class);
+				i.putExtras(b);
+				startActivity(i);
 			}
 
 		});
 
-		liveButton.setOnClickListener(new View.OnClickListener() {
+		realButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				launchLivePos();
+				showPlanetDialog();
 			}
 
 		});
@@ -149,7 +159,15 @@ public class Planets extends FragmentActivity implements
 		solarButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				launchSolar();
+				// Launch the Solar Eclipse activity
+				Bundle b = new Bundle();
+				b.putDouble("Lat", latitude);
+				b.putDouble("Long", longitude);
+				b.putDouble("Elevation", elevation);
+				b.putDouble("Offset", offset);
+				Intent i = new Intent(Planets.this, SolarEclipse.class);
+				i.putExtras(b);
+				startActivity(i);
 			}
 
 		});
@@ -157,27 +175,27 @@ public class Planets extends FragmentActivity implements
 		lunarButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				launchLunar();
+				// Launch the Lunar Eclipse activity
+				Bundle b = new Bundle();
+				b.putDouble("Lat", latitude);
+				b.putDouble("Long", longitude);
+				b.putDouble("Elevation", elevation);
+				b.putDouble("Offset", offset);
+				Intent i = new Intent(Planets.this, LunarEclipse.class);
+				i.putExtras(b);
+				startActivity(i);
 			}
 
 		});
-
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-				this, R.array.planets_array,
-				android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		planetNameSpinner.setAdapter(adapter);
-
-		planetNameSpinner
-				.setOnItemSelectedListener(new PlanetNameSelectedListener());
 
 	}
 
 	/**
 	 * Gets the GPS location of the device or loads test values.
 	 */
-	private void getLocation() {
+	public void getLocation() {
 		// get lat/long from GPS
+		locationDialog.dismiss();
 		if (DEBUG) {
 			// Test data to use with the emulator
 			latitude = 32.221743;
@@ -197,78 +215,6 @@ public class Planets extends FragmentActivity implements
 	}
 
 	/**
-	 * Launch the Solar Eclipse activity.
-	 */
-	private void launchSolar() {
-		bundle = new Bundle();
-		bundle.putDouble("Lat", latitude);
-		bundle.putDouble("Long", longitude);
-		bundle.putDouble("Elevation", elevation);
-		bundle.putDouble("Offset", offset);
-		Intent i = new Intent(this, SolarEclipse.class);
-		i.putExtras(bundle);
-		startActivity(i);
-	}
-
-	/**
-	 * Launch the Lunar Eclipse activity.
-	 */
-	private void launchLunar() {
-		bundle = new Bundle();
-		bundle.putDouble("Lat", latitude);
-		bundle.putDouble("Long", longitude);
-		bundle.putDouble("Elevation", elevation);
-		bundle.putDouble("Offset", offset);
-		Intent i = new Intent(this, LunarEclipse.class);
-		i.putExtras(bundle);
-		startActivity(i);
-	}
-
-	/**
-	 * Launch the Planet Position activity.
-	 */
-	private void launchPosition() {
-		bundle = new Bundle();
-		bundle.putDouble("Lat", latitude);
-		bundle.putDouble("Long", longitude);
-		bundle.putDouble("Elevation", elevation);
-		bundle.putDouble("Offset", offset);
-		Intent i = new Intent(this, Position.class);
-		i.putExtras(bundle);
-		startActivity(i);
-	}
-
-	/**
-	 * Launch the What's Up Now activity.
-	 */
-	private void launchWhatsUp() {
-		bundle = new Bundle();
-		bundle.putDouble("Lat", latitude);
-		bundle.putDouble("Long", longitude);
-		bundle.putDouble("Elevation", elevation);
-		bundle.putDouble("Offset", offset);
-		Intent i = new Intent(this, ViewWhatsUp.class);
-		i.putExtras(bundle);
-		startActivity(i);
-	}
-
-	/**
-	 * Launch the Live Position activity.
-	 */
-	private void launchLivePos() {
-		bundle = new Bundle();
-		bundle.putDouble("Lat", latitude);
-		bundle.putDouble("Long", longitude);
-		bundle.putDouble("Elevation", elevation);
-		bundle.putDouble("Offset", offset);
-		bundle.putInt("planet", planetNum);
-		bundle.putString("name", planetName);
-		Intent i = new Intent(this, LivePosition.class);
-		i.putExtras(bundle);
-		startActivity(i);
-	}
-
-	/**
 	 * Loads the device location from the DB, or shows the location alert dialog
 	 * box.
 	 */
@@ -284,14 +230,11 @@ public class Planets extends FragmentActivity implements
 			offset = locCur.getDouble(locCur.getColumnIndexOrThrow("offset"));
 			elevation = locCur.getDouble(locCur
 					.getColumnIndexOrThrow("elevation"));
-			String data = "";
-			data += "Latitude: " + latitude;
-			data += "\nLongitude: " + longitude;
-			data += "\nElevation: " + elevation;
-			data += "\nGMT offset: " + offset;
-			locationText.setText(data);
 		} else {
-			showLocationDataAlert();
+			// showLocationDataAlert();
+			locationDialog = LocationDialog.newInstance();
+			locationDialog.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
+			locationDialog.show(getSupportFragmentManager(), "locDialog");
 		}
 	}
 
@@ -316,36 +259,6 @@ public class Planets extends FragmentActivity implements
 	}
 
 	/**
-	 * Dialog box prompting the user to download the location or manually enter
-	 * it.
-	 */
-	private void showLocationDataAlert() {
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-		alertDialogBuilder
-				.setMessage(
-						"There is no location data saved.  "
-								+ "You can either download the data or "
-								+ "manually enter the data.")
-				.setCancelable(false)
-				.setPositiveButton("Download",
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int id) {
-								getLocation();
-							}
-						});
-		alertDialogBuilder.setNeutralButton("Manual",
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int id) {
-						enterLocManual();
-					}
-				});
-		AlertDialog alert = alertDialogBuilder.create();
-		alert.show();
-	}
-
-	/**
 	 * Loads a dialog box in a separate thread for the GPS location and
 	 * processes the location when finished.
 	 * 
@@ -353,12 +266,12 @@ public class Planets extends FragmentActivity implements
 	 * 
 	 */
 	private class GetGPSTask extends AsyncTask<Void, Void, Void> {
-		ProgressDialog dialog;
 
 		@Override
 		protected void onPreExecute() {
-			dialog = ProgressDialog.show(Planets.this, "",
-					"Downloading Location.\nPlease wait...", true);
+			gpsDialog = CalcDialog.newInstance(R.string.location_dialog);
+			gpsDialog.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
+			gpsDialog.show(getSupportFragmentManager(), "gpsDialog");
 		}
 
 		@Override
@@ -384,7 +297,7 @@ public class Planets extends FragmentActivity implements
 						"Unable to download location data.\nPlease try again",
 						Toast.LENGTH_LONG).show();
 			}
-			dialog.dismiss();
+			gpsDialog.dismiss();
 		}
 	}
 
@@ -395,12 +308,12 @@ public class Planets extends FragmentActivity implements
 	 * 
 	 */
 	private class CopyFilesTask extends AsyncTask<Void, Void, Void> {
-		ProgressDialog copyDialog;
 
 		@Override
 		protected void onPreExecute() {
-			copyDialog = ProgressDialog.show(Planets.this, "",
-					"Copying files. Please wait...", true);
+			copyDialog = CalcDialog.newInstance(R.string.copy_dialog);
+			copyDialog.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
+			copyDialog.show(getSupportFragmentManager(), "copyDialog");
 		}
 
 		@Override
@@ -477,24 +390,6 @@ public class Planets extends FragmentActivity implements
 		}
 	}
 
-	/**
-	 * Planet name selection for the live position activity
-	 * 
-	 * @author tgaddis
-	 * 
-	 */
-	public class PlanetNameSelectedListener implements OnItemSelectedListener {
-		public void onItemSelected(AdapterView<?> parent, View view, int pos,
-				long id) {
-			planetNum = pos;
-			planetName = (String) planetNameSpinner.getItemAtPosition(pos);
-		}
-
-		public void onNothingSelected(AdapterView<?> parent) {
-			// Do nothing.
-		}
-	}
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -531,7 +426,16 @@ public class Planets extends FragmentActivity implements
 	/**
 	 * Launches the manual entry location activity
 	 */
-	private void enterLocManual() {
+	public void enterLocManual() {
+		// Remove the location alert dialog if it is visible.
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		Fragment prev = getSupportFragmentManager().findFragmentByTag(
+				"locDialog");
+		if (prev != null) {
+			ft.remove(prev);
+		}
+		ft.addToBackStack(null);
+		// Launch the location activity
 		Intent i = new Intent(this, NewLoc.class);
 		startActivityForResult(i, LOCATION_MANUAL);
 	}
@@ -554,6 +458,32 @@ public class Planets extends FragmentActivity implements
 			loc = location;
 		};
 	};
+
+	private void showPlanetDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.planet_prompt);
+		final ArrayAdapter<CharSequence> adapter = ArrayAdapter
+				.createFromResource(this, R.array.planets_array,
+						android.R.layout.select_dialog_item);
+		builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int item) {
+				// Launch the Live Position activity.
+				Bundle b = new Bundle();
+				b.putDouble("Lat", latitude);
+				b.putDouble("Long", longitude);
+				b.putDouble("Elevation", elevation);
+				b.putDouble("Offset", offset);
+				b.putInt("planet", item);
+				b.putString("name", (String) adapter.getItem(item));
+				Intent i = new Intent(Planets.this, LivePosition.class);
+				i.putExtras(b);
+				startActivity(i);
+			}
+		});
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
 
 	// *** Loader Manager methods ***
 	@Override

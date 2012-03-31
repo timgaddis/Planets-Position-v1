@@ -19,16 +19,17 @@ package planets.position;
 
 import java.util.Calendar;
 
-import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class LivePosition extends Activity {
+public class LivePosition extends FragmentActivity {
 
 	private TextView pRAText, pDecText, pMagText, pRiseText, pCountText, pRise;
 	private TextView pAzText, pAltText, pDistText, pDateText, pTimeText,
@@ -36,13 +37,13 @@ public class LivePosition extends Activity {
 
 	double[] g = new double[3];
 	private Calendar utc, c;
-	private String planetName;
 	private int planetNum = 0;
 	private double offset;
 	private long timeLeft;
 	private Bundle bundle;
 	private UpdatePosition updatePos;
 	private Countdown counter;
+	private DialogFragment planetDialog;
 
 	// load c library
 	static {
@@ -85,10 +86,16 @@ public class LivePosition extends Activity {
 			g[1] = bundle.getDouble("Lat", 0);
 			g[0] = bundle.getDouble("Long", 0);
 			g[2] = bundle.getDouble("Elevation", 0);
-			planetNum = bundle.getInt("planet", 0);
-			pNameText.setText(bundle.getString("name"));
 		}
 
+		planetDialog = PlanetListDialog.newInstance(R.array.planets_array, 2,
+				R.string.planet_prompt, 0);
+		planetDialog.show(getSupportFragmentManager(), "planetDialog");
+	}
+
+	public void loadPlanet(String name, int num) {
+		planetNum = num;
+		pNameText.setText(name);
 		updatePos = new UpdatePosition();
 		updatePos.execute();
 	}
@@ -264,7 +271,7 @@ public class LivePosition extends Activity {
 			// convert UTC time to local time
 			utc.add(Calendar.MINUTE, m);
 			pDateText.setText(DateFormat.format("M/dd/yyyy", utc));
-			pTimeText.setText(DateFormat.format("h:mmaa", utc));
+			pTimeText.setText(DateFormat.format("h:mm aa", utc));
 			// update the rise/set time and the count down timer
 			if (i > 60) {
 				counter.cancel();

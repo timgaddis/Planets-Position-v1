@@ -27,10 +27,8 @@ import java.util.Calendar;
 import planets.position.UserLocation.LocationResult;
 import planets.position.data.PlanetsDbAdapter;
 import planets.position.data.PlanetsDbProvider;
-import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
@@ -51,7 +49,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -151,7 +148,14 @@ public class Planets extends FragmentActivity implements
 		realButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				showPlanetDialog();
+				Bundle b = new Bundle();
+				b.putDouble("Lat", latitude);
+				b.putDouble("Long", longitude);
+				b.putDouble("Elevation", elevation);
+				b.putDouble("Offset", offset);
+				Intent i = new Intent(Planets.this, LivePosition.class);
+				i.putExtras(b);
+				startActivity(i);
 			}
 
 		});
@@ -411,7 +415,6 @@ public class Planets extends FragmentActivity implements
 			startActivity(i);
 			return true;
 		case R.id.id_menu_help:
-			// showHelpDialog();
 			b = new Bundle();
 			b.putInt("res", R.string.main_help);
 			i = new Intent(this, About.class);
@@ -458,32 +461,6 @@ public class Planets extends FragmentActivity implements
 			loc = location;
 		};
 	};
-
-	private void showPlanetDialog() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string.planet_prompt);
-		final ArrayAdapter<CharSequence> adapter = ArrayAdapter
-				.createFromResource(this, R.array.planets_array,
-						android.R.layout.select_dialog_item);
-		builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int item) {
-				// Launch the Live Position activity.
-				Bundle b = new Bundle();
-				b.putDouble("Lat", latitude);
-				b.putDouble("Long", longitude);
-				b.putDouble("Elevation", elevation);
-				b.putDouble("Offset", offset);
-				b.putInt("planet", item);
-				b.putString("name", (String) adapter.getItem(item));
-				Intent i = new Intent(Planets.this, LivePosition.class);
-				i.putExtras(b);
-				startActivity(i);
-			}
-		});
-		AlertDialog alert = builder.create();
-		alert.show();
-	}
 
 	// *** Loader Manager methods ***
 	@Override

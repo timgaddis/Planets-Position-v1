@@ -22,17 +22,15 @@ import java.util.Calendar;
 import planets.position.UserLocation.LocationResult;
 import planets.position.data.PlanetsDbAdapter;
 import planets.position.data.PlanetsDbProvider;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -51,17 +49,11 @@ public class NewLoc extends FragmentActivity implements
 	private Location loc;
 	private UserLocation userLocation = new UserLocation();
 	private double elevation = 0, latitude = 0, longitude = 0, offset = 0;
-	static final String[] timeZones = new String[] { "-12:00", "-11:00",
-			"-10:00", "-9:30", "-9:00", "-8:00", "-7:00", "-6:00", "-5:00",
-			"-4:30", "-4:00", "-3:30", "-3:00", "-2:00", "-1:00", "0:00",
-			"+1:00", "+2:00", "+3:00", "+3:30", "+4:00", "+4:30", "+5:00",
-			"+5:30", "+5:45", "+6:00", "+7:00", "+8:00", "+8:45", "+9:00",
-			"+9:30", "+10:00", "+10:30", "+11:00", "+11:30", "+12:00",
-			"+12:45", "+13:00", "+14:00" };
 	private static final int LOC_LOADER = 1;
 	private String[] projection = { PlanetsDbAdapter.KEY_ROWID, "lat", "lng",
 			"elevation", "offset" };
 	private ContentResolver cr;
+	private DialogFragment offsetDialog, gpsDialog;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -92,7 +84,9 @@ public class NewLoc extends FragmentActivity implements
 		offsetButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				showOffsetDialog();
+				offsetDialog = PlanetListDialog.newInstance(R.array.gps_array,
+						0, R.string.loc_gmt, 0);
+				offsetDialog.show(getSupportFragmentManager(), "offsetDialog");
 			}
 		});
 
@@ -102,8 +96,6 @@ public class NewLoc extends FragmentActivity implements
 				getLocation();
 			}
 		});
-
-		// offsetButton.setText(timeZones[ioffset]);
 		loadData();
 	}
 
@@ -196,26 +188,17 @@ public class NewLoc extends FragmentActivity implements
 		return 0;
 	}
 
-	private void showOffsetDialog() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("GMT Offset");
-		builder.setItems(timeZones, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int item) {
-				// ioffset = item;
-				offsetButton.setText(timeZones[item]);
-				String tz[] = timeZones[item].split(":");
-				double h = Double.parseDouble(tz[0]);
-				double m = Double.parseDouble(tz[1]);
-				m /= 60.0;
-				if (h >= 0)
-					h += m;
-				else
-					h -= m;
-				offset = h;
-			}
-		});
-		AlertDialog alert = builder.create();
-		alert.show();
+	public void loadOffset(String time) {
+		offsetButton.setText(time);
+		String tz[] = time.split(":");
+		double h = Double.parseDouble(tz[0]);
+		double m = Double.parseDouble(tz[1]);
+		m /= 60.0;
+		if (h >= 0)
+			h += m;
+		else
+			h -= m;
+		offset = h;
 	}
 
 	/**
@@ -226,12 +209,12 @@ public class NewLoc extends FragmentActivity implements
 	 * 
 	 */
 	private class GetGPSTask extends AsyncTask<Void, Void, Void> {
-		ProgressDialog dialog;
 
 		@Override
 		protected void onPreExecute() {
-			dialog = ProgressDialog.show(NewLoc.this, "",
-					"Downloading Location.\nPlease wait...", true);
+			gpsDialog = CalcDialog.newInstance(R.string.location_dialog);
+			gpsDialog.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
+			gpsDialog.show(getSupportFragmentManager(), "gpsDialog");
 		}
 
 		@Override
@@ -251,7 +234,6 @@ public class NewLoc extends FragmentActivity implements
 				elevation = loc.getAltitude();
 				date = Calendar.getInstance().getTimeInMillis();
 				offset = Calendar.getInstance().getTimeZone().getOffset(date) / 3600000.0;
-				// saveLocation();
 				newLatText.setText(String.format("%.8f", latitude));
 				newLongText.setText(String.format("%.8f", longitude));
 				newElevationText.setText(String.format("%.1f", elevation));
@@ -274,7 +256,7 @@ public class NewLoc extends FragmentActivity implements
 						"Unable to download location data.\nPlease try again",
 						Toast.LENGTH_LONG).show();
 			}
-			dialog.dismiss();
+			gpsDialog.dismiss();
 		}
 	}
 

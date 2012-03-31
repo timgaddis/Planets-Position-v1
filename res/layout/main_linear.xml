@@ -22,7 +22,7 @@
             style="@style/ButtonText"
             android:background="@drawable/btn_blue"
             android:clickable="false"
-            android:text="@string/app_name2"
+            android:text="@string/app_name"
             android:textSize="36sp" />
 
         <View

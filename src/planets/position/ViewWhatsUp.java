@@ -21,19 +21,15 @@ import java.util.Calendar;
 
 import planets.position.data.PlanetsDbAdapter;
 import planets.position.data.PlanetsDbProvider;
-import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -46,7 +42,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -63,6 +58,7 @@ public class ViewWhatsUp extends FragmentActivity implements
 	private String[] planetNames = { "Sun", "Moon", "Mercury", "Venus", "Mars",
 			"Jupiter", "Saturn", "Uranus", "Neptune", "Pluto" };
 	private Bundle bundle;
+	private boolean dialogVisible = false;
 	private final int PLANET_DATA = 0;
 	private static final int UP_LOADER = 1;
 	private static final String TAG = ViewWhatsUp.class.getSimpleName();
@@ -71,7 +67,7 @@ public class ViewWhatsUp extends FragmentActivity implements
 	private SimpleCursorAdapter cursorAdapter;
 	private ContentResolver cr;
 	private ComputePlanetsTask computePlanetsTask;
-	private DialogFragment calcDialog;
+	private DialogFragment calcDialog, filterDialog;
 
 	// load c library
 	static {
@@ -143,6 +139,7 @@ public class ViewWhatsUp extends FragmentActivity implements
 	}
 
 	private void fillData(int list) {
+		filter = list;
 		Cursor plCursor;
 		if (list == 1) {
 			plCursor = cr.query(PlanetsDbProvider.PLANETS_URI, projection,
@@ -193,9 +190,8 @@ public class ViewWhatsUp extends FragmentActivity implements
 			}
 			// jdTT = time[0];
 			// jdUT = time[1];
-			calcDialog = CalcDialog.newInstance(R.string.up_dialog);
-			calcDialog.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
-			calcDialog.show(getSupportFragmentManager(), "calcDialog");
+			activity.dialogVisible = false;
+			activity.showProgressDialog();
 		}
 
 		@Override
@@ -262,19 +258,22 @@ public class ViewWhatsUp extends FragmentActivity implements
 		Log.i(TAG, "Activity " + this
 				+ " has been notified the task is complete.");
 		// Remove the dialog if it is visible.
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		Fragment prev = getSupportFragmentManager().findFragmentByTag(
-				"calcDialog");
-		if (prev != null) {
-			ft.remove(prev);
+		if (dialogVisible) {
+			calcDialog.dismiss();
 		}
-		ft.addToBackStack(null);
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(time);
 		viewDate.setText("What's up on "
 				+ DateFormat.format("MMM d @ hh:mm aa", cal));
 		planetsList.setVisibility(View.VISIBLE);
 		fillData(filter);
+	}
+
+	private void showProgressDialog() {
+		dialogVisible = true;
+		calcDialog = CalcDialog.newInstance(R.string.up_dialog);
+		calcDialog.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
+		calcDialog.show(getSupportFragmentManager(), "calcDialog");
 	}
 
 	private void showPlanetData(int num) {
@@ -300,6 +299,12 @@ public class ViewWhatsUp extends FragmentActivity implements
 		return true;
 	}
 
+	public void loadFilter(int item) {
+		filter = item;
+		filterDialog.dismiss();
+		fillData(item);
+	}
+
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch (item.getItemId()) {
@@ -313,21 +318,9 @@ public class ViewWhatsUp extends FragmentActivity implements
 			return true;
 		case R.id.id_menu_up_filter:
 			// Filter the planets by magnitude
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle(R.string.filter_prompt);
-			final ArrayAdapter<CharSequence> adapter = ArrayAdapter
-					.createFromResource(this, R.array.filter_array,
-							android.R.layout.select_dialog_singlechoice);
-			builder.setSingleChoiceItems(adapter, filter,
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int item) {
-							fillData(item);
-							filter = item;
-							dialog.dismiss();
-						}
-					});
-			AlertDialog alert = builder.create();
-			alert.show();
+			filterDialog = PlanetListDialog.newInstance(R.array.filter_array,
+					3, R.string.filter_prompt, filter);
+			filterDialog.show(getSupportFragmentManager(), "filterDialog");
 			return true;
 		}
 		return super.onMenuItemSelected(featureId, item);
@@ -338,7 +331,7 @@ public class ViewWhatsUp extends FragmentActivity implements
 		super.onActivityResult(requestCode, resultCode, intent);
 		switch (requestCode) {
 		case PLANET_DATA:
-			fillData(1);
+			fillData(filter);
 			return;
 		}
 	}

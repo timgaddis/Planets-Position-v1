@@ -21,7 +21,6 @@ import java.util.Calendar;
 
 import planets.position.data.PlanetsDbAdapter;
 import planets.position.data.PlanetsDbProvider;
-import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -29,6 +28,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -58,6 +58,7 @@ public class SolarEclipse extends FragmentActivity implements
 			"eclipseType", "local" };
 	private SimpleCursorAdapter cursorAdapter;
 	private ContentResolver cr;
+	private DialogFragment eclipseDialog;
 
 	// load c library
 	static {
@@ -119,7 +120,6 @@ public class SolarEclipse extends FragmentActivity implements
 		prevEclButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				// direction = 1.0;
 				new ComputeEclipsesTask().execute(firstEcl, 1.0);
 			}
 		});
@@ -127,7 +127,6 @@ public class SolarEclipse extends FragmentActivity implements
 		nextEclButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				// direction = 0.0;
 				new ComputeEclipsesTask().execute(lastEcl, 0.0);
 			}
 		});
@@ -169,23 +168,17 @@ public class SolarEclipse extends FragmentActivity implements
 	 * 
 	 */
 	private class ComputeEclipsesTask extends AsyncTask<Double, Void, Void> {
-		ProgressDialog dialog;
 		String eclDate, eclType;
 		ContentValues values;
-
-		@Override
-		protected void onCancelled() {
-			super.onCancelled();
-
-		}
 
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
 			values = new ContentValues();
 			eclipseList.setVisibility(View.INVISIBLE);
-			dialog = ProgressDialog.show(SolarEclipse.this, "",
-					"Calculating eclipses,\nplease wait...", true);
+			eclipseDialog = CalcDialog.newInstance(R.string.eclipse_dialog);
+			eclipseDialog.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
+			eclipseDialog.show(getSupportFragmentManager(), "eclipseDialog");
 		}
 
 		@Override
@@ -347,7 +340,7 @@ public class SolarEclipse extends FragmentActivity implements
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
-			dialog.dismiss();
+			eclipseDialog.dismiss();
 			eclipseList.setVisibility(View.VISIBLE);
 			fillData();
 		}

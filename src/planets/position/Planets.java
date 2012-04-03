@@ -57,7 +57,7 @@ public class Planets extends FragmentActivity implements
 
 	private Button positionButton, whatupButton, solarButton, lunarButton,
 			locationButton, realButton, titleButton;
-	private long date = 0, locDate = 0;
+	private long date = 0;
 	private double elevation, latitude, longitude, offset;
 	private Location loc;
 	private UserLocation userLocation = new UserLocation();
@@ -65,6 +65,8 @@ public class Planets extends FragmentActivity implements
 	private OutputStream myOutput;
 	private boolean DEBUG = false;
 	private DialogFragment locationDialog, gpsDialog, copyDialog;
+	private GetGPSTask gpsTask = new GetGPSTask();
+	private CopyFilesTask copyFilesTask = new CopyFilesTask();
 
 	private static final int LOCATION_MANUAL = 0;
 	private static final int PLANET_LOADER = 1;
@@ -90,7 +92,7 @@ public class Planets extends FragmentActivity implements
 
 		if (!(checkFiles("semo_18.se1") && checkFiles("sepl_18.se1"))) {
 			// copy files thread
-			new CopyFilesTask().execute();
+			copyFilesTask.execute();
 		} else
 			loadLocation();
 
@@ -110,14 +112,18 @@ public class Planets extends FragmentActivity implements
 			@Override
 			public void onClick(View view) {
 				// Launch the Planet Position activity
-				Bundle b = new Bundle();
-				b.putDouble("Lat", latitude);
-				b.putDouble("Long", longitude);
-				b.putDouble("Elevation", elevation);
-				b.putDouble("Offset", offset);
-				Intent i = new Intent(Planets.this, Position.class);
-				i.putExtras(b);
-				startActivity(i);
+				if (checkLocation()) {
+					Bundle b = new Bundle();
+					b.putDouble("Lat", latitude);
+					b.putDouble("Long", longitude);
+					b.putDouble("Elevation", elevation);
+					b.putDouble("Offset", offset);
+					Intent i = new Intent(Planets.this, Position.class);
+					i.putExtras(b);
+					startActivity(i);
+				} else {
+					loadLocation();
+				}
 			}
 		});
 
@@ -133,14 +139,17 @@ public class Planets extends FragmentActivity implements
 			@Override
 			public void onClick(View view) {
 				// Launch the What's Up Now activity
-				Bundle b = new Bundle();
-				b.putDouble("Lat", latitude);
-				b.putDouble("Long", longitude);
-				b.putDouble("Elevation", elevation);
-				b.putDouble("Offset", offset);
-				Intent i = new Intent(Planets.this, ViewWhatsUp.class);
-				i.putExtras(b);
-				startActivity(i);
+				if (checkLocation()) {
+					Bundle b = new Bundle();
+					b.putDouble("Lat", latitude);
+					b.putDouble("Long", longitude);
+					b.putDouble("Elevation", elevation);
+					b.putDouble("Offset", offset);
+					Intent i = new Intent(Planets.this, ViewWhatsUp.class);
+					i.putExtras(b);
+					startActivity(i);
+				} else
+					loadLocation();
 			}
 
 		});
@@ -148,14 +157,18 @@ public class Planets extends FragmentActivity implements
 		realButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Bundle b = new Bundle();
-				b.putDouble("Lat", latitude);
-				b.putDouble("Long", longitude);
-				b.putDouble("Elevation", elevation);
-				b.putDouble("Offset", offset);
-				Intent i = new Intent(Planets.this, LivePosition.class);
-				i.putExtras(b);
-				startActivity(i);
+				if (checkLocation()) {
+					Bundle b = new Bundle();
+					b.putDouble("Lat", latitude);
+					b.putDouble("Long", longitude);
+					b.putDouble("Elevation", elevation);
+					b.putDouble("Offset", offset);
+					Intent i = new Intent(Planets.this, LivePosition.class);
+					i.putExtras(b);
+					startActivity(i);
+				} else {
+					loadLocation();
+				}
 			}
 
 		});
@@ -164,14 +177,18 @@ public class Planets extends FragmentActivity implements
 			@Override
 			public void onClick(View view) {
 				// Launch the Solar Eclipse activity
-				Bundle b = new Bundle();
-				b.putDouble("Lat", latitude);
-				b.putDouble("Long", longitude);
-				b.putDouble("Elevation", elevation);
-				b.putDouble("Offset", offset);
-				Intent i = new Intent(Planets.this, SolarEclipse.class);
-				i.putExtras(b);
-				startActivity(i);
+				if (checkLocation()) {
+					Bundle b = new Bundle();
+					b.putDouble("Lat", latitude);
+					b.putDouble("Long", longitude);
+					b.putDouble("Elevation", elevation);
+					b.putDouble("Offset", offset);
+					Intent i = new Intent(Planets.this, SolarEclipse.class);
+					i.putExtras(b);
+					startActivity(i);
+				} else {
+					loadLocation();
+				}
 			}
 
 		});
@@ -180,18 +197,29 @@ public class Planets extends FragmentActivity implements
 			@Override
 			public void onClick(View view) {
 				// Launch the Lunar Eclipse activity
-				Bundle b = new Bundle();
-				b.putDouble("Lat", latitude);
-				b.putDouble("Long", longitude);
-				b.putDouble("Elevation", elevation);
-				b.putDouble("Offset", offset);
-				Intent i = new Intent(Planets.this, LunarEclipse.class);
-				i.putExtras(b);
-				startActivity(i);
+				if (checkLocation()) {
+					Bundle b = new Bundle();
+					b.putDouble("Lat", latitude);
+					b.putDouble("Long", longitude);
+					b.putDouble("Elevation", elevation);
+					b.putDouble("Offset", offset);
+					Intent i = new Intent(Planets.this, LunarEclipse.class);
+					i.putExtras(b);
+					startActivity(i);
+				} else {
+					loadLocation();
+				}
 			}
 
 		});
 
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		copyFilesTask.cancel(false);
+		gpsTask.cancel(true);
 	}
 
 	/**
@@ -210,7 +238,7 @@ public class Planets extends FragmentActivity implements
 			saveLocation();
 		} else {
 			loc = null;
-			new GetGPSTask().execute();
+			gpsTask.execute();
 			boolean result = userLocation.getLocation(this, locationResult);
 			if (!result) {
 				loc = new Location(LocationManager.PASSIVE_PROVIDER);
@@ -219,16 +247,30 @@ public class Planets extends FragmentActivity implements
 	}
 
 	/**
-	 * Loads the device location from the DB, or shows the location alert dialog
-	 * box.
+	 * Checks to see if there is a location saved in the DB.
+	 * 
+	 * @return boolean true if location saved.
 	 */
-	private void loadLocation() {
+	private boolean checkLocation() {
+		long locDate;
 		Cursor locCur = cr.query(
 				Uri.withAppendedPath(PlanetsDbProvider.LOCATION_URI,
 						String.valueOf(0)), projection, null, null, null);
 		locCur.moveToFirst();
 		locDate = locCur.getLong(locCur.getColumnIndexOrThrow("date"));
-		if (locDate > 0) {
+		return (locDate > 0);
+	}
+
+	/**
+	 * Loads the device location from the DB, or shows the location alert dialog
+	 * box.
+	 */
+	private void loadLocation() {
+		if (checkLocation()) {
+			Cursor locCur = cr.query(
+					Uri.withAppendedPath(PlanetsDbProvider.LOCATION_URI,
+							String.valueOf(0)), projection, null, null, null);
+			locCur.moveToFirst();
 			latitude = locCur.getDouble(locCur.getColumnIndexOrThrow("lat"));
 			longitude = locCur.getDouble(locCur.getColumnIndexOrThrow("lng"));
 			offset = locCur.getDouble(locCur.getColumnIndexOrThrow("offset"));
@@ -238,7 +280,7 @@ public class Planets extends FragmentActivity implements
 			// showLocationDataAlert();
 			locationDialog = LocationDialog.newInstance();
 			locationDialog.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
-			locationDialog.show(getSupportFragmentManager(), "locDialog");
+			locationDialog.show(getSupportFragmentManager(), "locDialogMain");
 		}
 	}
 
@@ -275,13 +317,13 @@ public class Planets extends FragmentActivity implements
 		protected void onPreExecute() {
 			gpsDialog = CalcDialog.newInstance(R.string.location_dialog);
 			gpsDialog.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
-			gpsDialog.show(getSupportFragmentManager(), "gpsDialog");
+			gpsDialog.show(getSupportFragmentManager(), "gpsDialogMain");
 		}
 
 		@Override
 		protected Void doInBackground(Void... params) {
 			while (true) {
-				if (loc != null)
+				if (loc != null || this.isCancelled())
 					break;
 			}
 			return null;
@@ -301,7 +343,16 @@ public class Planets extends FragmentActivity implements
 						"Unable to download location data.\nPlease try again",
 						Toast.LENGTH_LONG).show();
 			}
-			gpsDialog.dismiss();
+			// gpsDialog.dismiss();
+			FragmentTransaction ft = getSupportFragmentManager()
+					.beginTransaction();
+			Fragment prev = getSupportFragmentManager().findFragmentByTag(
+					"gpsDialogMain");
+			if (prev != null) {
+				ft.remove(prev);
+			}
+			// ft.addToBackStack(null);
+			ft.commit();
 		}
 	}
 
@@ -317,7 +368,7 @@ public class Planets extends FragmentActivity implements
 		protected void onPreExecute() {
 			copyDialog = CalcDialog.newInstance(R.string.copy_dialog);
 			copyDialog.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
-			copyDialog.show(getSupportFragmentManager(), "copyDialog");
+			copyDialog.show(getSupportFragmentManager(), "copyDialogMain");
 		}
 
 		@Override
@@ -338,7 +389,15 @@ public class Planets extends FragmentActivity implements
 
 		@Override
 		protected void onPostExecute(Void result) {
-			copyDialog.dismiss();
+			// copyDialog.dismiss();
+			FragmentTransaction ft = getSupportFragmentManager()
+					.beginTransaction();
+			Fragment prev = getSupportFragmentManager().findFragmentByTag(
+					"copyDialogMain");
+			if (prev != null) {
+				ft.remove(prev);
+			}
+			ft.commit();
 			loadLocation();
 		}
 
@@ -433,14 +492,14 @@ public class Planets extends FragmentActivity implements
 		// Remove the location alert dialog if it is visible.
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		Fragment prev = getSupportFragmentManager().findFragmentByTag(
-				"locDialog");
+				"locDialogMain");
 		if (prev != null) {
 			ft.remove(prev);
 		}
-		ft.addToBackStack(null);
+		ft.commit();
 		// Launch the location activity
 		Intent i = new Intent(this, NewLoc.class);
-		startActivityForResult(i, LOCATION_MANUAL);
+		startActivity(i);
 	}
 
 	@Override

@@ -29,7 +29,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -58,7 +60,6 @@ public class ViewWhatsUp extends FragmentActivity implements
 	private String[] planetNames = { "Sun", "Moon", "Mercury", "Venus", "Mars",
 			"Jupiter", "Saturn", "Uranus", "Neptune", "Pluto" };
 	private Bundle bundle;
-	private boolean dialogVisible = false;
 	private final int PLANET_DATA = 0;
 	private static final int UP_LOADER = 1;
 	private static final String TAG = ViewWhatsUp.class.getSimpleName();
@@ -138,6 +139,12 @@ public class ViewWhatsUp extends FragmentActivity implements
 		return computePlanetsTask;
 	}
 
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		computePlanetsTask.cancel(true);
+	}
+
 	private void fillData(int list) {
 		filter = list;
 		Cursor plCursor;
@@ -190,13 +197,14 @@ public class ViewWhatsUp extends FragmentActivity implements
 			}
 			// jdTT = time[0];
 			// jdUT = time[1];
-			activity.dialogVisible = false;
 			activity.showProgressDialog();
 		}
 
 		@Override
 		protected Void doInBackground(Void... params) {
 			for (int i = 0; i < 10; i++) {
+				if (this.isCancelled())
+					break;
 				values.clear();
 				data = planetUpData(time[0], time[1], i, g, 0.0, 0.0);
 				if (data == null) {
@@ -258,9 +266,13 @@ public class ViewWhatsUp extends FragmentActivity implements
 		Log.i(TAG, "Activity " + this
 				+ " has been notified the task is complete.");
 		// Remove the dialog if it is visible.
-		if (dialogVisible) {
-			calcDialog.dismiss();
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		Fragment prev = getSupportFragmentManager().findFragmentByTag(
+				"calcDialogView");
+		if (prev != null) {
+			ft.remove(prev);
 		}
+		ft.commitAllowingStateLoss();
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(time);
 		viewDate.setText("What's up on "
@@ -270,10 +282,9 @@ public class ViewWhatsUp extends FragmentActivity implements
 	}
 
 	private void showProgressDialog() {
-		dialogVisible = true;
 		calcDialog = CalcDialog.newInstance(R.string.up_dialog);
 		calcDialog.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
-		calcDialog.show(getSupportFragmentManager(), "calcDialog");
+		calcDialog.show(getSupportFragmentManager(), "calcDialogView");
 	}
 
 	private void showPlanetData(int num) {

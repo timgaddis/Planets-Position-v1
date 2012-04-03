@@ -31,7 +31,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -148,24 +150,43 @@ public class NewLoc extends FragmentActivity implements
 
 	private int saveLocation() {
 		ContentValues values = new ContentValues();
-		if (!newLatText.getText().toString().equals(""))
-			latitude = Double.parseDouble(newLatText.getText().toString());
-		else {
+		if (!newLatText.getText().toString().equals("")) {
+			try {
+				latitude = Double.parseDouble(newLatText.getText().toString());
+			} catch (NumberFormatException ex) {
+				Toast.makeText(NewLoc.this, "Enter a number for the latitude",
+						Toast.LENGTH_LONG).show();
+				return 1;
+			}
+		} else {
 			Toast.makeText(NewLoc.this, "Enter a value for the latitude",
 					Toast.LENGTH_LONG).show();
 			return 1;
 		}
-		if (!newLongText.getText().toString().equals(""))
-			longitude = Double.parseDouble(newLongText.getText().toString());
-		else {
+		if (!newLongText.getText().toString().equals("")) {
+			try {
+				longitude = Double
+						.parseDouble(newLongText.getText().toString());
+			} catch (NumberFormatException ex) {
+				Toast.makeText(NewLoc.this, "Enter a number for the longitude",
+						Toast.LENGTH_LONG).show();
+				return 1;
+			}
+		} else {
 			Toast.makeText(NewLoc.this, "Enter a value for the longitude",
 					Toast.LENGTH_LONG).show();
 			return 1;
 		}
-		if (!newElevationText.getText().toString().equals(""))
-			elevation = Double.parseDouble(newElevationText.getText()
-					.toString());
-		else {
+		if (!newElevationText.getText().toString().equals("")) {
+			try {
+				elevation = Double.parseDouble(newElevationText.getText()
+						.toString());
+			} catch (NumberFormatException ex) {
+				Toast.makeText(NewLoc.this, "Enter a number for the elevation",
+						Toast.LENGTH_LONG).show();
+				return 1;
+			}
+		} else {
 			Toast.makeText(NewLoc.this, "Enter a value for the elevation",
 					Toast.LENGTH_LONG).show();
 			return 1;
@@ -256,7 +277,15 @@ public class NewLoc extends FragmentActivity implements
 						"Unable to download location data.\nPlease try again",
 						Toast.LENGTH_LONG).show();
 			}
-			gpsDialog.dismiss();
+			// gpsDialog.dismiss();
+			FragmentTransaction ft = getSupportFragmentManager()
+					.beginTransaction();
+			Fragment prev = getSupportFragmentManager().findFragmentByTag(
+					"gpsDialog");
+			if (prev != null) {
+				ft.remove(prev);
+			}
+			ft.addToBackStack(null);
 		}
 	}
 

@@ -29,7 +29,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -59,6 +61,7 @@ public class LunarEclipse extends FragmentActivity implements
 	private SimpleCursorAdapter cursorAdapter;
 	private ContentResolver cr;
 	private DialogFragment eclipseDialog;
+	private ComputeEclipsesTask computeEclipses = new ComputeEclipsesTask();
 
 	// load c library
 	static {
@@ -113,24 +116,30 @@ public class LunarEclipse extends FragmentActivity implements
 		// jdTT = time[0];
 		// jdUT = time[1];
 
-		new ComputeEclipsesTask().execute(time[1], 0.0);
+		computeEclipses.execute(time[1], 0.0);
 
 		prevEclButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				new ComputeEclipsesTask().execute(firstEcl, 1.0);
+				computeEclipses.execute(firstEcl, 1.0);
 			}
 		});
 
 		nextEclButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				new ComputeEclipsesTask().execute(lastEcl, 0.0);
+				computeEclipses.execute(lastEcl, 0.0);
 			}
 		});
 
 		eclipseList.setOnItemClickListener(new EclipseSelectedListener());
 
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		computeEclipses.cancel(true);
 	}
 
 	private void fillData() {
@@ -177,7 +186,8 @@ public class LunarEclipse extends FragmentActivity implements
 			eclipseList.setVisibility(View.INVISIBLE);
 			eclipseDialog = CalcDialog.newInstance(R.string.eclipse_dialog);
 			eclipseDialog.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
-			eclipseDialog.show(getSupportFragmentManager(), "eclipseDialog");
+			eclipseDialog.show(getSupportFragmentManager(),
+					"eclipseDialogLunar");
 		}
 
 		@Override
@@ -192,6 +202,8 @@ public class LunarEclipse extends FragmentActivity implements
 			start = params[0];
 
 			for (i = 0; i < 8; i++) {
+				if (this.isCancelled())
+					break;
 				values.clear();
 				data1 = lunarDataGlobal(start, g, backward);
 				if (data1 == null) {
@@ -311,7 +323,15 @@ public class LunarEclipse extends FragmentActivity implements
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
-			eclipseDialog.dismiss();
+			// eclipseDialog.dismiss();
+			FragmentTransaction ft = getSupportFragmentManager()
+					.beginTransaction();
+			Fragment prev = getSupportFragmentManager().findFragmentByTag(
+					"eclipseDialogLunar");
+			if (prev != null) {
+				ft.remove(prev);
+			}
+			ft.commit();
 			eclipseList.setVisibility(View.VISIBLE);
 			fillData();
 		}

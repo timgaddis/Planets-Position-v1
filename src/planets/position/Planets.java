@@ -65,10 +65,9 @@ public class Planets extends FragmentActivity implements
 	private OutputStream myOutput;
 	private boolean DEBUG = false;
 	private DialogFragment locationDialog, gpsDialog, copyDialog;
-	private GetGPSTask gpsTask = new GetGPSTask();
-	private CopyFilesTask copyFilesTask = new CopyFilesTask();
+	private GetGPSTask gpsTask;
+	private CopyFilesTask copyFilesTask;
 
-	private static final int LOCATION_MANUAL = 0;
 	private static final int PLANET_LOADER = 1;
 	private String[] projection = { PlanetsDbAdapter.KEY_ROWID, "date", "lat",
 			"lng", "elevation", "offset" };
@@ -92,6 +91,7 @@ public class Planets extends FragmentActivity implements
 
 		if (!(checkFiles("semo_18.se1") && checkFiles("sepl_18.se1"))) {
 			// copy files thread
+			copyFilesTask = new CopyFilesTask();
 			copyFilesTask.execute();
 		} else
 			loadLocation();
@@ -218,16 +218,25 @@ public class Planets extends FragmentActivity implements
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		copyFilesTask.cancel(false);
-		gpsTask.cancel(true);
+		if (copyFilesTask != null)
+			copyFilesTask.cancel(false);
+		if (gpsTask != null)
+			gpsTask.cancel(true);
 	}
 
 	/**
 	 * Gets the GPS location of the device or loads test values.
 	 */
 	public void getLocation() {
+		// Remove the location alert dialog if it is visible.
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		Fragment prev = getSupportFragmentManager().findFragmentByTag(
+				"locDialogMain");
+		if (prev != null) {
+			ft.remove(prev);
+		}
+		ft.commit();
 		// get lat/long from GPS
-		locationDialog.dismiss();
 		if (DEBUG) {
 			// Test data to use with the emulator
 			latitude = 32.221743;
@@ -238,6 +247,7 @@ public class Planets extends FragmentActivity implements
 			saveLocation();
 		} else {
 			loc = null;
+			gpsTask = new GetGPSTask();
 			gpsTask.execute();
 			boolean result = userLocation.getLocation(this, locationResult);
 			if (!result) {
@@ -351,7 +361,6 @@ public class Planets extends FragmentActivity implements
 			if (prev != null) {
 				ft.remove(prev);
 			}
-			// ft.addToBackStack(null);
 			ft.commit();
 		}
 	}
@@ -500,17 +509,6 @@ public class Planets extends FragmentActivity implements
 		// Launch the location activity
 		Intent i = new Intent(this, NewLoc.class);
 		startActivity(i);
-	}
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode,
-			Intent intent) {
-		super.onActivityResult(requestCode, resultCode, intent);
-		switch (requestCode) {
-		case LOCATION_MANUAL:
-			loadLocation();
-			return;
-		}
 	}
 
 	public LocationResult locationResult = new LocationResult() {

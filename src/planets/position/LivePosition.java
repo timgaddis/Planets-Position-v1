@@ -106,7 +106,8 @@ public class LivePosition extends FragmentActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		counter.cancel();
-		updatePos.cancel(true);
+		if (updatePos != null)
+			updatePos.cancel(true);
 	}
 
 	private void resetTimer() {

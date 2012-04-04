@@ -142,7 +142,8 @@ public class ViewWhatsUp extends FragmentActivity implements
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		computePlanetsTask.cancel(true);
+		if (computePlanetsTask != null)
+			computePlanetsTask.cancel(true);
 	}
 
 	private void fillData(int list) {

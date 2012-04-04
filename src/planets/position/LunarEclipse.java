@@ -61,7 +61,7 @@ public class LunarEclipse extends FragmentActivity implements
 	private SimpleCursorAdapter cursorAdapter;
 	private ContentResolver cr;
 	private DialogFragment eclipseDialog;
-	private ComputeEclipsesTask computeEclipses = new ComputeEclipsesTask();
+	private ComputeEclipsesTask computeEclipses;
 
 	// load c library
 	static {
@@ -116,11 +116,13 @@ public class LunarEclipse extends FragmentActivity implements
 		// jdTT = time[0];
 		// jdUT = time[1];
 
+		computeEclipses = new ComputeEclipsesTask();
 		computeEclipses.execute(time[1], 0.0);
 
 		prevEclButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				computeEclipses = new ComputeEclipsesTask();
 				computeEclipses.execute(firstEcl, 1.0);
 			}
 		});
@@ -128,6 +130,7 @@ public class LunarEclipse extends FragmentActivity implements
 		nextEclButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				computeEclipses = new ComputeEclipsesTask();
 				computeEclipses.execute(lastEcl, 0.0);
 			}
 		});
@@ -139,7 +142,8 @@ public class LunarEclipse extends FragmentActivity implements
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		computeEclipses.cancel(true);
+		if (computeEclipses != null)
+			computeEclipses.cancel(true);
 	}
 
 	private void fillData() {

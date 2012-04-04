@@ -56,6 +56,7 @@ public class NewLoc extends FragmentActivity implements
 			"elevation", "offset" };
 	private ContentResolver cr;
 	private DialogFragment offsetDialog, gpsDialog;
+	private GetGPSTask gpsTask;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -101,13 +102,21 @@ public class NewLoc extends FragmentActivity implements
 		loadData();
 	}
 
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if (gpsTask != null)
+			gpsTask.cancel(true);
+	}
+
 	/**
 	 * Gets the GPS location of the device or loads test values.
 	 */
 	private void getLocation() {
 		// get lat/long from GPS
 		loc = null;
-		new GetGPSTask().execute();
+		gpsTask = new GetGPSTask();
+		gpsTask.execute();
 		boolean result = userLocation.getLocation(this, locationResult);
 		if (!result) {
 			loc = new Location(LocationManager.PASSIVE_PROVIDER);
@@ -235,13 +244,13 @@ public class NewLoc extends FragmentActivity implements
 		protected void onPreExecute() {
 			gpsDialog = CalcDialog.newInstance(R.string.location_dialog);
 			gpsDialog.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
-			gpsDialog.show(getSupportFragmentManager(), "gpsDialog");
+			gpsDialog.show(getSupportFragmentManager(), "gpsDialogLoc");
 		}
 
 		@Override
 		protected Void doInBackground(Void... params) {
 			while (true) {
-				if (loc != null)
+				if (loc != null || this.isCancelled())
 					break;
 			}
 			return null;
@@ -281,11 +290,11 @@ public class NewLoc extends FragmentActivity implements
 			FragmentTransaction ft = getSupportFragmentManager()
 					.beginTransaction();
 			Fragment prev = getSupportFragmentManager().findFragmentByTag(
-					"gpsDialog");
+					"gpsDialogLoc");
 			if (prev != null) {
 				ft.remove(prev);
 			}
-			ft.addToBackStack(null);
+			ft.commit();
 		}
 	}
 

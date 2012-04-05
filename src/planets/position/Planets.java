@@ -64,7 +64,7 @@ public class Planets extends FragmentActivity implements
 	private InputStream myInput;
 	private OutputStream myOutput;
 	private boolean DEBUG = false;
-	private DialogFragment locationDialog, gpsDialog, copyDialog;
+	private DialogFragment locationDialog, gpsDialog, copyDialog, planetDialog;
 	private GetGPSTask gpsTask;
 	private CopyFilesTask copyFilesTask;
 
@@ -113,14 +113,11 @@ public class Planets extends FragmentActivity implements
 			public void onClick(View view) {
 				// Launch the Planet Position activity
 				if (checkLocation()) {
-					Bundle b = new Bundle();
-					b.putDouble("Lat", latitude);
-					b.putDouble("Long", longitude);
-					b.putDouble("Elevation", elevation);
-					b.putDouble("Offset", offset);
-					Intent i = new Intent(Planets.this, Position.class);
-					i.putExtras(b);
-					startActivity(i);
+					planetDialog = PlanetListDialog
+							.newInstance(R.array.planets_array, 1,
+									R.string.planet_prompt, 0);
+					planetDialog.show(getSupportFragmentManager(),
+							"planetDialog");
 				} else {
 					loadLocation();
 				}
@@ -157,15 +154,13 @@ public class Planets extends FragmentActivity implements
 		realButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				// Launch Real Time Position activity
 				if (checkLocation()) {
-					Bundle b = new Bundle();
-					b.putDouble("Lat", latitude);
-					b.putDouble("Long", longitude);
-					b.putDouble("Elevation", elevation);
-					b.putDouble("Offset", offset);
-					Intent i = new Intent(Planets.this, LivePosition.class);
-					i.putExtras(b);
-					startActivity(i);
+					planetDialog = PlanetListDialog
+							.newInstance(R.array.planets_array, 2,
+									R.string.planet_prompt, 0);
+					planetDialog.show(getSupportFragmentManager(),
+							"planetDialog");
 				} else {
 					loadLocation();
 				}
@@ -222,6 +217,29 @@ public class Planets extends FragmentActivity implements
 			copyFilesTask.cancel(false);
 		if (gpsTask != null)
 			gpsTask.cancel(true);
+	}
+
+	public void loadPlanets(String name, int num, int x) {
+
+		Bundle b = new Bundle();
+		b.putDouble("Lat", latitude);
+		b.putDouble("Long", longitude);
+		b.putDouble("Elevation", elevation);
+		b.putDouble("Offset", offset);
+		b.putInt("num", num);
+		b.putString("name", name);
+
+		if (x == 1) {
+			// Sky Position
+			Intent i = new Intent(getApplicationContext(), Position.class);
+			i.putExtras(b);
+			startActivity(i);
+		} else {
+			// Real Time Position
+			Intent i = new Intent(getApplicationContext(), LivePosition.class);
+			i.putExtras(b);
+			startActivity(i);
+		}
 	}
 
 	/**

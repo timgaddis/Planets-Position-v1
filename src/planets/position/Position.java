@@ -86,6 +86,8 @@ public class Position extends FragmentActivity {
 			g[1] = bundle.getDouble("Lat", 0);
 			g[0] = bundle.getDouble("Long", 0);
 			g[2] = bundle.getDouble("Elevation", 0);
+			planetNum = bundle.getInt("num", -1);
+			planetName = bundle.getString("name");
 		}
 
 		// get the current date, time
@@ -98,7 +100,6 @@ public class Position extends FragmentActivity {
 
 		// display the current date (this method is below)
 		updateDisplay();
-		showPlanetDialog();
 
 		dateButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -113,7 +114,9 @@ public class Position extends FragmentActivity {
 		nameButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				showPlanetDialog();
+				planetDialog = PlanetListDialog.newInstance(
+						R.array.planets_array, 4, R.string.planet_prompt, 0);
+				planetDialog.show(getSupportFragmentManager(), "planetDialog");
 			}
 		});
 
@@ -126,8 +129,6 @@ public class Position extends FragmentActivity {
 				dateTimeDialog.show(getSupportFragmentManager(), "dtDialog");
 			}
 		});
-
-		computeLocation();
 	}
 
 	private void computeLocation() {
@@ -240,12 +241,6 @@ public class Position extends FragmentActivity {
 		planetNum = num;
 		planetName = name;
 		computeLocation();
-	}
-
-	private void showPlanetDialog() {
-		planetDialog = PlanetListDialog.newInstance(R.array.planets_array, 1,
-				R.string.planet_prompt, 0);
-		planetDialog.show(getSupportFragmentManager(), "planetDialog");
 	}
 
 	public void loadTime(int hourOfDay, int minute) {

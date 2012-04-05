@@ -73,18 +73,25 @@ public class PlanetListDialog extends DialogFragment {
 										.loadOffset(gpsArray[item]);
 								break;
 							case 1:
-								// sky position
-								String[] planetArray = res
+								// sky position in Planets
+								String[] planetArray1 = res
+										.getStringArray(R.array.planets_array);
+								((Planets) getActivity()).loadPlanets(
+										planetArray1[item], item, 1);
+								break;
+							case 4:
+								// sky position in Position
+								String[] planetArray2 = res
 										.getStringArray(R.array.planets_array);
 								((Position) getActivity()).loadPlanet(
-										planetArray[item], item);
+										planetArray2[item], item);
 								break;
 							case 2:
-								// live position
+								// real time position
 								String[] planetLiveArray = res
 										.getStringArray(R.array.planets_array);
-								((LivePosition) getActivity()).loadPlanet(
-										planetLiveArray[item], item);
+								((Planets) getActivity()).loadPlanets(
+										planetLiveArray[item], item, 2);
 								break;
 							}
 						}

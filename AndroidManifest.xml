@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="planets.position"
     android:installLocation="auto"
-    android:versionCode="16"
-    android:versionName="1.5.2" >
+    android:versionCode="17"
+    android:versionName="1.5.3" >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />

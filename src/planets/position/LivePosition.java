@@ -86,16 +86,9 @@ public class LivePosition extends FragmentActivity {
 			g[1] = bundle.getDouble("Lat", 0);
 			g[0] = bundle.getDouble("Long", 0);
 			g[2] = bundle.getDouble("Elevation", 0);
+			planetNum = bundle.getInt("num", -1);
+			pNameText.setText(bundle.getString("name"));
 		}
-
-		planetDialog = PlanetListDialog.newInstance(R.array.planets_array, 2,
-				R.string.planet_prompt, 0);
-		planetDialog.show(getSupportFragmentManager(), "planetDialog");
-	}
-
-	public void loadPlanet(String name, int num) {
-		planetNum = num;
-		pNameText.setText(name);
 		updatePos = new UpdatePosition();
 		updatePos.execute();
 	}
@@ -105,7 +98,8 @@ public class LivePosition extends FragmentActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		counter.cancel();
+		if (counter != null)
+			counter.cancel();
 		if (updatePos != null)
 			updatePos.cancel(true);
 	}

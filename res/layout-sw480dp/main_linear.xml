@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView1"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp" >
+
+        <View
+            android:id="@+id/view0"
+            android:layout_width="wrap_content"
+            android:layout_height="15dp" />
+
+        <Button
+            android:id="@+id/titleButton"
+            style="@style/ButtonText"
+            android:background="@drawable/btn_blue"
+            android:clickable="false"
+            android:text="@string/app_name"
+            android:textSize="46sp" />
+
+        <View
+            android:id="@+id/view1"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/positionButton"
+                style="@style/ButtonText_large"
+                android:layout_weight=".5"
+                android:background="@drawable/btn_blue"
+                android:text="@string/pos_button" >
+            </Button>
+
+            <Button
+                android:id="@+id/whatupButton"
+                style="@style/ButtonText_large"
+                android:layout_weight=".5"
+                android:background="@drawable/btn_blue"
+                android:text="@string/up_button" >
+            </Button>
+        </LinearLayout>
+
+        <View
+            android:id="@+id/view5"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/solarEclButton"
+                style="@style/ButtonText_large"
+                android:layout_weight=".5"
+                android:background="@drawable/btn_blue"
+                android:text="@string/solar_button" >
+            </Button>
+
+            <Button
+                android:id="@+id/lunarEclButton"
+                style="@style/ButtonText_large"
+                android:layout_weight=".5"
+                android:background="@drawable/btn_blue"
+                android:text="@string/lunar_button" >
+            </Button>
+        </LinearLayout>
+
+        <View
+            android:id="@+id/view9"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout3"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/realButton"
+                style="@style/ButtonText_large"
+                android:layout_weight=".5"
+                android:background="@drawable/btn_blue"
+                android:text="@string/real_button" >
+            </Button>
+
+            <Button
+                android:id="@+id/locationButton"
+                style="@style/ButtonText_large"
+                android:layout_weight=".5"
+                android:background="@drawable/btn_blue"
+                android:text="@string/loc_button" >
+            </Button>
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView>

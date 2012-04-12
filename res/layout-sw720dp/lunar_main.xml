@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/prevLEclButton"
+            style="@style/ButtonText_xlarge"
+            android:layout_weight=".5"
+            android:background="@drawable/btn_blue"
+            android:text="@string/ecl_prev" />
+
+        <Button
+            android:id="@+id/nextLEclButton"
+            style="@style/ButtonText_xlarge"
+            android:layout_weight=".5"
+            android:background="@drawable/btn_blue"
+            android:text="@string/ecl_next" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:background="@color/background_color"
+            android:text="@string/ecl_date"
+            android:textColor="@color/text_color"
+            android:textSize="34sp" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:background="@color/background_color"
+            android:gravity="center_horizontal"
+            android:paddingRight="10dp"
+            android:text="@string/ecl_type"
+            android:textColor="@color/text_color"
+            android:textSize="34sp" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:background="@color/background_color"
+            android:gravity="center_horizontal"
+            android:text="@string/ecl_local"
+            android:textColor="@color/text_color"
+            android:textSize="34sp" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/view1"
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:background="@color/text_color" />
+
+    <ListView
+        android:id="@+id/lunarEclList"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+</LinearLayout>

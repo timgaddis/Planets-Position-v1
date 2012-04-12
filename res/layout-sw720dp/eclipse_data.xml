@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView1"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentLeft="true" >
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/ecl_date_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/text_color"
+            android:textSize="@dimen/main_button_text_xlarge" />
+
+        <View
+            android:id="@+id/view0"
+            android:layout_width="fill_parent"
+            android:layout_height="5dp"
+            android:layout_below="@+id/ecl_date_text" />
+
+        <TextView
+            android:id="@+id/ecl_type_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/view0"
+            android:gravity="center"
+            android:textColor="@color/text_color"
+            android:textSize="@dimen/main_button_text_xlarge" />
+
+        <View
+            android:id="@+id/view1"
+            android:layout_width="fill_parent"
+            android:layout_height="10dp"
+            android:layout_below="@+id/ecl_type_text" />
+
+        <TextView
+            android:id="@+id/ecl_globalData"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/view1"
+            android:gravity="center"
+            android:textColor="@color/text_color"
+            android:textSize="@dimen/label_text_xxlarge"
+            android:typeface="monospace" />
+
+        <View
+            android:id="@+id/view2"
+            android:layout_width="fill_parent"
+            android:layout_height="10dp"
+            android:layout_below="@+id/ecl_globalData" />
+
+        <TextView
+            android:id="@+id/ecl_localData"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/view2"
+            android:gravity="center"
+            android:textColor="@color/text_color"
+            android:textSize="@dimen/label_text_xxlarge"
+            android:typeface="monospace" />
+    </RelativeLayout>
+
+</ScrollView>

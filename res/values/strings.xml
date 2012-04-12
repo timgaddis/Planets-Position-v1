@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Planets Position</string>
-    <string name="pos_title">Planet\'s Position</string>
+    <string name="app_name">Planet\'s Position</string>
+    <string name="pos_title">Sky Position</string>
+    <string name="up_title">What\'s Up Now</string>
     <string name="loc_title">Location</string>
     <string name="solar_title">Solar Eclipses</string>
     <string name="lunar_title">Lunar Eclipses</string>
@@ -10,8 +11,43 @@
     <string name="menu_help">Help</string>
     <string name="menu_filter">Filter</string>
     <string name="menu_update">Update</string>
-    <string name="no_planets">No Planets Up</string>
+    <string name="pos_button">Sky\nPosition</string>
+    <string name="up_button">What\'s\nUp Now</string>
+    <string name="solar_button">Solar\nEclipses</string>
+    <string name="lunar_button">Lunar\nEclipses</string>
+    <string name="real_button">Real Time\nPosition</string>
+    <string name="loc_button">Update\nLocation</string>
     <string name="save">Save</string>
+    <string name="loc_down">GPS</string>
+    <string name="loc_enter">Update Location Data</string>
+    <string name="loc_lat">Latitude</string>
+    <string name="loc_lng">Longitude</string>
+    <string name="loc_ele">Elevation (m)</string>
+    <string name="loc_gmt">GMT offset (hr)</string>
+    <string name="data_ra">Right Ascension</string>
+    <string name="data_dec">Declination</string>
+    <string name="data_az">Azimuth</string>
+    <string name="data_alt">Altitude</string>
+    <string name="data_dis">Distance</string>
+    <string name="data_mag">Magnitude</string>
+    <string name="data_rs">Rise/Set Time</string>
+    <string name="data_set">Set Time</string>
+    <string name="data_rise">Rise Time</string>
+    <string name="ecl_prev">Previous\nEclipses</string>
+    <string name="ecl_next">Next\nEclipses</string>
+    <string name="ecl_date">Date (UTC)</string>
+    <string name="ecl_type">Type</string>
+    <string name="ecl_local">Local</string>
+    <string name="planet_name">Name</string>
+    <string name="below_hor">Object is below the horizon</string>
+    <string name="alert_string">There is no location data saved.
+        You can either download the data or manually enter the data.</string>
+    <string name="alert_down">Download</string>
+    <string name="alert_manual">Manual</string>
+    <string name="up_dialog">Calculating planets,\nplease wait…</string>
+    <string name="eclipse_dialog">Calculating eclipses,\nplease wait…</string>
+    <string name="location_dialog">Downloading Location.\nPlease wait…</string>
+    <string name="copy_dialog">Copying files.\nPlease wait…</string>
     <string name="filter_prompt">Filter planets</string>
 
     <string-array name="filter_array">
@@ -33,12 +69,53 @@
         <item>Neptune</item>
         <item>Pluto</item>
     </string-array>
+    <string-array name="gps_array">
+        <item>-12:00</item>
+        <item>-11:00</item>
+        <item>-10:00</item>
+        <item>-9:30</item>
+        <item>-9:00</item>
+        <item>-8:00</item>
+        <item>-7:00</item>
+        <item>-6:00</item>
+        <item>-5:00</item>
+        <item>-4:30</item>
+        <item>-4:00</item>
+        <item>-3:30</item>
+        <item>-3:00</item>
+        <item>-2:00</item>
+        <item>-1:00</item>
+        <item>0:00</item>
+        <item>+1:00</item>
+        <item>+2:00</item>
+        <item>+3:00</item>
+        <item>+3:30</item>
+        <item>+4:00</item>
+        <item>+4:30</item>
+        <item>+5:00</item>
+        <item>+5:30</item>
+        <item>+5:45</item>
+        <item>+6:00</item>
+        <item>+7:00</item>
+        <item>+8:00</item>
+        <item>+8:45</item>
+        <item>+9:00</item>
+        <item>+9:30</item>
+        <item>+10:00</item>
+        <item>+10:30</item>
+        <item>+11:00</item>
+        <item>+11:30</item>
+        <item>+12:00</item>
+        <item>+12:45</item>
+        <item>+13:00</item>
+        <item>+14:00</item>
+    </string-array>
 
-    <string name="main_about"><b>Planets Position v1.4.1</b>\n\n
-		Planets Position is a program to calculate the position of the planets
+    <string name="main_about">Planet\'s Position v1.5.3\n\n
+        Planets Position is a program to calculate the position of the planets
 		in the night sky based on a given location on Earth.\n\n
-		<b>License and Copyright</b>\n\n
-		Copyright (C) 2011 Tim Gaddis\n\n
+		License and Copyright\n\n
+		Copyright © 2012 Tim Gaddis\n\n
 		This program is free software: you can redistribute it and/or modify it
 		under the terms of the GNU General Public License as published by the 
 		Free Software Foundation, either version 3 of the License, or (at your 
@@ -57,15 +134,13 @@
 		https://github.com/timgaddis/Planets-Position\n\n
 		Swiss Ephemeris code is used in this program for planetary position
 		calculations.\n
-		http://www.astro.com/swisseph/swephinfo_e.htm?lang=e\n
-	</string>
-    <string name="main_help">
-		Initially, location data needs to be saved for the position 
+		http://www.astro.com/swisseph/swephinfo_e.htm?lang=e\n</string>
+    <string name="main_help">Initially, location data needs to be saved for the position 
 		calculations.\n
 		The two options are to retrieve location data from GPS or manually 
 		enter all of the data.  The location data is then saved to the 
 		program.\n\n
-		The Planet\'s Position screen lets you select a planet and a date 
+		The Sky Position screen lets you select a planet and a date 
 		and time, then it will calculate the position.\n\n
 		The What\'s Up Now screen lists what planets are up for the current 
 		date and time of the device for the given location.\n\n
@@ -74,116 +149,83 @@
 		The Lunar Eclipse screen lists lunar eclipses and indicates which of 
 		them are visible at the location saved on the device.\n\n
 		The Real Time Position screen is the current real time position of the 
-		selected planet.\n
-	</string>
-    <string name="pos_help">
-		The Planet, Local Date, and Local Time fields are user changeable.
+		selected planet.\n</string>
+    <string name="pos_help">The Planet, Local Date, and Local Time fields are user changeable.
 		Initially the Local Date and Local Time are set to the current date and
 		time of the device.\n\n
-		When a planet is selected, 8 values are calculated.\n\n
-		<b>Right Ascension:</b>\n
+		When a planet is selected, 8 values are calculated.\n\nRight Ascension:\n
 		The position on the celestial sphere east of the Vernal Equinox.\n
-		http://en.m.wikipedia.org/wiki/Right_ascension\n\n
-		<b>Declination:</b>\n
+		http://en.m.wikipedia.org/wiki/Right_ascension\n\nDeclination:\n
 		The position on the celestial sphere north or south of the celestial
 		equator.\n
-		http://en.m.wikipedia.org/wiki/Declination\n\n
-		<b>Azimuth:</b>\n
+		http://en.m.wikipedia.org/wiki/Declination\n\nAzimuth:\n
 		The compass direction for the planet\'s position for the given
 		location.\n
-		http://en.m.wikipedia.org/wiki/Azimuth\n\n
-		<b>Altitude:</b>\n
+		http://en.m.wikipedia.org/wiki/Azimuth\n\nAltitude:\n
 		The angle above the horizon of the given planet.\n
-		http://en.m.wikipedia.org/wiki/Altitude_(astronomy)\n\n
-		<b>Distance:</b>\n
+		http://en.m.wikipedia.org/wiki/Altitude_(astronomy)\n\nDistance:\n
 		The distance of the planet from the Earth in astronomical units.\n
-		http://en.m.wikipedia.org/wiki/Astronomical_unit\n\n
-		<b>Magnitude</b>\n
+		http://en.m.wikipedia.org/wiki/Astronomical_unit\n\nMagnitude\n
 		The brightness of a planet on a logarithmic scale, where the smaller the
 		number, the brighter the planet.\n
-		http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\n
-		<b>Rise and Set Times</b>\n
+		http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\nRise and Set Times\n
 		The times at which the planet rises and sets for the given location.\n
 		http://en.m.wikipedia.org/wiki/Sun_rise\n
-		http://en.m.wikipedia.org/wiki/Sunset\n
-	</string>
-    <string name="up_help">
-		This is a list of the planets above the horizon at the current date and
+		http://en.m.wikipedia.org/wiki/Sunset\n</string>
+    <string name="up_help">This is a list of the planets above the horizon at the current date and
 		time.\n\n
-		7 values are calculated for each planet.\n\n
-		<b>Right Ascension:</b>\n
+		7 values are calculated for each planet.\n\nRight Ascension:\n
 		The position on the celestial sphere east of the Vernal Equinox.\n
-		http://en.m.wikipedia.org/wiki/Right_ascension\n\n
-		<b>Declination:</b>\n
+		http://en.m.wikipedia.org/wiki/Right_ascension\n\nDeclination:\n
 		The position on the celestial sphere north or south of the celestial
 		equator.\n
-		http://en.m.wikipedia.org/wiki/Declination\n\n
-		<b>Azimuth:</b>\n
+		http://en.m.wikipedia.org/wiki/Declination\n\nAzimuth:\n
 		The compass direction for the planet\'s position for the given
 		location.\n
-		http://en.m.wikipedia.org/wiki/Azimuth\n\n
-		<b>Altitude:</b>\n
+		http://en.m.wikipedia.org/wiki/Azimuth\n\nAltitude:\n
 		The angle above the horizon of the given planet.\n
-		http://en.m.wikipedia.org/wiki/Altitude_(astronomy)\n\n
-		<b>Distance:</b>\n
+		http://en.m.wikipedia.org/wiki/Altitude_(astronomy)\n\nDistance:\n
 		The distance of the planet from the Earth in astronomical units.\n
-		http://en.m.wikipedia.org/wiki/Astronomical_unit\n\n
-		<b>Magnitude</b>\n
+		http://en.m.wikipedia.org/wiki/Astronomical_unit\n\nMagnitude\n
 		The brightness of a planet on a logarithmic scale, where the smaller the
 		number, the brighter the planet.\n
-		http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\n
-		<b>Set Time</b>\n
+		http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\nSet Time\n
 		The time at which the planet sets for the given location.\n
-		http://en.m.wikipedia.org/wiki/Sunset\n
-	</string>
-    <string name="solarEcl_help">
-        When an eclipse is selected, 6 values are calculated.\n\n
-        <b>Eclipse Types:</b>\n
-        \tTotal Eclipse\n
-        \tAnnular Eclipse\n
-        \tPartial Eclipse\n
-        \tHybrid Eclipse\n
-        http://en.m.wikipedia.org/wiki/Solar_eclipse#Types\n\n
-        <b>Azimuth:</b>\n
+		http://en.m.wikipedia.org/wiki/Sunset\n</string>
+    <string name="solarEcl_help">When an eclipse is selected, 6 values are calculated.\n\n
+        Eclipse Types:\n
+        Total Eclipse\n
+        Annular Eclipse\n
+        Partial Eclipse\n
+        Hybrid Eclipse\n
+        http://en.m.wikipedia.org/wiki/Solar_eclipse#Types\n\nAzimuth:\n
         The compass direction for the Sun\'s position for the given location.\n
-        http://en.m.wikipedia.org/wiki/Azimuth\n\n
-        <b>Altitude:</b>\n
+        http://en.m.wikipedia.org/wiki/Azimuth\n\nAltitude:\n
         The angle above the horizon of the Sun.\n
-        http://en.m.wikipedia.org/wiki/Altitude_(astronomy)\n\n
-        <b>Magnitude:</b>\n
+        http://en.m.wikipedia.org/wiki/Altitude_(astronomy)\n\nMagnitude:\n
         The brightness of the eclipse on a logarithmic scale, where the smaller
         the number, the brighter the eclipse.\n
-        http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\n
-        <b>Saros Number:</b>\n
-        <b>Saros Member Number:</b>\n
+        http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\nSaros Number:\nSaros Member Number:\n
         The saros is a a period of 223 synodic months that can be used to 
         predict eclipses of the Sun and Moon\n
         http://eclipse.gsfc.nasa.gov/SEsaros/SEsaros.html\n
-        http://en.m.wikipedia.org/wiki/Saros_number\n
-    </string>
-    <string name="lunarEcl_help">
-        When an eclipse is selected, 6 values are calculated.\n\n
-        <b>Eclipse Types:</b>\n
-        \tTotal Eclipse\n
-        \tPartial Eclipse\n
-        \tPenumbral Eclipse\n
-        http://en.m.wikipedia.org/wiki/Lunar_eclipse#Types_of_lunar_eclipse\n\n
-        <b>Azimuth:</b>\n
+        http://en.m.wikipedia.org/wiki/Saros_number\n</string>
+    <string name="lunarEcl_help">When an eclipse is selected, 6 values are calculated.\n\n
+        Eclipse Types:\n
+        Total Eclipse\n
+        Partial Eclipse\n
+        Penumbral Eclipse\n
+        http://en.m.wikipedia.org/wiki/Lunar_eclipse#Types_of_lunar_eclipse\n\nAzimuth:\n
         The compass direction for the Moon\'s position for the given location.\n
-        http://en.m.wikipedia.org/wiki/Azimuth\n\n
-        <b>Altitude:</b>\n
+        http://en.m.wikipedia.org/wiki/Azimuth\n\nAltitude:\n
         The angle above the horizon of the Moon.\n
-        http://en.m.wikipedia.org/wiki/Altitude_(astronomy)\n\n
-        <b>Magnitude:</b>\n
+        http://en.m.wikipedia.org/wiki/Altitude_(astronomy)\n\nMagnitude:\n
         The brightness of the eclipse on a logarithmic scale, where the smaller
         the number, the brighter the eclipse.\n
-        http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\n
-        <b>Saros Number:</b>\n
-        <b>Saros Member Number:</b>\n
+        http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\nSaros Number:\nSaros Member Number:\n
         The saros is a a period of 223 synodic months that can be used to 
         predict eclipses of the Sun and Moon\n
         http://eclipse.gsfc.nasa.gov/SEsaros/SEsaros.html\n
-        http://en.m.wikipedia.org/wiki/Saros_number\n
-    </string>
+        http://en.m.wikipedia.org/wiki/Saros_number\n</string>
 
 </resources>

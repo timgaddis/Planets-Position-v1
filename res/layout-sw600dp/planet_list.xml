@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <View
+        android:id="@+id/view01"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view01" >
+
+        <TextView
+            android:id="@+id/text01"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.25"
+            android:gravity="center_vertical"
+            android:padding="5dp"
+            android:textColor="@color/text_color"
+            android:textSize="24sp" />
+
+        <Button
+            android:id="@+id/refreshButton"
+            style="@style/ButtonText_large"
+            android:layout_weight="0.75"
+            android:background="@drawable/btn_blue"
+            android:text="@string/menu_update" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/view03"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/linearLayout2" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/view03" >
+
+        <TextView
+            android:id="@+id/text02"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/background_color"
+            android:text="@string/planet_name"
+            android:textColor="@color/text_color"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/text03"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/background_color"
+            android:gravity="center_horizontal"
+            android:text="@string/data_az"
+            android:textColor="@color/text_color"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/text04"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/background_color"
+            android:gravity="center_horizontal"
+            android:text="@string/data_alt"
+            android:textColor="@color/text_color"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/text05"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/background_color"
+            android:gravity="center_horizontal"
+            android:text="@string/data_mag"
+            android:textColor="@color/text_color"
+            android:textSize="24sp" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/view02"
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:layout_below="@+id/linearLayout1"
+        android:background="@color/text_color" />
+
+    <ListView
+        android:id="@+id/listView1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/view02" />
+
+</RelativeLayout>

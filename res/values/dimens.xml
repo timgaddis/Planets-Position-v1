@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <dimen name="pos_planet_name">20sp</dimen>
     <dimen name="pos_planet_name2">26sp</dimen>
-    <dimen name="pos_text_width">135dp</dimen>
-    <dimen name="pos_data_text">20sp</dimen>
+    <dimen name="pos_planet_name_large">40sp</dimen>
+    <dimen name="pos_planet_name_xlarge">46sp</dimen>
+    <dimen name="main_button_text_xlarge">50sp</dimen>
+    <dimen name="label_text">14sp</dimen>
+    <dimen name="label_text_large">18sp</dimen>
+    <dimen name="label_text_xlarge">22sp</dimen>
+    <dimen name="label_text_xxlarge">24sp</dimen>
+    <dimen name="label_text_xxxlarge">30sp</dimen>
+    <dimen name="label_text_xxxxlarge">42sp</dimen>
     <dimen name="pos_data_pad">5dp</dimen>
-    <dimen name="info_planet_name">24sp</dimen>
-    <dimen name="info_data_text">16sp</dimen>
+    <dimen name="list_padding">15dp</dimen>
+    <dimen name="list_padding_small">10dp</dimen>
+    <dimen name="list_padding_xsmall">5dp</dimen>
 
 </resources>

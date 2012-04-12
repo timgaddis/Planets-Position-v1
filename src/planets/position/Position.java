@@ -1,7 +1,7 @@
 package planets.position;
 
 /*
- * Copyright (C) 2011 Tim Gaddis
+ * Copyright (C) 2012 Tim Gaddis
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,33 +20,22 @@ package planets.position;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.app.TimePickerDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
-public class Position extends Activity {
+public class Position extends FragmentActivity {
 
-	private Button dateButton, timeButton;
-	private Spinner planetNameSpinner;
+	private Button dateButton, timeButton, nameButton;
 	private TextView pRAText, pDecText, pMagText, pRiseText, pSetText;
 	private TextView pAzText, pAltText, pBelowText, pDistText;
 	private Bundle bundle;
@@ -56,8 +45,7 @@ public class Position extends Activity {
 	double[] g = new double[3];
 	private Calendar gc, utc;
 	private String planetName;
-	static final int DATE_DIALOG_ID = 0;
-	static final int TIME_DIALOG_ID = 1;
+	private DialogFragment planetDialog, dateTimeDialog;
 
 	// load c library
 	static {
@@ -80,7 +68,7 @@ public class Position extends Activity {
 
 		dateButton = (Button) findViewById(R.id.pos_date_button);
 		timeButton = (Button) findViewById(R.id.pos_time_button);
-		planetNameSpinner = (Spinner) findViewById(R.id.pos_name_spin);
+		nameButton = (Button) findViewById(R.id.pos_name_button);
 		pAzText = (TextView) findViewById(R.id.pos_az_text);
 		pAltText = (TextView) findViewById(R.id.pos_alt_text);
 		pRAText = (TextView) findViewById(R.id.pos_ra_text);
@@ -98,6 +86,8 @@ public class Position extends Activity {
 			g[1] = bundle.getDouble("Lat", 0);
 			g[0] = bundle.getDouble("Long", 0);
 			g[2] = bundle.getDouble("Elevation", 0);
+			planetNum = bundle.getInt("num", -1);
+			planetName = bundle.getString("name");
 		}
 
 		// get the current date, time
@@ -108,34 +98,37 @@ public class Position extends Activity {
 		mMonth = c.get(Calendar.MONTH);
 		mDay = c.get(Calendar.DAY_OF_MONTH);
 
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-				this, R.array.planets_array,
-				android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		planetNameSpinner.setAdapter(adapter);
-
 		// display the current date (this method is below)
 		updateDisplay();
-
-		planetNameSpinner
-				.setOnItemSelectedListener(new PlanetNameSelectedListener());
 
 		dateButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				showDialog(DATE_DIALOG_ID);
+				dateTimeDialog = DateTimeDialog.newInstance(1, mHour, mMinute,
+						mDay, mMonth, mYear);
+				dateTimeDialog.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
+				dateTimeDialog.show(getSupportFragmentManager(), "dtDialog");
+			}
+		});
+
+		nameButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				planetDialog = PlanetListDialog.newInstance(
+						R.array.planets_array, 4, R.string.planet_prompt, 0);
+				planetDialog.show(getSupportFragmentManager(), "planetDialog");
 			}
 		});
 
 		timeButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				showDialog(TIME_DIALOG_ID);
+				dateTimeDialog = DateTimeDialog.newInstance(0, mHour, mMinute,
+						mDay, mMonth, mYear);
+				dateTimeDialog.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
+				dateTimeDialog.show(getSupportFragmentManager(), "dtDialog");
 			}
 		});
-
-		computeLocation();
-
 	}
 
 	private void computeLocation() {
@@ -146,6 +139,7 @@ public class Position extends Activity {
 			char decSign;
 			String[] dateArr;
 
+			nameButton.setText(planetName);
 			utc = new GregorianCalendar(mYear, mMonth, mDay, mHour, mMinute, 0);
 			m = (int) (offset * 60);
 			utc.add(Calendar.MINUTE, m * -1);
@@ -239,74 +233,27 @@ public class Position extends Activity {
 	private void updateDisplay() {
 		gc = new GregorianCalendar(mYear, mMonth, mDay, mHour, mMinute, 0);
 		dateButton.setText(DateFormat.format("M/dd/yyyy", gc));
-		timeButton.setText(DateFormat.format("h:mmaa", gc));
+		timeButton.setText(DateFormat.format("h:mm aa", gc));
 		computeLocation();
 	}
 
-	private void planetDialog() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string.planet_prompt);
-		final ArrayAdapter<CharSequence> adapter = ArrayAdapter
-				.createFromResource(this, R.array.planets_array,
-						android.R.layout.select_dialog_item);
-		builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int item) {
-				planetNum = item;
-				planetName = (String) adapter.getItem(item);
-				computeLocation();
-			}
-		});
-		AlertDialog alert = builder.create();
-		alert.show();
+	public void loadPlanet(String name, int num) {
+		planetNum = num;
+		planetName = name;
+		computeLocation();
 	}
 
-	public class PlanetNameSelectedListener implements OnItemSelectedListener {
-		public void onItemSelected(AdapterView<?> parent, View view, int pos,
-				long id) {
-			planetNum = pos;
-			planetName = (String) planetNameSpinner.getItemAtPosition(pos);
-			computeLocation();
-		}
-
-		public void onNothingSelected(AdapterView<?> parent) {
-			// Do nothing.
-		}
+	public void loadTime(int hourOfDay, int minute) {
+		mHour = hourOfDay;
+		mMinute = minute;
+		updateDisplay();
 	}
 
-	// the callback received when the user "sets" the date in the dialog
-	private DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener() {
-		@Override
-		public void onDateSet(DatePicker view, int year, int monthOfYear,
-				int dayOfMonth) {
-			mYear = year;
-			mMonth = monthOfYear;
-			mDay = dayOfMonth;
-			updateDisplay();
-		}
-	};
-
-	// the callback received when the user "sets" the time in the dialog
-	private TimePickerDialog.OnTimeSetListener mTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
-		@Override
-		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-			mHour = hourOfDay;
-			mMinute = minute;
-			updateDisplay();
-		}
-	};
-
-	@Override
-	protected Dialog onCreateDialog(int id) {
-		switch (id) {
-		case DATE_DIALOG_ID:
-			return new DatePickerDialog(this, mDateSetListener, mYear, mMonth,
-					mDay);
-		case TIME_DIALOG_ID:
-			return new TimePickerDialog(this, mTimeSetListener, mHour, mMinute,
-					false);
-		}
-		return null;
+	public void loadDate(int year, int monthOfYear, int dayOfMonth) {
+		mYear = year;
+		mMonth = monthOfYear;
+		mDay = dayOfMonth;
+		updateDisplay();
 	}
 
 	@Override

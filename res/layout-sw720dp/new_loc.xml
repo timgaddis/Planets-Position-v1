@@ -43,11 +43,36 @@
             android:inputType="numberSigned|numberDecimal"
             android:textSize="@dimen/label_text_xxxxlarge" />
 
+        <RadioGroup
+            android:id="@+id/radioGroup1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/newLatText"
+            android:orientation="horizontal" >
+
+            <RadioButton
+                android:id="@+id/radioLatNorth"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:checked="true"
+                android:text="@string/loc_north"
+                android:textSize="@dimen/label_text_xxxxlarge" />
+
+            <RadioButton
+                android:id="@+id/radioLatSouth"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:text="@string/loc_south"
+                android:textSize="@dimen/label_text_xxxxlarge" />
+        </RadioGroup>
+
         <TextView
             android:id="@+id/text02"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/newLatText"
+            android:layout_below="@+id/radioGroup1"
             android:text="@string/loc_lng"
             android:textColor="@color/text_color"
             android:textSize="@dimen/label_text_xxxxlarge" />
@@ -60,11 +85,36 @@
             android:inputType="numberSigned|numberDecimal"
             android:textSize="@dimen/label_text_xxxxlarge" />
 
+        <RadioGroup
+            android:id="@+id/radioGroup2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/newLongText"
+            android:orientation="horizontal" >
+
+            <RadioButton
+                android:id="@+id/radioLngEast"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:checked="true"
+                android:text="@string/loc_east"
+                android:textSize="@dimen/label_text_xxxxlarge" />
+
+            <RadioButton
+                android:id="@+id/radioLngWest"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:text="@string/loc_west"
+                android:textSize="@dimen/label_text_xxxxlarge" />
+        </RadioGroup>
+
         <View
             android:id="@+id/view02"
             android:layout_width="fill_parent"
             android:layout_height="5dp"
-            android:layout_below="@+id/newLongText" />
+            android:layout_below="@+id/radioGroup2" />
 
         <LinearLayout
             android:id="@+id/linearLayout1"

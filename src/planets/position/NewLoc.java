@@ -40,6 +40,7 @@ import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 public class NewLoc extends FragmentActivity implements
@@ -47,6 +48,7 @@ public class NewLoc extends FragmentActivity implements
 
 	private Button saveLocButton, offsetButton, gpsButton;
 	private EditText newLongText, newLatText, newElevationText;
+	private RadioButton radioNorth, radioSouth, radioEast, radioWest;
 	private long date = 0;
 	private Location loc;
 	private UserLocation userLocation = new UserLocation();
@@ -69,6 +71,10 @@ public class NewLoc extends FragmentActivity implements
 		newElevationText = (EditText) findViewById(R.id.newElevationText);
 		newLatText = (EditText) findViewById(R.id.newLatText);
 		newLongText = (EditText) findViewById(R.id.newLongText);
+		radioNorth = (RadioButton) findViewById(R.id.radioLatNorth);
+		radioSouth = (RadioButton) findViewById(R.id.radioLatSouth);
+		radioEast = (RadioButton) findViewById(R.id.radioLngEast);
+		radioWest = (RadioButton) findViewById(R.id.radioLngWest);
 
 		cr = getApplicationContext().getContentResolver();
 		getSupportLoaderManager().initLoader(LOC_LOADER, null, this);
@@ -132,11 +138,18 @@ public class NewLoc extends FragmentActivity implements
 						String.valueOf(0)), projection, null, null, null);
 		locCur.moveToFirst();
 		latitude = locCur.getDouble(locCur.getColumnIndexOrThrow("lat"));
-		if (latitude != -1.0) {
-			newLatText.setText(String.format("%.8f",
-					locCur.getDouble(locCur.getColumnIndexOrThrow("lat"))));
-			newLongText.setText(String.format("%.8f",
-					locCur.getDouble(locCur.getColumnIndexOrThrow("lng"))));
+		if (latitude != 91.0) {
+			if (latitude < 0)
+				radioSouth.toggle();
+			else
+				radioNorth.toggle();
+			newLatText.setText(String.format("%.8f", Math.abs(latitude)));
+			longitude = locCur.getDouble(locCur.getColumnIndexOrThrow("lng"));
+			if (longitude < 0)
+				radioWest.toggle();
+			else
+				radioEast.toggle();
+			newLongText.setText(String.format("%.8f", Math.abs(longitude)));
 			newElevationText
 					.setText(String.format("%.1f", locCur.getDouble(locCur
 							.getColumnIndexOrThrow("elevation"))));
@@ -162,6 +175,15 @@ public class NewLoc extends FragmentActivity implements
 		if (!newLatText.getText().toString().equals("")) {
 			try {
 				latitude = Double.parseDouble(newLatText.getText().toString());
+				if (latitude < 0) {
+					Toast.makeText(
+							NewLoc.this,
+							"Please enter a positive value for\nthe latitude and select South",
+							Toast.LENGTH_LONG).show();
+					return 1;
+				}
+				if (radioSouth.isChecked())
+					latitude *= -1;
 			} catch (NumberFormatException ex) {
 				Toast.makeText(NewLoc.this, "Enter a number for the latitude",
 						Toast.LENGTH_LONG).show();
@@ -176,6 +198,15 @@ public class NewLoc extends FragmentActivity implements
 			try {
 				longitude = Double
 						.parseDouble(newLongText.getText().toString());
+				if (longitude < 0) {
+					Toast.makeText(
+							NewLoc.this,
+							"Please enter a positive value for\nthe longitude and select West",
+							Toast.LENGTH_LONG).show();
+					return 1;
+				}
+				if (radioWest.isChecked())
+					longitude *= -1;
 			} catch (NumberFormatException ex) {
 				Toast.makeText(NewLoc.this, "Enter a number for the longitude",
 						Toast.LENGTH_LONG).show();
@@ -264,8 +295,16 @@ public class NewLoc extends FragmentActivity implements
 				elevation = loc.getAltitude();
 				date = Calendar.getInstance().getTimeInMillis();
 				offset = Calendar.getInstance().getTimeZone().getOffset(date) / 3600000.0;
-				newLatText.setText(String.format("%.8f", latitude));
-				newLongText.setText(String.format("%.8f", longitude));
+				newLatText.setText(String.format("%.8f", Math.abs(latitude)));
+				if (latitude < 0)
+					radioSouth.toggle();
+				else
+					radioNorth.toggle();
+				newLongText.setText(String.format("%.8f", Math.abs(longitude)));
+				if (longitude < 0)
+					radioWest.toggle();
+				else
+					radioEast.toggle();
 				newElevationText.setText(String.format("%.1f", elevation));
 				String off = "";
 				if (offset < 0)

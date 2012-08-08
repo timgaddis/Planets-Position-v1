@@ -17,6 +17,7 @@
     <string name="lunar_button">Lunar\nEclipses</string>
     <string name="real_button">Real Time\nPosition</string>
     <string name="loc_button">Update\nLocation</string>
+    <string name="ecl_map">Eclipse Map</string>
     <string name="save">Save</string>
     <string name="loc_down">GPS</string>
     <string name="loc_enter">Update Location Data</string>
@@ -24,6 +25,10 @@
     <string name="loc_lng">Longitude</string>
     <string name="loc_ele">Elevation (m)</string>
     <string name="loc_gmt">GMT offset (hr)</string>
+    <string name="loc_north">North</string>
+    <string name="loc_south">South</string>
+    <string name="loc_east">East</string>
+    <string name="loc_west">West</string>
     <string name="data_ra">Right Ascension</string>
     <string name="data_dec">Declination</string>
     <string name="data_az">Azimuth</string>

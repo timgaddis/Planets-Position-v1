@@ -35,6 +35,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 public class EclipseData extends FragmentActivity implements
@@ -42,9 +43,10 @@ public class EclipseData extends FragmentActivity implements
 
 	private TextView eclDateText, eclTypeText, eclGlobalDataText,
 			eclLocalDataText;
+	private Button eclMapButton;
 	private int eclipseNum;
 	private boolean helpSE, localEcl;
-	private double offset;
+	private double offset, lon, lat, startDate = 0, endDate = 0;
 
 	private static final int SOLAR_LOADER = 1;
 	private static final int LUNAR_LOADER = 2;
@@ -54,15 +56,17 @@ public class EclipseData extends FragmentActivity implements
 			"eclipseType", "eclipseDate", "penBegin", "partBegin", "totBegin",
 			"maxEclTime", "totEnd", "partEnd", "penEnd" };
 	private String[] se_projection = { PlanetsDbAdapter.KEY_ROWID,
-			"eclipseType", "eclipseDate", "globalBeginTime", "globalTotBegin",
-			"globalMaxTime", "globalTotEnd", "globalEndTime" };
+			"eclipseType", "eclipseDate", "globalType", "globalBeginTime",
+			"globalTotBegin", "globalMaxTime", "globalTotEnd", "globalEndTime",
+			"globalCenterBegin", "globalCenterEnd" };
 	private String[] lel_projection = { PlanetsDbAdapter.KEY_ROWID,
 			"eclipseType", "eclipseDate", "penBegin", "partBegin", "totBegin",
 			"maxEclTime", "totEnd", "partEnd", "penEnd", "moonAz", "moonAlt",
 			"eclipseMag", "sarosNum", "sarosMemNum", "rTime", "sTime" };
 	private String[] sel_projection = { PlanetsDbAdapter.KEY_ROWID,
-			"eclipseType", "eclipseDate", "globalBeginTime", "globalTotBegin",
-			"globalMaxTime", "globalTotEnd", "globalEndTime", "localType",
+			"eclipseType", "eclipseDate", "globalType", "globalBeginTime",
+			"globalTotBegin", "globalMaxTime", "globalTotEnd", "globalEndTime",
+			"globalCenterBegin", "globalCenterEnd", "localType",
 			"localFirstTime", "localSecondTime", "localMaxTime",
 			"localThirdTime", "localFourthTime", "sunAz", "sunAlt",
 			"fracCover", "localMag", "sarosNum", "sarosMemNum" };
@@ -85,6 +89,7 @@ public class EclipseData extends FragmentActivity implements
 		eclTypeText = (TextView) findViewById(R.id.ecl_type_text);
 		eclGlobalDataText = (TextView) findViewById(R.id.ecl_globalData);
 		eclLocalDataText = (TextView) findViewById(R.id.ecl_localData);
+		eclMapButton = (Button) findViewById(R.id.eclMapButton);
 
 		cr = getApplicationContext().getContentResolver();
 		// load bundle from previous activity
@@ -92,6 +97,8 @@ public class EclipseData extends FragmentActivity implements
 		if (bundle != null) {
 			eclipseNum = bundle.getInt("eclipseNum", 0);
 			offset = bundle.getDouble("Offset", 0);
+			lon = bundle.getDouble("Long", 0);
+			lat = bundle.getDouble("Lat", 0);
 			localEcl = bundle.getBoolean("local");
 			if (bundle.getBoolean("db")) {
 				if (localEcl) {
@@ -115,6 +122,23 @@ public class EclipseData extends FragmentActivity implements
 				fillLunarData();
 			}
 		}
+
+		eclMapButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Bundle b = new Bundle();
+				b.putDouble("Lat", lat);
+				b.putDouble("Long", lon);
+				b.putDouble("start", startDate);
+				b.putDouble("end", endDate);
+				b.putCharSequence("date", eclDateText.getText());
+				b.putCharSequence("type", eclTypeText.getText());
+				Intent i = new Intent(getApplicationContext(), EclipseMap.class);
+				i.putExtras(b);
+				startActivity(i);
+			}
+
+		});
 	}
 
 	@Override
@@ -127,6 +151,7 @@ public class EclipseData extends FragmentActivity implements
 	private void fillLunarData() {
 		String localData, globalData;
 		Cursor eclipseCursor;
+		eclMapButton.setVisibility(View.GONE);
 		if (localEcl) {
 			eclipseCursor = cr.query(
 					Uri.withAppendedPath(PlanetsDbProvider.LUNAR_URI,
@@ -248,13 +273,13 @@ public class EclipseData extends FragmentActivity implements
 		} else {
 			eclLocalDataText.setVisibility(View.GONE);
 		}
-		// planetDbHelper.close();
 	}
 
 	private void fillSolarData() {
 		String eclType, localData, globalData;
 		int val;
 		Cursor eclipseCursor;
+		eclMapButton.setVisibility(View.VISIBLE);
 		if (localEcl) {
 			eclipseCursor = cr.query(
 					Uri.withAppendedPath(PlanetsDbProvider.SOLAR_URI,
@@ -267,6 +292,19 @@ public class EclipseData extends FragmentActivity implements
 					null, null);
 		}
 		eclipseCursor.moveToFirst();
+		val = eclipseCursor.getInt(eclipseCursor
+				.getColumnIndexOrThrow("globalType"));
+		if ((val & 16) == 16) { // SE_ECL_PARTIAL
+			startDate = eclipseCursor.getDouble(eclipseCursor
+					.getColumnIndexOrThrow("globalBeginTime"));
+			endDate = eclipseCursor.getDouble(eclipseCursor
+					.getColumnIndexOrThrow("globalEndTime"));
+		} else {
+			startDate = eclipseCursor.getDouble(eclipseCursor
+					.getColumnIndexOrThrow("globalCenterBegin"));
+			endDate = eclipseCursor.getDouble(eclipseCursor
+					.getColumnIndexOrThrow("globalCenterEnd"));
+		}
 		eclTypeText.setText(eclipseCursor.getString(eclipseCursor
 				.getColumnIndexOrThrow("eclipseType")) + " Eclipse");
 		eclDateText.setText(eclipseCursor.getString(eclipseCursor

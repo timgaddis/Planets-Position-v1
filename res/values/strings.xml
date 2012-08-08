@@ -21,8 +21,8 @@
     <string name="save">Save</string>
     <string name="loc_down">GPS</string>
     <string name="loc_enter">Update Location Data</string>
-    <string name="loc_lat">Latitude</string>
-    <string name="loc_lng">Longitude</string>
+    <string name="loc_lat">Latitude (\u00b0)</string>
+    <string name="loc_lng">Longitude (\u00b0)</string>
     <string name="loc_ele">Elevation (m)</string>
     <string name="loc_gmt">GMT offset (hr)</string>
     <string name="loc_north">North</string>

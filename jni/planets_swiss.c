@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Tim Gaddis
+ * Copyright (C) 2012 Tim Gaddis
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,41 @@
 #include <stdlib.h>
 #include <android/log.h>
 #include "swiss/swephexp.h"
+
+/*
+ * Calculate the geographic position of where a solar eclipse occurs for a
+ * 		given date.
+ * Swiss Ephemeris functions called:
+ * 		swe_set_ephe_path
+ * 		swe_sol_eclipse_where
+ * 		swe_close
+ * Input: Julian date in ut1.
+ * Output: Double array containing longitude and latitude.
+ */
+jdoubleArray Java_planets_position_EclipseMap_solarDataPos(JNIEnv* env,
+		jobject this, jdouble d_ut) {
+
+	char serr[256];
+	double attr[20], g[2];
+	int retval;
+
+	jdoubleArray result;
+	result = (*env)->NewDoubleArray(env, 2);
+	if (result == NULL) {
+		__android_log_print(ANDROID_LOG_ERROR, "solarDataPos",
+				"JNI ERROR NewDoubleArray: out of memory error");
+		return NULL; /* out of memory error thrown */
+	}
+
+	swe_set_ephe_path("/mnt/sdcard/ephemeris/");
+
+	swe_sol_eclipse_where(d_ut, SEFLG_SWIEPH, g, attr, serr);
+	swe_close();
+
+	// move from the temp structure to the java structure
+	(*env)->SetDoubleArrayRegion(env, result, 0, 2, g);
+	return result;
+}
 
 /*
  * Covert a given Julian date to a calendar date in utc.
@@ -242,41 +277,6 @@ jstring Java_planets_position_LunarEclipse_jd2utc(JNIEnv* env, jobject this,
 
 	i = sprintf(output, outFormat, y, mo, d, h, mi, s);
 	return (*env)->NewStringUTF(env, output);
-}
-
-/*
- * Calculate the geographic position of where a solar eclipse occurs for a
- * 		given date.
- * Swiss Ephemeris functions called:
- * 		swe_set_ephe_path
- * 		swe_sol_eclipse_where
- * 		swe_close
- * Input: Julian date in ut1.
- * Output: Double array containing longitude and latitude.
- */
-jdoubleArray Java_planets_position_SolarEclipse_solarDataPos(JNIEnv* env,
-		jobject this, jdouble d_ut) {
-
-	char serr[256];
-	double attr[20], g[2];
-	int retval;
-
-	jdoubleArray result;
-	result = (*env)->NewDoubleArray(env, 2);
-	if (result == NULL) {
-		__android_log_print(ANDROID_LOG_ERROR, "solarDataPos",
-				"JNI ERROR NewDoubleArray: out of memory error");
-		return NULL; /* out of memory error thrown */
-	}
-
-	swe_set_ephe_path("/mnt/sdcard/ephemeris/");
-
-	swe_sol_eclipse_where(d_ut, SEFLG_SWIEPH, g, attr, serr);
-	swe_close();
-
-	// move from the temp structure to the java structure
-	(*env)->SetDoubleArrayRegion(env, result, 0, 2, g);
-	return result;
 }
 
 /*

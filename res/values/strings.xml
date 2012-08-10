@@ -141,6 +141,10 @@
 		calculations.\n
 		http://www.astro.com/swisseph/swephinfo_e.htm?lang=e\n\n
 		Change Log\n\n
+		Version 1.6\n
+		-Added North, South, East, West selections to the update location activity.\n
+ 		-Added Eclipse Map activity that displays eclipse paths on Google Maps.\n
+ 		-Added Internet permission for use with Google Maps.\n\n
 		Version 1.5.4\n
 		-Fixed force close at startup for devices with Android 2.X and below.\n
 		-Added change log to about page.\n\n
@@ -233,7 +237,9 @@
         The saros is a a period of 223 synodic months that can be used to 
         predict eclipses of the Sun and Moon\n
         http://eclipse.gsfc.nasa.gov/SEsaros/SEsaros.html\n
-        http://en.m.wikipedia.org/wiki/Saros_number\n</string>
+        http://en.m.wikipedia.org/wiki/Saros_number\n
+        Eclipse Map is the path of totality for total, anular, or hybrid eclipses 
+        or maximum eclipse for partial eclipses.\n</string>
     <string name="lunarEcl_help">When an eclipse is selected, 6 values are calculated.\n\n
         Eclipse Types:\n
         Total Eclipse\n

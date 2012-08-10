@@ -46,9 +46,6 @@ public class EclipseMap extends MapActivity {
 			// eclipseTypeText.setText();
 		}
 
-		// Log.i("Eclipse Map", "latitude: " + latitude);
-		// Log.i("Eclipse Map", "longitude: " + longitude);
-
 		// device location
 		p1 = new GeoPoint((int) (latitude * 1E6), (int) (longitude * 1E6));
 		mapView.getOverlays().add(new RouteOverlay(p1, p1, 1, this));
@@ -65,8 +62,6 @@ public class EclipseMap extends MapActivity {
 		double[] data;
 		double interval = (endDate - startDate) / 80.0;
 		double date = startDate + interval;
-		// Log.i("Eclipse Map path", "startDate: " + startDate);
-		// Log.i("Eclipse Map path", "endDate: " + endDate);
 
 		// eclipse path
 		data = solarDataPos(startDate);

@@ -374,6 +374,8 @@ public class SolarEclipse extends FragmentActivity implements
 		Bundle bundle = new Bundle();
 		bundle.putInt("eclipseNum", num);
 		bundle.putDouble("Offset", offset);
+		bundle.putDouble("Long", g[0]);
+		bundle.putDouble("Lat", g[1]);
 		bundle.putBoolean("db", true);
 		bundle.putBoolean("local", local);
 		Intent i = new Intent(this, EclipseData.class);

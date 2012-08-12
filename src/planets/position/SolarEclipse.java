@@ -69,8 +69,6 @@ public class SolarEclipse extends FragmentActivity implements
 	}
 
 	// c function prototypes
-	public native double[] solarDataPos(double d2);
-
 	public native double[] solarDataLocal(double d2, double[] loc, int back);
 
 	public native double[] solarDataGlobal(double d2, int back);
@@ -413,13 +411,9 @@ public class SolarEclipse extends FragmentActivity implements
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> arg0) {
-		if (cursorAdapter != null)
-			cursorAdapter.swapCursor(null);
 	}
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor data) {
-		if (cursorAdapter != null)
-			cursorAdapter.swapCursor(data);
 	}
 }

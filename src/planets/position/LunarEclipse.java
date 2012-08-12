@@ -381,14 +381,10 @@ public class LunarEclipse extends FragmentActivity implements
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> arg0) {
-		if (cursorAdapter != null)
-			cursorAdapter.swapCursor(null);
 	}
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor data) {
-		if (cursorAdapter != null)
-			cursorAdapter.swapCursor(data);
 	}
 
 }

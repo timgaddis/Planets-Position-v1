@@ -41,7 +41,7 @@ public class RouteOverlay extends Overlay {
 	public boolean draw(Canvas canvas, MapView mapView, boolean shadow,
 			long when) {
 		Projection projection = mapView.getProjection();
-		if (shadow == false) {
+		if (!shadow) {
 			Paint paint = new Paint();
 			paint.setAntiAlias(true);
 			Point point = new Point();
@@ -49,12 +49,12 @@ public class RouteOverlay extends Overlay {
 			if (mode == 1) {
 				Bitmap bmp1 = BitmapFactory.decodeResource(
 						mContext.getResources(), R.drawable.marker);
-				Bitmap bmp2 = BitmapFactory.decodeResource(
-						mContext.getResources(), R.drawable.shadow);
+				// Bitmap bmp2 = BitmapFactory.decodeResource(
+				// mContext.getResources(), R.drawable.shadow);
 				canvas.drawBitmap(bmp1, point.x - bmp1.getWidth() / 2, point.y
 						- bmp1.getHeight(), null);
-				canvas.drawBitmap(bmp2, point.x - 15,
-						point.y - bmp2.getHeight(), null);
+				// canvas.drawBitmap(bmp2, point.x - 15,
+				// point.y - bmp2.getHeight(), null);
 			} else if (mode == 2) {
 				paint.setColor(Color.RED);
 				Point point2 = new Point();

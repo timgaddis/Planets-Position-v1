@@ -292,18 +292,15 @@ public class EclipseData extends FragmentActivity implements
 					null, null);
 		}
 		eclipseCursor.moveToFirst();
-		val = eclipseCursor.getInt(eclipseCursor
-				.getColumnIndexOrThrow("globalType"));
-		if ((val & 16) == 16) { // SE_ECL_PARTIAL
+		startDate = eclipseCursor.getDouble(eclipseCursor
+				.getColumnIndexOrThrow("globalCenterBegin"));
+		endDate = eclipseCursor.getDouble(eclipseCursor
+				.getColumnIndexOrThrow("globalCenterEnd"));
+		if (startDate == 0.0 || endDate == 0.0) {
 			startDate = eclipseCursor.getDouble(eclipseCursor
 					.getColumnIndexOrThrow("globalBeginTime"));
 			endDate = eclipseCursor.getDouble(eclipseCursor
 					.getColumnIndexOrThrow("globalEndTime"));
-		} else {
-			startDate = eclipseCursor.getDouble(eclipseCursor
-					.getColumnIndexOrThrow("globalCenterBegin"));
-			endDate = eclipseCursor.getDouble(eclipseCursor
-					.getColumnIndexOrThrow("globalCenterEnd"));
 		}
 		eclTypeText.setText(eclipseCursor.getString(eclipseCursor
 				.getColumnIndexOrThrow("eclipseType")) + " Eclipse");

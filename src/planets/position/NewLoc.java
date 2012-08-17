@@ -52,6 +52,7 @@ public class NewLoc extends FragmentActivity implements
 	private long date = 0;
 	private Location loc;
 	private UserLocation userLocation = new UserLocation();
+	private double westLong, southLat;
 	private double elevation = 0, latitude = 0, longitude = 0, offset = 0;
 	private static final int LOC_LOADER = 1;
 	private String[] projection = { PlanetsDbAdapter.KEY_ROWID, "lat", "lng",
@@ -115,6 +116,24 @@ public class NewLoc extends FragmentActivity implements
 			gpsTask.cancel(true);
 	}
 
+	public void onRadioButtonClicked(View view) {
+
+		switch (view.getId()) {
+		case R.id.radioLatNorth:
+			southLat = 1.0;
+			break;
+		case R.id.radioLatSouth:
+			southLat = -1.0;
+			break;
+		case R.id.radioLngEast:
+			westLong = 1.0;
+			break;
+		case R.id.radioLngWest:
+			westLong = -1.0;
+			break;
+		}
+	}
+
 	/**
 	 * Gets the GPS location of the device or loads test values.
 	 */
@@ -139,16 +158,22 @@ public class NewLoc extends FragmentActivity implements
 		locCur.moveToFirst();
 		latitude = locCur.getDouble(locCur.getColumnIndexOrThrow("lat"));
 		if (latitude != 91.0) {
-			if (latitude < 0)
+			if (latitude < 0) {
 				radioSouth.toggle();
-			else
+				southLat = -1.0;
+			} else {
 				radioNorth.toggle();
+				southLat = 1.0;
+			}
 			newLatText.setText(String.format("%.8f", Math.abs(latitude)));
 			longitude = locCur.getDouble(locCur.getColumnIndexOrThrow("lng"));
-			if (longitude < 0)
+			if (longitude < 0) {
 				radioWest.toggle();
-			else
+				westLong = -1.0;
+			} else {
 				radioEast.toggle();
+				westLong = 1.0;
+			}
 			newLongText.setText(String.format("%.8f", Math.abs(longitude)));
 			newElevationText
 					.setText(String.format("%.1f", locCur.getDouble(locCur
@@ -182,8 +207,7 @@ public class NewLoc extends FragmentActivity implements
 							Toast.LENGTH_LONG).show();
 					return 1;
 				}
-				if (radioSouth.isChecked())
-					latitude *= -1;
+				latitude *= southLat;
 			} catch (NumberFormatException ex) {
 				Toast.makeText(NewLoc.this, "Enter a number for the latitude",
 						Toast.LENGTH_LONG).show();
@@ -205,8 +229,7 @@ public class NewLoc extends FragmentActivity implements
 							Toast.LENGTH_LONG).show();
 					return 1;
 				}
-				if (radioWest.isChecked())
-					longitude *= -1;
+				longitude *= westLong;
 			} catch (NumberFormatException ex) {
 				Toast.makeText(NewLoc.this, "Enter a number for the longitude",
 						Toast.LENGTH_LONG).show();
@@ -296,15 +319,21 @@ public class NewLoc extends FragmentActivity implements
 				date = Calendar.getInstance().getTimeInMillis();
 				offset = Calendar.getInstance().getTimeZone().getOffset(date) / 3600000.0;
 				newLatText.setText(String.format("%.8f", Math.abs(latitude)));
-				if (latitude < 0)
+				if (latitude < 0) {
 					radioSouth.toggle();
-				else
+					southLat = -1.0;
+				} else {
 					radioNorth.toggle();
+					southLat = 1.0;
+				}
 				newLongText.setText(String.format("%.8f", Math.abs(longitude)));
-				if (longitude < 0)
+				if (longitude < 0) {
 					radioWest.toggle();
-				else
+					westLong = -1.0;
+				} else {
 					radioEast.toggle();
+					westLong = 1.0;
+				}
 				newElevationText.setText(String.format("%.1f", elevation));
 				String off = "";
 				if (offset < 0)

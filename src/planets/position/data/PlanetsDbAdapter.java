@@ -32,7 +32,7 @@ public class PlanetsDbAdapter extends SQLiteOpenHelper {
 
 	private static final String DEBUG_TAG = "PlanetsDbAdapter";
 	private static final String DATABASE_NAME = "PlanetsDB";
-	private static final int DATABASE_VERSION = 7;
+	private static final int DATABASE_VERSION = 8;
 
 	public static final String TABLE_LOCATION = "location";
 	public static final String TABLE_PLANETS = "planets";
@@ -52,7 +52,7 @@ public class PlanetsDbAdapter extends SQLiteOpenHelper {
 
 	private static final String insertRow = "insert into location "
 			+ "(_id, lat, lng, temp, pressure, elevation, date, offset, ioffset) "
-			+ "VALUES (0, -1.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 13);";
+			+ "VALUES (0, 91.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 13);";
 
 	private static final String PL_DB_CREATE = "create table planets "
 			+ "(_id integer primary key autoincrement, name text not null, "

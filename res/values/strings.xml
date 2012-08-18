@@ -183,43 +183,57 @@
     <string name="pos_help">The Planet, Local Date, and Local Time fields are user changeable.
 		Initially the Local Date and Local Time are set to the current date and
 		time of the device.\n\n
-		When a planet is selected, 8 values are calculated.\n\nRight Ascension:\n
+		When a planet is selected, 8 values are calculated.\n\n
+		Right Ascension:\n
 		The position on the celestial sphere east of the Vernal Equinox.\n
-		http://en.m.wikipedia.org/wiki/Right_ascension\n\nDeclination:\n
+		http://en.m.wikipedia.org/wiki/Right_ascension\n\n
+		Declination:\n
 		The position on the celestial sphere north or south of the celestial
 		equator.\n
-		http://en.m.wikipedia.org/wiki/Declination\n\nAzimuth:\n
+		http://en.m.wikipedia.org/wiki/Declination\n\n
+		Azimuth:\n
 		The compass direction for the planet\'s position for the given
 		location.\n
-		http://en.m.wikipedia.org/wiki/Azimuth\n\nAltitude:\n
+		http://en.m.wikipedia.org/wiki/Azimuth\n\n
+		Altitude:\n
 		The angle above the horizon of the given planet.\n
-		http://en.m.wikipedia.org/wiki/Altitude_(astronomy)\n\nDistance:\n
+		http://en.m.wikipedia.org/wiki/Altitude_(astronomy)\n\n
+		Distance:\n
 		The distance of the planet from the Earth in astronomical units.\n
-		http://en.m.wikipedia.org/wiki/Astronomical_unit\n\nMagnitude\n
+		http://en.m.wikipedia.org/wiki/Astronomical_unit\n\n
+		Magnitude\n
 		The brightness of a planet on a logarithmic scale, where the smaller the
 		number, the brighter the planet.\n
-		http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\nRise and Set Times\n
+		http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\n
+		Rise and Set Times\n
 		The times at which the planet rises and sets for the given location.\n
 		http://en.m.wikipedia.org/wiki/Sun_rise\n
 		http://en.m.wikipedia.org/wiki/Sunset\n</string>
     <string name="up_help">This is a list of the planets above the horizon at the current date and
 		time.\n\n
-		7 values are calculated for each planet.\n\nRight Ascension:\n
+		7 values are calculated for each planet.\n\n
+		Right Ascension:\n
 		The position on the celestial sphere east of the Vernal Equinox.\n
-		http://en.m.wikipedia.org/wiki/Right_ascension\n\nDeclination:\n
+		http://en.m.wikipedia.org/wiki/Right_ascension\n\n
+		Declination:\n
 		The position on the celestial sphere north or south of the celestial
 		equator.\n
-		http://en.m.wikipedia.org/wiki/Declination\n\nAzimuth:\n
+		http://en.m.wikipedia.org/wiki/Declination\n\n
+		Azimuth:\n
 		The compass direction for the planet\'s position for the given
 		location.\n
-		http://en.m.wikipedia.org/wiki/Azimuth\n\nAltitude:\n
+		http://en.m.wikipedia.org/wiki/Azimuth\n\n
+		Altitude:\n
 		The angle above the horizon of the given planet.\n
-		http://en.m.wikipedia.org/wiki/Altitude_(astronomy)\n\nDistance:\n
+		http://en.m.wikipedia.org/wiki/Altitude_(astronomy)\n\n
+		Distance:\n
 		The distance of the planet from the Earth in astronomical units.\n
-		http://en.m.wikipedia.org/wiki/Astronomical_unit\n\nMagnitude\n
+		http://en.m.wikipedia.org/wiki/Astronomical_unit\n\n
+		Magnitude\n
 		The brightness of a planet on a logarithmic scale, where the smaller the
 		number, the brighter the planet.\n
-		http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\nSet Time\n
+		http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\n
+		Set Time\n
 		The time at which the planet sets for the given location.\n
 		http://en.m.wikipedia.org/wiki/Sunset\n</string>
     <string name="solarEcl_help">When an eclipse is selected, 6 values are calculated.\n\n
@@ -228,18 +242,22 @@
         Annular Eclipse\n
         Partial Eclipse\n
         Hybrid Eclipse\n
-        http://en.m.wikipedia.org/wiki/Solar_eclipse#Types\n\nAzimuth:\n
+        http://en.m.wikipedia.org/wiki/Solar_eclipse#Types\n\n
+        Azimuth:\n
         The compass direction for the Sun\'s position for the given location.\n
-        http://en.m.wikipedia.org/wiki/Azimuth\n\nAltitude:\n
+        http://en.m.wikipedia.org/wiki/Azimuth\n\n
+        Altitude:\n
         The angle above the horizon of the Sun.\n
-        http://en.m.wikipedia.org/wiki/Altitude_(astronomy)\n\nMagnitude:\n
+        http://en.m.wikipedia.org/wiki/Altitude_(astronomy)\n\n
+        Magnitude:\n
         The brightness of the eclipse on a logarithmic scale, where the smaller
         the number, the brighter the eclipse.\n
-        http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\nSaros Number:\nSaros Member Number:\n
+        http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\n
+        Saros Number:\nSaros Member Number:\n
         The saros is a a period of 223 synodic months that can be used to 
         predict eclipses of the Sun and Moon\n
         http://eclipse.gsfc.nasa.gov/SEsaros/SEsaros.html\n
-        http://en.m.wikipedia.org/wiki/Saros_number\n
+        http://en.m.wikipedia.org/wiki/Saros_number\n\n
         Eclipse Map is the path of totality for total, anular, or hybrid eclipses 
         or maximum eclipse for partial eclipses.\n</string>
     <string name="lunarEcl_help">When an eclipse is selected, 6 values are calculated.\n\n
@@ -247,14 +265,18 @@
         Total Eclipse\n
         Partial Eclipse\n
         Penumbral Eclipse\n
-        http://en.m.wikipedia.org/wiki/Lunar_eclipse#Types_of_lunar_eclipse\n\nAzimuth:\n
+        http://en.m.wikipedia.org/wiki/Lunar_eclipse#Types_of_lunar_eclipse\n\n
+        Azimuth:\n
         The compass direction for the Moon\'s position for the given location.\n
-        http://en.m.wikipedia.org/wiki/Azimuth\n\nAltitude:\n
+        http://en.m.wikipedia.org/wiki/Azimuth\n\n
+        Altitude:\n
         The angle above the horizon of the Moon.\n
-        http://en.m.wikipedia.org/wiki/Altitude_(astronomy)\n\nMagnitude:\n
+        http://en.m.wikipedia.org/wiki/Altitude_(astronomy)\n\n
+        Magnitude:\n
         The brightness of the eclipse on a logarithmic scale, where the smaller
         the number, the brighter the eclipse.\n
-        http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\nSaros Number:\nSaros Member Number:\n
+        http://en.m.wikipedia.org/wiki/Magnitude_(astronomy)\n\n
+        Saros Number:\nSaros Member Number:\n
         The saros is a a period of 223 synodic months that can be used to 
         predict eclipses of the Sun and Moon\n
         http://eclipse.gsfc.nasa.gov/SEsaros/SEsaros.html\n

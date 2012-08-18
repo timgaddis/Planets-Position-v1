@@ -69,6 +69,7 @@
         <provider
             android:name=".data.PlanetsDbProvider"
             android:authorities="planets.position.data.planetsdbprovider"
+            android:exported="false"
             android:multiprocess="true" >
         </provider>
     </application>

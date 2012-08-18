@@ -63,11 +63,10 @@ public class Planets extends FragmentActivity implements
 	private UserLocation userLocation = new UserLocation();
 	private InputStream myInput;
 	private OutputStream myOutput;
-	private boolean DEBUG = false;
 	private DialogFragment locationDialog, gpsDialog, copyDialog, planetDialog;
 	private GetGPSTask gpsTask;
 	private CopyFilesTask copyFilesTask;
-
+	private final int LOCATION_DATA = 0;
 	private static final int PLANET_LOADER = 1;
 	private String[] projection = { PlanetsDbAdapter.KEY_ROWID, "date", "lat",
 			"lng", "elevation", "offset" };
@@ -255,22 +254,12 @@ public class Planets extends FragmentActivity implements
 		}
 		ft.commit();
 		// get lat/long from GPS
-		if (DEBUG) {
-			// Test data to use with the emulator
-			latitude = 32.221743;
-			longitude = -110.926479;
-			elevation = 713.0;
-			date = Calendar.getInstance().getTimeInMillis();
-			offset = -7.0;
-			saveLocation();
-		} else {
-			loc = null;
-			gpsTask = new GetGPSTask();
-			gpsTask.execute();
-			boolean result = userLocation.getLocation(this, locationResult);
-			if (!result) {
-				loc = new Location(LocationManager.PASSIVE_PROVIDER);
-			}
+		loc = null;
+		gpsTask = new GetGPSTask();
+		gpsTask.execute();
+		boolean result = userLocation.getLocation(this, locationResult);
+		if (!result) {
+			loc = new Location(LocationManager.PASSIVE_PROVIDER);
 		}
 	}
 
@@ -526,7 +515,21 @@ public class Planets extends FragmentActivity implements
 		ft.commit();
 		// Launch the location activity
 		Intent i = new Intent(this, NewLoc.class);
-		startActivity(i);
+		startActivityForResult(i, LOCATION_DATA);
+	}
+
+	protected void onActivityResult(int requestCode, int resultCode,
+			Intent intent) {
+		super.onActivityResult(requestCode, resultCode, intent);
+		switch (requestCode) {
+		case LOCATION_DATA:
+			if (resultCode == RESULT_CANCELED)
+				Toast.makeText(Planets.this,
+						"Location not saved,\nusing old values.",
+						Toast.LENGTH_LONG).show();
+			loadLocation();
+			return;
+		}
 	}
 
 	public LocationResult locationResult = new LocationResult() {

@@ -112,8 +112,12 @@ public class NewLoc extends FragmentActivity implements
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		if (gpsTask != null)
+		if (gpsTask != null) {
 			gpsTask.cancel(true);
+			setResult(RESULT_CANCELED);
+		} else
+			setResult(RESULT_OK);
+		finish();
 	}
 
 	public void onRadioButtonClicked(View view) {

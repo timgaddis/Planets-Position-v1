@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="planets.position"
     android:installLocation="auto"
-    android:versionCode="19"
-    android:versionName="1.6" >
+    android:versionCode="20"
+    android:versionName="1.6.1" >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -64,7 +64,9 @@
             android:name="EclipseMap"
             android:theme="@android:style/Theme.NoTitleBar" />
 
-        <uses-library android:name="com.google.android.maps" />
+        <uses-library
+            android:name="com.google.android.maps"
+            android:required="false" />
 
         <provider
             android:name=".data.PlanetsDbProvider"

@@ -139,6 +139,10 @@ public class EclipseData extends FragmentActivity implements
 			}
 
 		});
+
+		// Hides the EclipseMap button if Google Maps library is not available.
+		if (!mapClassCheck())
+			eclMapButton.setVisibility(View.GONE);
 	}
 
 	@Override
@@ -146,6 +150,23 @@ public class EclipseData extends FragmentActivity implements
 		super.onDestroy();
 		setResult(RESULT_OK);
 		finish();
+	}
+
+	/**
+	 * Checks for the Google Maps library. Amazon Kindle devices do not have
+	 * that library.
+	 * 
+	 * @return true if it has the lib, false otherwise.
+	 */
+	private boolean mapClassCheck() {
+		try {
+			Class.forName("com.google.android.maps.MapActivity");
+			// Google Maps available
+			return true;
+		} catch (Exception e) {
+			// Google Maps not available
+			return false;
+		}
 	}
 
 	private void fillLunarData() {

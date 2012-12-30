@@ -116,7 +116,7 @@
         <item>+14:00</item>
     </string-array>
 
-    <string name="main_about">Planet\'s Position v1.6.1\n\n
+    <string name="main_about">Planet\'s Position v1.6.2\n\n
         Planets Position is a program to calculate the position of the planets
 		in the night sky based on a given location on Earth.\n\n
 		License and Copyright\n\n
@@ -141,6 +141,9 @@
 		calculations.\n
 		http://www.astro.com/swisseph/swephinfo_e.htm?lang=e\n\n
 		Change Log\n\n
+		Version 1.6.2\n
+        - Fixed bug that caused crashes in background threads.\n
+        - Fixed bug that caused IllegalStateException error.\n\n
 		Version 1.6.1\n
 		- Removed Google Maps from devices that don\'t have access to the Google Maps library.\n\n
 		Version 1.6\n

@@ -120,6 +120,14 @@ public class NewLoc extends FragmentActivity implements
 		finish();
 	}
 
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		// http://code.google.com/p/android/issues/detail?id=19917
+		outState.putString("WORKAROUND_FOR_BUG_19917_KEY",
+				"WORKAROUND_FOR_BUG_19917_VALUE");
+		super.onSaveInstanceState(outState);
+	}
+
 	public void onRadioButtonClicked(View view) {
 
 		switch (view.getId()) {

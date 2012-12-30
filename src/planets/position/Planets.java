@@ -218,6 +218,14 @@ public class Planets extends FragmentActivity implements
 			gpsTask.cancel(true);
 	}
 
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		// http://code.google.com/p/android/issues/detail?id=19917
+		outState.putString("WORKAROUND_FOR_BUG_19917_KEY",
+				"WORKAROUND_FOR_BUG_19917_VALUE");
+		super.onSaveInstanceState(outState);
+	}
+
 	public void loadPlanets(String name, int num, int x) {
 
 		Bundle b = new Bundle();
@@ -397,8 +405,13 @@ public class Planets extends FragmentActivity implements
 			} catch (IOException e) {
 				// e.printStackTrace();
 				Log.e("CopyFile error", e.getMessage());
-				Toast.makeText(Planets.this, "Error copying assets files",
-						Toast.LENGTH_LONG).show();
+				Planets.this.runOnUiThread(new Runnable() {
+					public void run() {
+						Toast.makeText(Planets.this,
+								"Error copying assets files", Toast.LENGTH_LONG)
+								.show();
+					}
+				});
 			}
 			return null;
 		}

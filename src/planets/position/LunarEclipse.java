@@ -213,9 +213,14 @@ public class LunarEclipse extends FragmentActivity implements
 				if (data1 == null) {
 					Log.e("Lunar Eclipse error",
 							"ComputeEclipsesTask data1g error");
-					Toast.makeText(getApplicationContext(),
-							"Lunar eclipse error\nplease restart the activity",
-							Toast.LENGTH_LONG).show();
+					LunarEclipse.this.runOnUiThread(new Runnable() {
+						public void run() {
+							Toast.makeText(
+									getApplicationContext(),
+									"There was an error compuling eclipses,\nplease restart the activity",
+									Toast.LENGTH_LONG).show();
+						}
+					});
 					break;
 				}
 				// save the beginning time of the eclipse
@@ -259,10 +264,14 @@ public class LunarEclipse extends FragmentActivity implements
 					if (data2 == null) {
 						Log.e("Lunar Eclipse error",
 								"ComputeEclipsesTask data1l error");
-						Toast.makeText(
-								getApplicationContext(),
-								"Lunar eclipse error\nplease restart the activity",
-								Toast.LENGTH_LONG).show();
+						LunarEclipse.this.runOnUiThread(new Runnable() {
+							public void run() {
+								Toast.makeText(
+										getApplicationContext(),
+										"There was an error compuling eclipses,\nplease restart the activity",
+										Toast.LENGTH_LONG).show();
+							}
+						});
 						break;
 					}
 					val = (int) data1[0];

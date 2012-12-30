@@ -18,6 +18,7 @@ package planets.position;
  */
 
 import java.util.Calendar;
+import java.util.Locale;
 
 import planets.position.data.PlanetsDbAdapter;
 import planets.position.data.PlanetsDbProvider;
@@ -120,7 +121,8 @@ public class PlanetData extends FragmentActivity implements
 			ram = (int) ra;
 			ra -= ram;
 			ras = ra * 60;
-			return String.format("%dh %dm %.1fs", rah, ram, ras);
+			return String.format(Locale.getDefault(), "%dh %dm %.1fs", rah,
+					ram, ras);
 		case 1:
 			// Dec value
 			dec = value;
@@ -137,14 +139,14 @@ public class PlanetData extends FragmentActivity implements
 			dec -= decm;
 			dec *= 60;
 			decs = (int) dec;
-			return String.format("%c%d\u00b0 %d\' %d\"", decSign, decd, decm,
-					decs);
+			return String.format(Locale.getDefault(), "%c%d\u00b0 %d\' %d\"",
+					decSign, decd, decm, decs);
 		case 2:
 			// Distance value
-			return String.format("%.4f AU", value);
+			return String.format(Locale.getDefault(), "%.4f AU", value);
 		case 3:
 			// Az or Alt value
-			return String.format("%.1f\u00b0", value);
+			return String.format(Locale.getDefault(), "%.1f\u00b0", value);
 		default:
 			return "";
 		}

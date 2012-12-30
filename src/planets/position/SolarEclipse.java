@@ -208,10 +208,14 @@ public class SolarEclipse extends FragmentActivity implements
 			data2 = solarDataLocal(start, g, backward);
 			if (data2 == null) {
 				Log.e("Solar Eclipse error", "computeEclipses data1 error");
-				Toast.makeText(
-						getApplicationContext(),
-						"computeEclipses error 1,\nplease restart the activity",
-						Toast.LENGTH_LONG).show();
+				SolarEclipse.this.runOnUiThread(new Runnable() {
+					public void run() {
+						Toast.makeText(
+								getApplicationContext(),
+								"There was an error compuling eclipses,\nplease restart the activity",
+								Toast.LENGTH_LONG).show();
+					}
+				});
 				finish();
 			}
 			Log.i("Solar Eclipse", "Local date1: " + data2[1]);
@@ -226,10 +230,14 @@ public class SolarEclipse extends FragmentActivity implements
 				data1 = solarDataGlobal(start, backward);
 				if (data1 == null) {
 					Log.e("Solar Eclipse error", "computeEclipses data1g error");
-					Toast.makeText(
-							getApplicationContext(),
-							"computeEclipses error 3,\nplease restart the activity",
-							Toast.LENGTH_LONG).show();
+					SolarEclipse.this.runOnUiThread(new Runnable() {
+						public void run() {
+							Toast.makeText(
+									getApplicationContext(),
+									"There was an error compuling eclipses,\nplease restart the activity",
+									Toast.LENGTH_LONG).show();
+						}
+					});
 					break;
 				}
 				// Log.i("Solar Eclipse", "Global number: " + (i + 1)
@@ -305,10 +313,14 @@ public class SolarEclipse extends FragmentActivity implements
 					if (data2 == null) {
 						Log.e("Solar Eclipse error",
 								"computeEclipses data2a error");
-						Toast.makeText(
-								getApplicationContext(),
-								"computeEclipses error 1,\nplease restart the activity",
-								Toast.LENGTH_LONG).show();
+						SolarEclipse.this.runOnUiThread(new Runnable() {
+							public void run() {
+								Toast.makeText(
+										getApplicationContext(),
+										"There was an error compuling eclipses,\nplease restart the activity",
+										Toast.LENGTH_LONG).show();
+							}
+						});
 						break;
 					}
 				} else {

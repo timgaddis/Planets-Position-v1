@@ -201,10 +201,14 @@ public class LivePosition extends FragmentActivity {
 							utc.get(Calendar.MINUTE), utc.get(Calendar.SECOND));
 					if (data == null) {
 						Log.e("Date error", "pos date error");
-						Toast.makeText(
-								getApplicationContext(),
-								"Date conversion error,\nplease restart the activity",
-								Toast.LENGTH_SHORT).show();
+						LivePosition.this.runOnUiThread(new Runnable() {
+							public void run() {
+								Toast.makeText(
+										getApplicationContext(),
+										"Date conversion error,\nplease restart the activity",
+										Toast.LENGTH_SHORT).show();
+							}
+						});
 						this.cancel(true);
 					}
 					// jdTT = data[0];
@@ -214,10 +218,14 @@ public class LivePosition extends FragmentActivity {
 							0.0);
 					if (data == null) {
 						Log.e("Position error", "planetUpData error");
-						Toast.makeText(
-								getApplicationContext(),
-								"Planet calculation error,\nplease restart the activity",
-								Toast.LENGTH_SHORT).show();
+						LivePosition.this.runOnUiThread(new Runnable() {
+							public void run() {
+								Toast.makeText(
+										getApplicationContext(),
+										"Planet calculation error,\nplease restart the activity",
+										Toast.LENGTH_SHORT).show();
+							}
+						});
 						this.cancel(true);
 					}
 					ra = data[0];

@@ -47,6 +47,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ViewWhatsUp extends FragmentActivity implements
 		LoaderManager.LoaderCallbacks<Cursor> {
@@ -210,7 +211,16 @@ public class ViewWhatsUp extends FragmentActivity implements
 				data = planetUpData(time[0], time[1], i, g, 0.0, 0.0);
 				if (data == null) {
 					Log.e("Position error", "ViewWhatsUp - planetUpData error");
+					ViewWhatsUp.this.runOnUiThread(new Runnable() {
+						public void run() {
+							Toast.makeText(
+									getApplicationContext(),
+									"There was an error compuling planet positions,\nplease restart the activity",
+									Toast.LENGTH_LONG).show();
+						}
+					});
 					activity.finish();
+					break;
 				}
 				String[] dateArr = jd2utc(data[6]).split("_");
 
